@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" version="2.5.0" method="upgrade">
+
+	<name>COM_RBO</name>
+	<!-- Следующие элементы необязательны -->
+	<creationDate>Февраль 2015</creationDate>
+	<author>Сергей Ефремов</author>
+	<authorEmail>s_efremov@mail.ru</authorEmail>
+	<authorUrl>robik.ru</authorUrl>
+	<copyright>(c) Робик.РУ 2015</copyright>
+	<license>Информация о лицензии</license>
+	<!--  Версия записывается в таблицу компонентов -->
+	<version>0.0.5</version>
+	<!-- Описание необязательно -->
+	<description>COM_RBO_DESCRIPTION</description>
+
+	<!-- Запускается при установке -->
+	<!--install>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
+		</sql>
+	</install-->
+	<!-- Запускается при удалении -->
+	<!--uninstall>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
+		</sql>
+	</uninstall-->
+	<!-- Запускается при обновлении -->
+	<update>
+		<schemas>
+			<schemapath type="mysql">sql/updates/mysql</schemapath>
+		</schemas>
+	</update>
+
+	<!-- Раздел основных файлов сайта -->
+	<!-- Обратите внимание на значение аттрибута folder: Этот аттрибут описывает папку нашего пакета-установщика из которой должны копироваться файлы. 
+	Поэтому указанные в этом разделе файлы будут скопированы из папки /site/ нашего пакета-установщика в соответствующую папку установки. -->
+	<files folder="site">
+		<filename>index.html</filename>
+		<filename>controller.php</filename>
+		<filename>rbo.php</filename>
+		<folder>language</folder>
+		<folder>models</folder>
+		<folder>views</folder>
+		<folder>images</folder>
+		<filename>images/index.html</filename>
+	</files>
+
+	<!--media destination="com_rbo" folder="media">
+		<filename>index.html</filename>
+		<folder>images</folder>
+	</media-->
+
+</extension>
