@@ -11,7 +11,7 @@ class RbOModelInvList extends JModelItem
   public $inv_list="";
 
   public function __construct ($params) {
-<<<<<<< Upstream, based on git.siams.com/master
+
     $aColumns = array( 'orderId', 'order_time', 'cust_lastname', 'order_answer' );
     parent::__construct($params);
 
@@ -104,99 +104,6 @@ class RbOModelInvList extends JModelItem
 	$s.='"3":"'.$v['order_sum']   .'",';
 	$s.='"4":"'.$v['order_status']   .'",';
 	$s.='"DT_RowId":"dtrid_'.$v['orderID'].'"}';
-=======
-    $aColumns = array( 'phNumber', 'phCount', 'phDescr', 'phType', 'phStatus', 'phCreated' , 'phUserID' );
-    parent::__construct($params);
-
-    $db = JFactory::getDBO();
-    $this->user =& JFactory::getUser ();
-    $this->user_id = $this->user->id; 
-    $is_admin = !(array_search("8",$this->user->groups)===false && array_search("7",$this->user->groups)===false);
-
-    $input = JFactory::getApplication()->input;
-    $iDisplayStart = $input->getInt('iDisplayStart');
-    $iDisplayLength = $input->getInt('iDisplayLength');
-    $sEcho = $input->getString('sEcho');
-    //dump($_REQUEST,"R");
-
-    //Paging
-    $sLimit = "";
-    if ( isset( $_POST['iDisplayStart'] ) && $_POST['iDisplayLength'] != '-1' ) {
-      $sLimit = "LIMIT ".intval( $_POST['iDisplayStart'] ).", ".
-        intval( $_POST['iDisplayLength'] );
-    }
-
-    //Ordering
-    $sOrder = "";
-    if ( isset( $_POST['iSortCol_0'] ) ) {
-      $sOrder = "ORDER BY  ";
-      for ( $i=0 ; $i<intval( $_POST['iSortingCols'] ) ; $i++ ) {
-      	if ( $_POST[ 'bSortable_'.intval($_POST['iSortCol_'.$i]) ] == "true" ) { 
-      	  $sOrder .= "`".$aColumns[ intval( $_POST['iSortCol_'.$i] ) ]."` ".
-      	    ($_POST['sSortDir_'.$i]==='asc' ? 'asc' : 'desc') .", ";
-      	}
-      }
-
-      $sOrder = substr_replace( $sOrder, "", -2 );
-      if ( $sOrder == "ORDER BY" ) {
-      	$sOrder = "";
-      }
-    }
-
-    //Filtering
-    $sWhere = $is_admin?"WHERE ":"WHERE phUserID=".$this->user->id;
-    if ( isset($_POST['sSearch']) && $_POST['sSearch'] != "" ) {
-      $sWhere .= " AND (";
-      for ( $i=0 ; $i<count($aColumns) ; $i++ ) {
-        $sWhere .= "`".$aColumns[$i]."` LIKE '%".mysql_real_escape_string( $_POST['sSearch'] )."%' OR ";
-      }
-      $sWhere = substr_replace( $sWhere, "", -3 );
-      $sWhere .= ')';
-    }
-
-
-    //Individual column filtering
-/*    for ( $i=0 ; $i<count($aColumns) ; $i++ ) {
-      if ( isset($_POST['bSearchable_'.$i]) && $_POST['bSearchable_'.$i] == "true" && $_POST['sSearch_'.$i] != '' ) {
-        if ( $sWhere == "" ) {
-          $sWhere = "WHERE ";
-        }
-        else {
-          $sWhere .= " AND ";
-        }
-        $sWhere .= "`".$aColumns[$i]."` LIKE '%".mysql_real_escape_string($_POST['sSearch_'.$i])."%' ";
-      }
-    }*/
-
-    $sWhere = $is_admin?"":"WHERE phUserID=".$this->user->id;
-    $q = "SELECT count(*) FROM phOrder ".$sWhere;
-    $db->setQuery($q);
-    $iTotalRecords = $db->loadResult();
-
-    $q = "SELECT `".str_replace(" , ", " ", implode("`, `", $aColumns))."`
-       FROM phOrder $sWhere $sOrder $sLimit";
-
-    //$q = "SELECT phNumber,phCreated,phDescr,phCount,phType,phStatus FROM phOrder WHERE phUserID=".$this->user->id;
-    $db->setQuery($q);
-    $data_rows_assoc_list = $db->loadAssocList();
-    $iTotalDisplayRecords = $db->getAffectedRows ();
-//dump($iTotalRecords,"iTotalRecords");
-//dump($iTotalDisplayRecords,"iTotalDisplayRecords");
-
-    $s = '';
-	
-    $iCnt=0;
-    foreach ($data_rows_assoc_list as $v) {
-	if ($s!='') $s.=',';
-	$s.='{"0":"<a class=aid_ href='.$v['phNumber'].'>'.$v['phNumber'].'</a>",';
-        $s.='"1":"['.$v['phCount'].']",';
-	$s.='"2":"'.$v['phDescr']  .'",';
-	$s.='"3":"'.$v['phType']   .'",';
-	//$s.='"4":"'.$v['phStatus'] .'",';
-	$s.='"4":"'.$this->getSelectList($v['phStatus']).'",';
-	$s.='"5":"'.$v['phCreated'].'",';
-	$s.='"DT_RowId":"dtrid_'.$v['phNumber'].'"}';
->>>>>>> 7059477 Заработал url  http://robik.ru/ajax.php?option=com_rbo&OrderId=190&view=invlIST&format=raw
         $iCnt++;
     }             
 
