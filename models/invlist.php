@@ -87,7 +87,7 @@ class RbOModelInvList extends JModelItem
          " LEFT JOIN SS_ordered_carts soc ON so.orderID = soc.orderID "+
          " GROUP BY so.orderID $sLimit";*/
          
-    $q = "SELECT so.orderID, so.order_num, so.order_date, so.order_cust, so.order_sum, so.order_status FROM rbo_orders so ORDER BY orderID DESC $sLimit";
+    $q = "SELECT orderID, order_num, order_date, order_cust, order_sum, order_status FROM rbo_orders ORDER BY orderID DESC $sLimit";
 
     $db->setQuery($q);
     $data_rows_assoc_list = $db->loadAssocList();
