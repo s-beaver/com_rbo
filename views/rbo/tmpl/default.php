@@ -17,7 +17,8 @@ $(document).ready(function() {
         "bProcessing": true,
         "bServerSide": true,
         "aaSorting": [[ 1, "desc" ]],
-        "sAjaxSource": "/ajax.php?option=com_rbo&inv_id=190&view=invlist&format=raw",
+        //"sAjaxSource": "/ajax.php?option=com_rbo&inv_id=190&view=invlist&format=raw",
+        "sAjaxSource": "/ajax.php?option=com_rbo&view=invlist&format=raw",
         "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
           oSettings.jqXHR = $.ajax( {
             "dataType": 'json',
