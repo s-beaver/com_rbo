@@ -5,10 +5,10 @@ jimport('joomla.application.component.view');
 
 class RbOViewRbO extends JViewLegacy
 {
-	protected $UserEMail;
+	//protected $UserEMail;
 	public function display($tpl = null) 
 	{
-		$this->UserEMail = $this->get('UserEMail');
+		//$this->UserEMail = $this->get('UserEMail');
 
 		if (count($errors = $this->get('Errors')))
 		{

@@ -25,5 +25,15 @@ class RbOController extends JControllerLegacy
 		parent::display ($cachable);
 	}
 
+	function get_invoice_list()
+	{
+		//echo "get_invoice_list";
+		include_once "models/invoicelist.php";
+		$invList = new RbOInvoiceList();
+		echo $invList->getinvList();
+
+		//parent::display ($cachable);
+	}
+
 }
 

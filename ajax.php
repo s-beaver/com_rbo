@@ -16,16 +16,15 @@ $app->initialise();
 $user = JFactory::getUser(); 
 //$db = JFactory::getDBO();
 $input = $app->input;
-$cmd = $input->getString('command');
+$cmd = $input->getCmd('task');
 //echo "ответ cервера user=".$user->email."; command=$cmd";
 
 switch ($cmd) {
 	case "get_invoice_list":{
 		include_once "models/invoicelist.php";
-		$invList = new RbOInvoiceList($params);
+		$invList = new RbOInvoiceList();
 		echo $invList->getinvList();
 		break;
-		
 	}
 	
 	case "get_invoice":{

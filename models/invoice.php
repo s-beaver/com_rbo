@@ -1,31 +1,10 @@
-<?php define('_JEXEC', 1); 
-define('DS', DIRECTORY_SEPARATOR);  
-if (file_exists(dirname(__FILE__) . '/defines.php')) { 	
-	include_once dirname(__FILE__) . '/defines.php'; 
-}  
-if (!defined('_JDEFINES')) { 	
-	define('JPATH_BASE', dirname(__FILE__)); 	
-	require_once JPATH_BASE.'/includes/defines.php'; 
-}  
-
-require_once JPATH_BASE.'/includes/framework.php';  
-
-$app = JFactory::getApplication('site'); 
-$app->initialise();  
-$user = JFactory::getUser; 
-echo "ответ cервера";
-
-
-//robik.ru/ajax.php?option=com_rbo&OrderId=190&view=invoices&format=raw
-
-//jimport('joomla.application.component.modelitem');
-//jimport('joomla.filesystem.file');
+<?php 
 jimport('etc.json_lib');
 
 class RbOInvoice
 {
-	public $user_email="";
-	public $user_id="";
+	//public $user_email="";
+	//public $user_id="";
 
 	public $invId="";
 	public $inv_num="";
@@ -33,6 +12,13 @@ class RbOInvoice
 	public $inv_cust=array();
 	public $inv_sum=0;
 	public $inv_status="";
+	public $inv_rem="";
+	public $inv_firm="";
+	public $inv_manager="";
+	public $created_by="";
+	public $created_on="";
+	public $modified_by="";
+	public $modified_on="";
 	public $inv_products=array();
 
 	public $command="";
@@ -43,24 +29,22 @@ class RbOInvoice
 	public function __construct ($params) {
 
 		$db = JFactory::getDBO();
-		$this->user =& JFactory::getUser ();
+		/*$this->user =& JFactory::getUser ();
 		$this->user_email = $this->user->email;
-		$this->user_id = $this->user->id;
+		$this->user_id = $this->user->id;*/
 
 		$this->oJson = new Services_JSON();
 
 		$input = JFactory::getApplication()->input;
-		$this->inv_num = $input->getString('inv_num','0');
-		$this->inv_email = $input->getString('inv_email','');
+		$this->invId = $input->getString('invId','0');
+		/*$this->inv_email = $input->getString('inv_email','');
 		$this->inv_type = $input->getString('inv_type','');
 		$this->inv_text = $input->getString('inv_text','');
 		$this->inv_cnt = $input->getUint('inv_cnt',0);
 		$this->inv_price = $input->getUint('inv_price');
 		$this->inv_files = $input->get('inv_files',null,"ARRAY");
-		$this->inv_status = $input->getString('inv_status','');
+		$this->inv_status = $input->getString('inv_status','');  */
 		$this->command = $input->getString('command','read');
-		//dump($_REQUEST,"input");
-		//dump($this->inv_files,'inv_files');
 
 		switch ($this->command) {
 			case "read":
@@ -75,17 +59,11 @@ class RbOInvoice
 
 				else { //редактируем существующий
 					$this->invUpdate($db);
-					$this->saveFileQty();
 				}
 				break;
 
 			case "delete":
 				$this->invDelete($db);
-				break;
-
-			case "zip":
-				//dump("1","zip");
-				$this->zipIt();
 				break;
 		}
 
@@ -101,13 +79,12 @@ class RbOInvoice
 	//=================================================================
 	public function invRead($db)
 	{
-		//$q = "SELECT phCreated,phDescr,phCount,phType,phStatus,phPrice FROM phinv WHERE phNumber='".$this->inv_num."'";
-		$q = "SELECT orderID, order_date, order_cust, order_sum, order_status FROM rbo_orders WHERE order_num='".$this->inv_num."'";
+		$q = "SELECT order_num, order_date, order_cust, order_sum, order_status, order_rem, ".
+                     "order_firm, order_manager, created_by, created_on, modified_by, modified_on ".
+                     "FROM rbo_orders WHERE orderID=".$this->invId;
 		$db->setQuery($q);
 		$inv = $db->loadAssoc();
-		$inv["inv_email"] = $this->user_email;
-		$this->readFileQty();
-		$inv["inv_files"] = $this->inv_files;
+		//$inv["inv_email"] = $this->user_email;
 
 		$this->response = $this->oJson->encode($inv);
 	}
@@ -115,7 +92,7 @@ class RbOInvoice
 	//=================================================================
 	public function invUpdate($db)
 	{
-		$phStatus="";
+		/*$phStatus="";
 		if ($this->inv_status!="") $phStatus = ", phStatus='".$this->inv_status."' ";
 		$q = "UPDATE phinv SET phDescr='".$this->inv_text."',".
 				" phCount=".$this->inv_cnt.", ".
@@ -127,13 +104,13 @@ class RbOInvoice
 		$db->query();
 
 		$res["result"] = "success";
-		$this->response = $this->oJson->encode($res);
+		$this->response = $this->oJson->encode($res);*/
 	}
 
 	//=================================================================
 	public function invCreate($db)
 	{
-		$cur_date=date("d.m.Y");
+		/*$cur_date=date("d.m.Y");
 		//$this->inv_num=date("md-His");//md-Hi
 		//$inv_folder=date("ymd-His");
 		$this->inv_num = $this->getUniqueinvNumber($db);
@@ -167,27 +144,27 @@ class RbOInvoice
 
 		//if (!is_dir(JPATH_BASE.DS.$this->rootfolder.$inv_folder)) $b = mkdir($this->rootfolder.$inv_folder,0777);
 		$res["result"] = $this->inv_num;
-		$this->response = $this->oJson->encode($res);
+		$this->response = $this->oJson->encode($res);*/
 	}
 
 	//=================================================================
 	public function invDelete($db)
 	{
-		$q = "DELETE FROM phinv WHERE phNumber='".$this->inv_num."'";
+		/*$q = "DELETE FROM phinv WHERE phNumber='".$this->inv_num."'";
 		$db->setQuery($q);
 		$this->response = $q;
 		$db->query();
 		//удалить каталог
 
 		$res["result"] = "success";
-		$this->response = $this->oJson->encode($res);
+		$this->response = $this->oJson->encode($res); */
 	}
 
 	//=================================================================
 	public function getUniqueinvNumber($db)
 	{
 		//    return date("md-Hi");
-		$uval=date("md-H");
+		/*$uval=date("md-H");
 		$min=(int)date("i");
 		$db->setQuery("SELECT phNumber FROM phinv WHERE phNumber='".$uval.$min."'");
 		$db->query();
@@ -201,59 +178,9 @@ class RbOInvoice
 			}
 			$i++;
 		}
-		return $uval.$min;
+		return $uval.$min;*/
 	}
 
-	//=================================================================
-	public function readFileQty()
-	{
-		$this->inv_files = array();
-		if (file_exists('phfiles/'.$this->inv_num.'/'.$this->qtyfilename)) {
-			$res = explode('},', file_get_contents('phfiles/'.$this->inv_num.'/'.$this->qtyfilename));
-
-			if (count($res)>0) {
-				foreach ($res as $v) {
-					if (strpos($v,'}')===false) { $v.='}'; } //dump($v,'v');
-					//dump(json_decode($v,true),'json');
-					$this->inv_files[] = json_decode($v,true);
-				}
-			}
-		}  //dump($this->inv_files,'this->inv_files');
-	}
-
-	//=================================================================
-	public function saveFileQty()
-	{
-		if (count($this->inv_files)>0) {
-			$s="";
-			foreach ($this->inv_files as $v) {
-				if ($s!="") $s.=',';
-				$s.=$this->oJson->encode($v);
-			}
-			$res = file_put_contents('phfiles/'.$this->inv_num.'/'.$this->qtyfilename,$s);
-		}
-	}
-
-	//=================================================================
-	public function zipIt()
-	{
-		//Удалить файл $this->inv_num
-		$zip = new ZipArchive;
-
-		$zipfilename = 'phfiles/on-line-inv.zip';
-		if ($zip->open($zipfilename, ZipArchive::CREATE) === true) {
-			if (count($this->inv_files)>0) {
-				foreach ($this->inv_files as $v) {
-					$fTitle = iconv('windows-1251', 'cp866', '('.$v["fileqty"].'шт)'.$v["filename"]);
-					$zip->addFile('phfiles/'.$this->inv_num.'/'.$v["filename"], $fTitle);
-				}
-			}
-			$zip->close();
-			$res["result"] = 'http://robik.ru/'.$zipfilename;
-			$this->response = $this->oJson->encode($res);
-		} else {//Ошибка
-		}
-	}
 }
 
 //===================================================================

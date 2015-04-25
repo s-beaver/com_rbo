@@ -73,14 +73,6 @@ class RbOInvoiceList
     $db->setQuery($q);
     $iTotalRecords = $db->loadResult();
 
-    /*$q = "SELECT `".str_replace(" , ", " ", implode("`, `", $aColumns))."`
-       FROM ss_order $sWhere $sLimit";        */
-
-    /*$q = "SELECT so.orderID, so.order_time, CONCAT(so.cust_lastname, ' ', so.cust_firstname) customer, "+
-         " SUM(soc.Price * soc.Quantity) ordersum, so.order_answer FROM SS_orders so "+
-         " LEFT JOIN SS_ordered_carts soc ON so.orderID = soc.orderID "+
-         " GROUP BY so.orderID $sLimit";*/
-         
     $q = "SELECT orderID, order_num, order_date, order_cust, order_sum, order_status FROM rbo_orders ORDER BY orderID DESC $sLimit";
 
     $db->setQuery($q);
@@ -125,7 +117,4 @@ class RbOInvoiceList
 
   
 }
-
-
-
 
