@@ -11,15 +11,30 @@
 </head>
 <script>
 $(function() {
-    $( "#selectable" ).selectable();
+    $( "#selectable1" ).selectable();
   });
+
+    $(document).ready(function() {
+                $.ajax({
+                  //dataType: 'json',
+                  type: "POST",
+                  data: {
+                    "command":"submit"
+                  },    
+                  url: '/components/com_rbo/models/invoices.php',
+                  success: function(data) { alert(4444); $(".results").html(data)}
+                });   
+     });   
+
 </script>
 <body>
 <ol id="selectable">
-  <li class="ui-widget-content">Счета</li>
-  <li class="ui-widget-content">Накладные</li>
-  <li class="ui-widget-content">Операции</li>
-  <li class="ui-widget-content">Отчеты</li>
+  <li class="ui-widget-content1"><a href='/index.php?option=com_rbo&view=invoices'>Счета</a></li>
+  <li class="ui-widget-content1">Накладные</li>
+  <li class="ui-widget-content1">Операции</li>
+  <li class="ui-widget-content1">Отчеты</li>
 </ol>
+
+<div class="results">Ждем ответа</div>
 </body>
 </html>
