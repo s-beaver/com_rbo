@@ -12,6 +12,11 @@
   <script src="components/com_rbo/views/invoices/tmpl/invoices.js"></script>
 </head>
 <body>
+<div id="neworder-form" title="Новый счёт">
+</div>
+
+<div id="dialog-confirm" title="Удалить счёт?">Счёт будет удален. Продолжить?</div>
+
 <table id="TableInv" class="display" cellspacing="0" width="100%">
 </table>
 </body>

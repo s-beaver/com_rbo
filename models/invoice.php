@@ -5,6 +5,7 @@ class RbOInvoice
 {
 	//public $user_email="";
 	//public $user_id="";
+	public $db;
 
 	public $invId="";
 	public $inv_num="";
@@ -26,9 +27,9 @@ class RbOInvoice
 	public $oJson;
 
 	//=================================================================
-	public function __construct ($params) {
+	public function __construct () {
 
-		$db = JFactory::getDBO();
+		$this->db = JFactory::getDBO();
 		/*$this->user =& JFactory::getUser ();
 		$this->user_email = $this->user->email;
 		$this->user_id = $this->user->id;*/
@@ -44,29 +45,6 @@ class RbOInvoice
 		$this->inv_price = $input->getUint('inv_price');
 		$this->inv_files = $input->get('inv_files',null,"ARRAY");
 		$this->inv_status = $input->getString('inv_status','');  */
-		$this->command = $input->getString('command','read');
-
-		switch ($this->command) {
-			case "read":
-				$this->invRead($db);
-				break;
-
-			case "submit":
-
-				if ($this->inv_num=="0") {//новый заказ
-					$this->invCreate($db);
-				}
-
-				else { //редактируем существующий
-					$this->invUpdate($db);
-				}
-				break;
-
-			case "delete":
-				$this->invDelete($db);
-				break;
-		}
-
 
 	}
 
@@ -77,20 +55,20 @@ class RbOInvoice
 	}
 
 	//=================================================================
-	public function invRead($db)
+	public function invRead()
 	{
 		$q = "SELECT order_num, order_date, order_cust, order_sum, order_status, order_rem, ".
                      "order_firm, order_manager, created_by, created_on, modified_by, modified_on ".
                      "FROM rbo_orders WHERE orderID=".$this->invId;
-		$db->setQuery($q);
-		$inv = $db->loadAssoc();
+		$this->db->setQuery($q);
+		$inv = $this->db->loadAssoc();
 		//$inv["inv_email"] = $this->user_email;
 
 		$this->response = $this->oJson->encode($inv);
 	}
 
 	//=================================================================
-	public function invUpdate($db)
+	public function invUpdate()
 	{
 		/*$phStatus="";
 		if ($this->inv_status!="") $phStatus = ", phStatus='".$this->inv_status."' ";
@@ -100,20 +78,20 @@ class RbOInvoice
 				" phType='".$this->inv_type."' ".$phStatus.
 				" WHERE phNumber='".$this->inv_num."'";
 		//dump($q,"upd");
-		$db->setQuery($q);
-		$db->query();
+		$this->db->setQuery($q);
+		$this->db->query();
 
 		$res["result"] = "success";
 		$this->response = $this->oJson->encode($res);*/
 	}
 
 	//=================================================================
-	public function invCreate($db)
+	public function invCreate()
 	{
 		/*$cur_date=date("d.m.Y");
 		//$this->inv_num=date("md-His");//md-Hi
 		//$inv_folder=date("ymd-His");
-		$this->inv_num = $this->getUniqueinvNumber($db);
+		$this->inv_num = $this->getUniqueinvNumber();
 
 		$q = "INSERT INTO phinv (".
 				"phNumber,".  //0 autoinc
@@ -134,8 +112,8 @@ class RbOInvoice
 				$this->user_id.")";         //6
 		//dump($q,"create");
 
-		$db->setQuery($q);
-		$db->query();
+		$this->db->setQuery($q);
+		$this->db->query();
 
 		$body = 'Поступил заказ на печать фото (Заказ N'.$this->inv_num.'). Детали заказа см на сайте http://robik.ru/home/zakaz-foto-on-line/'.$this->inv_num;
 
@@ -148,12 +126,12 @@ class RbOInvoice
 	}
 
 	//=================================================================
-	public function invDelete($db)
+	public function invDelete()
 	{
 		/*$q = "DELETE FROM phinv WHERE phNumber='".$this->inv_num."'";
-		$db->setQuery($q);
+		$this->db->setQuery($q);
 		$this->response = $q;
-		$db->query();
+		$this->db->query();
 		//удалить каталог
 
 		$res["result"] = "success";
@@ -161,19 +139,19 @@ class RbOInvoice
 	}
 
 	//=================================================================
-	public function getUniqueinvNumber($db)
+	public function getUniqueinvNumber()
 	{
 		//    return date("md-Hi");
 		/*$uval=date("md-H");
 		$min=(int)date("i");
-		$db->setQuery("SELECT phNumber FROM phinv WHERE phNumber='".$uval.$min."'");
-		$db->query();
-		$ok = ($db->getAffectedRows()==0);
+		$this->db->setQuery("SELECT phNumber FROM phinv WHERE phNumber='".$uval.$min."'");
+		$this->db->query();
+		$ok = ($this->db->getAffectedRows()==0);
 		$i = 0;
 		while (!$ok && $i<=9) {
-			$db->setQuery("SELECT phNumber FROM phinv WHERE phNumber='".$uval.(abs(--$min))."'");
-			$db->query();
-			if ($db->getAffectedRows ()==0) {
+			$this->db->setQuery("SELECT phNumber FROM phinv WHERE phNumber='".$uval.(abs(--$min))."'");
+			$this->db->query();
+			if ($this->db->getAffectedRows ()==0) {
 				$ok=true;
 			}
 			$i++;

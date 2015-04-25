@@ -27,12 +27,39 @@ switch ($cmd) {
 		break;
 	}
 	
-	case "get_invoice":{
+	case "invoice_read":{
+		include_once "models/invoice.php";
+		$inv = new RbOInvoice();
+		$inv->invRead();
+		echo $inv->getResponse();
 		break;
+	}
+
+	case "invoice_submit":{
+		include_once "models/invoice.php";
+		$inv = new RbOInvoice();
+		
+		if ($inv->invId=="0") {//новый заказ
+			$inv->invCreate();
+		}
 	
+		else { //редактируем существующий
+			$inv->invUpdate();
+		}
+		break;
+	}
+	
+	case "invoice_delete": {
+		include_once "models/invoice.php";
+		$inv = new RbOInvoice();
+		$inv->invDelete();
+		break;
 	}
 	
 	default: {
 		echo "";		
 	}
 }
+
+
+
