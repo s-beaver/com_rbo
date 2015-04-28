@@ -26,21 +26,18 @@
 }
 
 #neworder-form * input.text {
-	margin-bottom: 12px;
-	width: 95%;
-	padding: .4em;
+	margin-bottom: 0px;
+	padding: .2em;
 }
 
 #neworder-form * select {
-	margin-bottom: 12px;
-	width: 95%;
-	padding: .4em;
+	margin-bottom: 0px;
+	padding: .2em;
 }
 
 #neworder-form * textarea {
-	margin-bottom: 12px;
-	width: 95%;
-	padding: .4em;
+	margin-bottom: 0px;
+	padding: .2em;
 }
 </style>
 
@@ -52,34 +49,57 @@
 
 	<div id="neworder-form" title="Новый счёт">
 		<form id="neworder-form-form" method="post" action="">
-			<fieldset>
+			<fieldset style='padding: 0'>
 				<table border=0 cellspacing=0 cellpadding=0>
 					<tr>
-						<td><label for="inv_num">№</label> <input type="text"
-							name="inv_num" id="inv_num"
-							class="text ui-widget-content ui-corner-all" value="" /> <label
-							for="inv_date">от</label> <input type="text" name="inv_date"
-							id="inv_date" class="text ui-widget-content ui-corner-all"
-							value="" /> <label for="inv_sum">Сумма</label> <input type="text"
-							name="inv_sum" id="inv_sum"
-							class="text ui-widget-content ui-corner-all" value="" /> <label
-							for="inv_status">Статус</label> <input type="text"
-							name="inv_status" id="inv_status"
-							class="text ui-widget-content ui-corner-all" value="" /></td>
+						<td>
+							<label for="inv_num">№</label>
+							<input type="text" name="inv_num" id="inv_num"
+								class="text ui-widget-content ui-corner-all"
+								style='text-align: right; width: 70px' value="" />
+							<label for="inv_date">от</label>
+							<input type="text" name="inv_date" id="inv_date"
+								class="text ui-widget-content ui-corner-all"
+								style='text-align: center; width: 100px' value="" />
+							<label for="inv_sum">Сумма</label>
+							<input type="text" name="inv_sum" id="inv_sum"
+								class="text ui-widget-content ui-corner-all"
+								style='text-align: right; width: 80px' value="" />
+							<label for="inv_status">Статус</label>
+							<input type="text" name="inv_status" id="inv_status"
+								class="text ui-widget-content ui-corner-all"
+								style='width: 150px' value="" />
+							<label for="inv_firm">Фирма</label>
+							<select id="inv_firm" name="inv_firm"
+								class="text ui-widget-content ui-corner-all" style='width: 70px' />
+							<option value="ип">ИП</option>
+							<option value="ооо">ООО</option>
+							</select>
+						</td>
 					</tr>
 					<tr>
-						<td><label for="inv_firm">Фирма</label> <select id="inv_firm"
-							name="inv_firm" class="text ui-widget-content ui-corner-all">
-								<option value="ип">ИП</option>
-								<option value="ооо">ООО</option>
-						</select> <label for="inv_manager">Менеджер</label> <select
-							id="inv_manager" name="inv_manager"
-							class="text ui-widget-content ui-corner-all">
-								<option value="Алексей">Алексей</option>
-								<option value="Аня">Аня</option>
-								<option value="Володя">Володя</option>
-								<option value="Николай">Николай</option>
-						</select></td>
+						<td>
+							<label for="inv_cust">Покупатель</label>
+							<input type="text" name="inv_cust" id="inv_cust"
+								class="text ui-widget-content ui-corner-all"
+								style='width: 450px' value="" />
+							<label for="inv_manager">Менеджер</label>
+							<select id="inv_manager" name="inv_manager"
+								class="text ui-widget-content ui-corner-all"
+								style='width: 120px' />
+							<option value="Алексей">Алексей</option>
+							<option value="Аня">Аня</option>
+							<option value="Володя">Володя</option>
+							<option value="Николай">Николай</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<table id="TableProducts" class="display compact" cellspacing="0"
+								width="100%">
+							</table>
+						</td>
 					</tr>
 				</table>
 			</fieldset>
@@ -89,7 +109,8 @@
 	<div id="dialog-confirm" title="Удалить счёт?">Счёт будет удален.
 		Продолжить?</div>
 
-	<table id="TableInv" class="display" cellspacing="0" width="100%">
+	<table id="TableInv" class="display compact" cellspacing="0"
+		width="100%">
 	</table>
 </body>
 </html>
