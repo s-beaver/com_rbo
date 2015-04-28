@@ -5,8 +5,11 @@ class RbOInvoice
 {
 	//public $user_email="";
 	//public $user_id="";
-	public $db;
-
+	private $db;
+	private $command="";
+	private $response="";
+	private $oJson;
+	
 	public $invId="";
 	public $inv_num="";
 	public $inv_date="";
@@ -21,10 +24,6 @@ class RbOInvoice
 	public $modified_by="";
 	public $modified_on="";
 	public $inv_products=array();
-
-	public $command="";
-	public $response="";
-	public $oJson;
 
 	//=================================================================
 	public function __construct () {
@@ -57,13 +56,27 @@ class RbOInvoice
 	//=================================================================
 	public function invRead()
 	{
-		$q = "SELECT order_num, order_date, order_cust, order_sum, order_status, order_rem, ".
-                     "order_firm, order_manager, created_by, created_on, modified_by, modified_on ".
-                     "FROM rbo_orders WHERE orderID=".$this->invId;
+		$q = "SELECT inv_num, inv_date, inv_cust, inv_sum, inv_status, inv_rem, ".
+                     "inv_firm, inv_manager, created_by, created_on, modified_by, modified_on ".
+                     "FROM rbo_invoices WHERE invId=".$this->invId;
 		$this->db->setQuery($q);
 		$inv = $this->db->loadAssoc();
-		//$inv["inv_email"] = $this->user_email;
-
+		$this->invId = $inv["invId"];
+		$this->inv_num=$inv["inv_num"];
+		$this->inv_date=$inv["inv_date"];
+		$this->inv_sum =$inv["inv_sum"];
+		$this->inv_status=$inv["inv_status"];
+		$this->inv_rem =$inv["inv_rem"];
+		$this->inv_firm=$inv["inv_firm"];
+		$this->inv_manager=$inv["inv_manager"];
+		$this->created_by =$inv["created_by"];
+		$this->created_on =$inv["created_on"];
+		$this->modified_by=$inv["modified_by"];
+		$this->modified_on=$inv["modified_on"];
+		                  
+		//$["inv_cust"]=array();
+		//$["inv_products"]=array();
+				
 		$this->response = $this->oJson->encode($inv);
 	}
 

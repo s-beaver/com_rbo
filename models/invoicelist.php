@@ -7,7 +7,7 @@ class RbOInvoiceList
 
   public function __construct () {
 
-    $aColumns = array( 'orderId', 'order_time', 'cust_lastname', 'order_answer' );
+    $aColumns = array( 'invId', 'inv_time', 'cust_lastname');
 
     $db = JFactory::getDBO();
     $this->user =& JFactory::getUser ();
@@ -69,12 +69,12 @@ class RbOInvoiceList
     }*/
 
     $sWhere = $is_admin?"":"WHERE phUserID=".$this->user->id;
-    $q = "SELECT count(*) FROM rbo_orders ".$sWhere;
+    $q = "SELECT count(*) FROM rbo_invoices ".$sWhere;
     $db->setQuery($q);
     $iTotalRecords = $db->loadResult();
 
-    $q = "SELECT orderID, order_num, order_date, order_cust, order_sum, order_status FROM rbo_orders ORDER BY orderID DESC $sLimit";
-
+    $q = "SELECT invID, inv_num, inv_date, inv_cust, inv_sum, inv_status FROM rbo_invoices ORDER BY invId DESC $sLimit";
+    
     $db->setQuery($q);
     $data_rows_assoc_list = $db->loadAssocList();
     $iTotalDisplayRecords = $db->getAffectedRows ();
@@ -84,12 +84,12 @@ class RbOInvoiceList
     $iCnt=0;
     foreach ($data_rows_assoc_list as $v) {
 	if ($s!='') $s.=',';
-	$s.='{"0":"<a class=aid_ href='.$v['orderID'].'>'.$v['order_num'].'</a>",';
-        $s.='"1":"['.$v['order_date'].']",';
-	$s.='"2":"'.$v['order_cust']  .'",';
-	$s.='"3":"'.$v['order_sum']   .'",';
-	$s.='"4":"'.$v['order_status']   .'",';
-	$s.='"DT_RowId":"dtrid_'.$v['orderID'].'"}';
+	$s.='{"0":"<a class=aid_ href='.$v['invID'].'>'.$v['inv_num'].'</a>",';
+        $s.='"1":"['.$v['inv_date'].']",';
+	$s.='"2":"'.$v['inv_cust']  .'",';
+	$s.='"3":"'.$v['inv_sum']   .'",';
+	$s.='"4":"'.$v['inv_status']   .'",';
+	$s.='"DT_RowId":"dtrid_'.$v['invID'].'"}';
         $iCnt++;
     }             
 
