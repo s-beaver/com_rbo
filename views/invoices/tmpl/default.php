@@ -39,13 +39,32 @@
 	margin-bottom: 0px;
 	padding: .2em;
 }
+
+.crop {
+	float: left;
+	overflow: hidden;
+	position: relative;
+	width: 32px;
+	height: 32px;
+}
+
+.crop_img_on {
+	position: absolute;
+	float: left;
+	top: 0px;
+	left: 0px;
+	top: 0px;
+}
+
+.crop_img_off {
+	position: absolute;
+	top: -32px;
+	left: 0px;
+}
 </style>
 
 </head>
 <body>
-
-	<!-- $("#inv_num") $("#inv_date") $("#inv_cust") - array $("#inv_sum")
-	$("#inv_status") $("#inv_rem") $("#inv_firm") $("#inv_manager")-->
 
 	<div id="neworder-form" title="Новый счёт">
 		<form id="neworder-form-form" method="post" action="">
@@ -53,45 +72,56 @@
 				<table border=0 cellspacing=0 cellpadding=0>
 					<tr>
 						<td>
-							<label for="inv_num">№</label>
-							<input type="text" name="inv_num" id="inv_num"
-								class="text ui-widget-content ui-corner-all"
-								style='text-align: right; width: 70px' value="" />
-							<label for="inv_date">от</label>
-							<input type="text" name="inv_date" id="inv_date"
-								class="text ui-widget-content ui-corner-all"
-								style='text-align: center; width: 100px' value="" />
-							<label for="inv_sum">Сумма</label>
-							<input type="text" name="inv_sum" id="inv_sum"
-								class="text ui-widget-content ui-corner-all"
-								style='text-align: right; width: 80px' value="" />
-							<label for="inv_status">Статус</label>
-							<input type="text" name="inv_status" id="inv_status"
-								class="text ui-widget-content ui-corner-all"
-								style='width: 150px' value="" />
-							<label for="inv_firm">Фирма</label>
-							<select id="inv_firm" name="inv_firm"
-								class="text ui-widget-content ui-corner-all" style='width: 70px' />
-							<option value="ип">ИП</option>
-							<option value="ооо">ООО</option>
-							</select>
+							<div style="float: left">
+								<label for="inv_num">№</label>
+								<input type="text" name="inv_num" id="inv_num"
+									class="text ui-widget-content ui-corner-all"
+									style='text-align: right; width: 50px' value="" />
+								<label for="inv_date">от</label>
+								<input type="text" name="inv_date" id="inv_date"
+									class="text ui-widget-content ui-corner-all"
+									style='text-align: center; width: 100px' value="" />
+							</div>
+							<div style="float: right">
+								<label for="inv_sum">Сумма</label>
+								<input type="text" name="inv_sum" id="inv_sum"
+									class="text ui-widget-content ui-corner-all"
+									style='text-align: right; width: 70px' value="" />
+								<label for="inv_status">Статус</label>
+								<input type="text" name="inv_status" id="inv_status"
+									class="text ui-widget-content ui-corner-all"
+									style='width: 150px' value="" />
+								<label for="inv_manager">Менеджер</label>
+								<select id="inv_manager" name="inv_manager"
+									class="text ui-widget-content ui-corner-all"
+									style='width: 120px' />
+								<option value="Алексей">Алексей</option>
+								<option value="Аня">Аня</option>
+								<option value="Володя">Володя</option>
+								<option value="Николай">Николай</option>
+								</select>
+							</div>
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<label for="inv_cust">Покупатель</label>
-							<input type="text" name="inv_cust" id="inv_cust"
-								class="text ui-widget-content ui-corner-all"
-								style='width: 450px' value="" />
-							<label for="inv_manager">Менеджер</label>
-							<select id="inv_manager" name="inv_manager"
-								class="text ui-widget-content ui-corner-all"
-								style='width: 120px' />
-							<option value="Алексей">Алексей</option>
-							<option value="Аня">Аня</option>
-							<option value="Володя">Володя</option>
-							<option value="Николай">Николай</option>
-							</select>
+							<div class="crop">
+								<img class="crop_img_off"
+									src="components/com_rbo/images/icon-32-new.png" />
+							</div>
+							<div style="float: right">
+								<label for="inv_cust">Покупатель</label>
+								<input type="text" name="inv_cust" id="inv_cust"
+									class="text ui-widget-content ui-corner-all"
+									style='width: 450px' value="" />
+								<label for="inv_firm">Фирма</label>
+								<select id="inv_firm" name="inv_firm"
+									class="text ui-widget-content ui-corner-all"
+									style='width: 70px' />
+								<option value="ип">ИП</option>
+								<option value="ооо">ООО</option>
+								</select>
+							</div>
 						</td>
 					</tr>
 					<tr>

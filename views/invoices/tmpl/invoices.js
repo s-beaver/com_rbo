@@ -1,6 +1,7 @@
 'use strict';
 var oTable;
 var oTableProducts;
+var apiTableProducts;
 var ajaxPath = "/components/com_rbo/";
 
 // ===================================================================================
@@ -243,6 +244,11 @@ $(document).ready(function() {
       "sClass" : "center",
       "sWidth" : "100"
     }, ]
+  });
+
+  apiTableProducts = oTableProducts.api();
+  $('#TableProducts tbody').on('click', 'tr', function() {
+    $(this).toggleClass('selected');
   });
 
 });
