@@ -18,6 +18,7 @@ $user = JFactory::getUser();
 $input = $app->input;
 $cmd = $input->getCmd('task');
 //echo "ответ cервера user=".$user->email."; command=$cmd";
+JLog::addLogger(array('text_file' => 'com_rbo.php'), JLog::ALL, array('com_rbo'));
 
 switch ($cmd) {
 	case "get_invoice_list":{
@@ -45,6 +46,7 @@ switch ($cmd) {
 	
 		else { //редактируем существующий
 			$inv->invUpdate();
+			echo $inv->getResponse();
 		}
 		break;
 	}

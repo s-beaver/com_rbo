@@ -3,6 +3,45 @@ var oTable;
 var oTableProducts;
 var apiTableProducts;
 var ajaxPath = "/components/com_rbo/";
+var inv_num = $("#inv_num");
+var inv_date = $("#inv_date");
+var inv_manager = $("#inv_manager");
+var inv_cust = $("#inv_cust");
+var inv_firm = $("#inv_firm");
+var allFields = $([]).add(inv_num).add(inv_date).add(inv_manager).add(inv_cust)
+    .add(inv_firm);
+var tips = $(".validateTips");
+
+// ===================================================================================
+function updateTips(t) {
+  tips.text(t).addClass("ui-state-highlight");
+  setTimeout(function() {
+    tips.removeClass("ui-state-highlight", 1500);
+  }, 500);
+}
+
+// ===================================================================================
+function checkLength(o, n, min, max) {
+  if (o.val().length > max || o.val().length < min) {
+    o.addClass("ui-state-error");
+    updateTips("Длина поля " + n + "  должна быть не менее " + min
+        + "  и не более " + max + " символов");
+    return false;
+  } else {
+    return true;
+  }
+}
+
+// ===================================================================================
+function checkRegexp(o, regexp, n) {
+  if (!(regexp.test(o.val()))) {
+    o.addClass("ui-state-error");
+    updateTips(n);
+    return false;
+  } else {
+    return true;
+  }
+}
 
 // ===================================================================================
 /**
@@ -59,14 +98,34 @@ function readInvoice(invId) {
 
 // ===================================================================================
 function checkSaveInvoice(invId, inv_status) {
-  // invoice_submit
-  /*
-   * $("#inv_num") $("#inv_date") $("#inv_cust")-array $("#inv_sum")
-   * $("#inv_status") $("#inv_rem") $("#inv_firm") $("#inv_manager")
-   */
-}
+  var bValid = true;
+  allFields.removeClass("ui-state-error");
+  // bValid = bValid && checkLength(inv_num, "Номер", 1, 3);
 
-// ===================================================================================
+  if (!bValid)
+    return;
+
+  $.ajax({
+    dataType : 'json',
+    type : "POST",
+    data : {
+      "invId" : invId,
+      "inv_num" : $("#inv_num").val(),
+      "inv_date" : $("#inv_date").val(),
+      "inv_manager" : $("#inv_manager").val(),
+      "inv_cust" : $("#inv_cust").val(),
+      "inv_firm" : $("#inv_firm").val()
+    },
+    url : ajaxPath + "ajax.php?task=invoice_submit",
+    success : function(inv_data) {
+      alert(inv_data);
+      /*
+       * $("#neworder-form").dialog("close"); oTable.fnDraw();
+       */
+    }
+  });
+
+}
 
 // ===================================================================================
 function deleteInvoice(invId) {
@@ -250,5 +309,11 @@ $(document).ready(function() {
   $('#TableProducts tbody').on('click', 'tr', function() {
     $(this).toggleClass('selected');
   });
+
+  $("#inv_date").datepicker({
+    showButtonPanel : true,
+    dateFormat: "dd.mm.yy"
+  });
+
 
 });
