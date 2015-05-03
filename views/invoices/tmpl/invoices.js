@@ -87,7 +87,7 @@ function readInvoice(invId) {
     dataType : 'json',
     type : "POST",
     data : {
-      "invId" : invId
+      "rbo_invoice":"{invId:'"+invId+"'}"
     },
     url : ajaxPath + "ajax.php?task=invoice_read",
     success : function(inv_data) {
