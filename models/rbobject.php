@@ -4,6 +4,7 @@ class RbObject {
  public $oJson; // нужно выносить из класса
  public $is_multiple = false; // читать одну запись или несколько по идентификатору
  public $response = ""; // подготовленный ответ для отправки в ответ на ajax запрос
+ /* public $table_row_id_fld_name = "";//название поля таблицы БД являющееся ключевым */
  public $table_name = ""; // наименование таблицы БД в которой хранится объект, по совместительству - название переменной для передачи данных через input буфер
  public $flds = array (); // ассоциативный массив, где ключ - название поле таблицы БД, а значение - тип поля из списка: numeric, string, datetime
  public $sysflds = array ("created_by" => "string","created_on" => "datetime",

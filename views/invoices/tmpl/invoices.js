@@ -13,6 +13,30 @@ var allFields = $([]).add(inv_num).add(inv_date).add(inv_manager).add(inv_cust)
 var tips = $(".validateTips");
 
 // ===================================================================================
+function IsNull(vVal) {
+  var und = void null;
+  switch (vVal) {
+  case und:
+  case null:
+  case undefined:
+  case NaN: {
+    return true;
+  }
+  default: {
+    return false;
+  }
+  }
+}
+
+// ===================================================================================
+function NullTo(oTest, sVoz) {
+  if (IsNull(oTest))
+    return sVoz;
+  else
+    return oTest;
+}
+
+// ===================================================================================
 function updateTips(t) {
   tips.text(t).addClass("ui-state-highlight");
   setTimeout(function() {
@@ -87,7 +111,7 @@ function readInvoice(invId) {
     dataType : 'json',
     type : "POST",
     data : {
-      "rbo_invoices":"{invId:'"+invId+"'}"
+      "rbo_invoices" : "{invId:" + invId + "}"
     },
     url : ajaxPath + "ajax.php?task=invoice_read",
     success : function(inv_data) {
@@ -101,22 +125,34 @@ function checkSaveInvoice(invId, inv_status) {
   var bValid = true;
   allFields.removeClass("ui-state-error");
   // bValid = bValid && checkLength(inv_num, "Номер", 1, 3);
+  var inv_products = "";
+  var p = apiTableProducts.rows().data();
+  for (var i = 0; i < p.length; i++) {
+    if (inv_products != "")
+      inv_products += ",";
+    inv_products += "['" + NullTo(p[i][0], "") + "','" + NullTo(p[i][1], "")
+        + "'," + NullTo(p[i][2], "") + "," + NullTo(p[i][3], "") + ","
+        + NullTo(p[i][4], "") + "," + $("#inv_num").val() + "]";
+  }
+  inv_products = "[" + inv_products + "]";
 
   if (!bValid)
     return;
 
+  var taskCmd = "invoice_create";
+  if (invId != 0)
+    taskCmd = "invoice_update";
   $.ajax({
     dataType : 'json',
     type : "POST",
     data : {
-      "invId" : invId,
-      "inv_num" : $("#inv_num").val(),
-      "inv_date" : $("#inv_date").val(),
-      "inv_manager" : $("#inv_manager").val(),
-      "inv_cust" : $("#inv_cust").val(),
-      "inv_firm" : $("#inv_firm").val()
+      "rbo_invoices" : "{invId:" + invId + ",inv_num:" + $("#inv_num").val()
+          + ",inv_date:'" + $("#inv_date").val() + "',inv_manager:'"
+          + $("#inv_manager").val() + "',inv_products:" + inv_products + "}"
+    // "inv_cust" : $("#inv_cust").val(),
+    // "inv_firm" : $("#inv_firm").val()
     },
-    url : ajaxPath + "ajax.php?task=invoice_submit",
+    url : ajaxPath + "ajax.php?task=" + taskCmd,
     success : function(inv_data) {
       alert(inv_data);
       /*
@@ -312,8 +348,7 @@ $(document).ready(function() {
 
   $("#inv_date").datepicker({
     showButtonPanel : true,
-    dateFormat: "dd.mm.yy"
+    dateFormat : "dd.mm.yy"
   });
-
 
 });

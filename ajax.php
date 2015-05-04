@@ -1,65 +1,75 @@
-<?php define('_JEXEC', 1);   
-define('DS', DIRECTORY_SEPARATOR);   
+<?php
+define ('_JEXEC', 1);
+define ('DS', DIRECTORY_SEPARATOR);
 
-if (file_exists(dirname(__FILE__) . '/defines.php')) { 	
-	include_once dirname(__FILE__) . '/defines.php'; 
-}  
-if (!defined('_JDEFINES')) { 	
-	define('RBO_PATH', realpath(dirname(__FILE__)));
-	define('JPATH_BASE', realpath(dirname(__FILE__)."/../.."));
-	require_once JPATH_BASE.'/includes/defines.php'; 
-}  
+if (file_exists (dirname (__FILE__) . '/defines.php')) {
+ include_once dirname (__FILE__) . '/defines.php';
+}
+if (! defined ('_JDEFINES')) {
+ define ('RBO_PATH', realpath (dirname (__FILE__)));
+ define ('JPATH_BASE', realpath (dirname (__FILE__) . "/../.."));
+ require_once JPATH_BASE . '/includes/defines.php';
+}
 
-require_once JPATH_BASE.'/includes/framework.php';  
+require_once JPATH_BASE . '/includes/framework.php';
 
-$app = JFactory::getApplication('site'); 
-$app->initialise();  
-$user = JFactory::getUser(); 
+$app = JFactory::getApplication ('site');
+$app->initialise ();
+$user = JFactory::getUser ();
 $input = $app->input;
-$cmd = $input->getCmd('task');
-JLog::addLogger(array('text_file' => 'com_rbo.php'), JLog::ALL, array('com_rbo'));
+$cmd = $input->getCmd ('task');
+JLog::addLogger (array ('text_file' => 'com_rbo.php' 
+), JLog::ALL, array ('com_rbo' 
+));
 
 switch ($cmd) {
-	case "get_invoice_list":{
-		include_once "models/invoicelist.php";
-		$invList = new RbOInvoiceList();
-		echo $invList->getinvList();
-		break;
-	}
-	
-	case "invoice_read":{
-		include_once "models/invoice.php";
-		$inv = new RbOInvoice();
-		$inv->readObject();
-		echo $inv->getResponse();
-		break;
-	}
-
-	case "invoice_submit":{
-		include_once "models/invoice.php";
-		$inv = new RbOInvoice();
-		
-		if ($inv->invId=="0") {//новый заказ ????????????????????????
-			$inv->createObject();
-		}
-	
-		else { //редактируем существующий
-			$inv->updateObject();
-			echo $inv->getResponse();
-		}
-		break;
-	}
-	
-	case "invoice_delete": {
-		include_once "models/invoice.php";
-		$inv = new RbOInvoice();
-		$inv->deleteObject();
-		break;
-	}
-	
-	default: {
-		echo "";		
-	}
+ case "get_invoice_list" :
+  {
+   include_once "models/invoicelist.php";
+   $invList = new RbOInvoiceList ();
+   echo $invList->getinvList ();
+   break;
+  }
+ 
+ case "invoice_read" :
+  {
+   include_once "models/invoice.php";
+   $inv = new RbOInvoice ();
+   $inv->readObject ();
+   echo $inv->getResponse ();
+   break;
+  }
+ 
+ case "invoice_create" :
+  {
+   include_once "models/invoice.php";
+   $inv = new RbOInvoice ();
+   $inv->createObject ();
+   echo $inv->getResponse ();
+   break;
+  }
+ 
+ case "invoice_update" :
+  {
+   include_once "models/invoice.php";
+   $inv = new RbOInvoice ();
+   $inv->updateObject ();
+   echo $inv->getResponse ();
+   break;
+  }
+ 
+ case "invoice_delete" :
+  {
+   include_once "models/invoice.php";
+   $inv = new RbOInvoice ();
+   $inv->deleteObject ();
+   break;
+  }
+ 
+ default :
+  {
+   echo "";
+  }
 }
 
 
