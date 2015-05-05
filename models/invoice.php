@@ -34,7 +34,7 @@ class RbOInvoice extends RbObject {
  }
  
  // =================================================================
- public function udateObject() {
+ public function updateObject() {
   $db = JFactory::getDBO ();
   $q = "UPDATE rbo_invoices SET inv_num=" . $this->inv_num . ", inv_date=STR_TO_DATE('" .
      $this->inv_date . "','%d.%m.%Y'), inv_cust='" . $this->inv_cust . "', inv_sum='" .

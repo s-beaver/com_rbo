@@ -12,15 +12,13 @@ if (! defined ('_JDEFINES')) {
 }
 
 require_once JPATH_BASE . '/includes/framework.php';
+JLog::addLogger (array ('text_file' => 'com_rbo.php' ), JLog::ALL, array ('com_rbo' ));
 
 $app = JFactory::getApplication ('site');
 $app->initialise ();
 $user = JFactory::getUser ();
 $input = $app->input;
 $cmd = $input->getCmd ('task');
-JLog::addLogger (array ('text_file' => 'com_rbo.php' 
-), JLog::ALL, array ('com_rbo' 
-));
 
 switch ($cmd) {
  case "get_invoice_list" :
