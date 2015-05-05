@@ -111,7 +111,9 @@ function readInvoice(invId) {
     dataType : 'json',
     type : "POST",
     data : {
-      "rbo_invoices" : "{invId:" + invId + "}"
+      "rbo_invoices" : {
+        "invId" : invId
+      }
     },
     url : ajaxPath + "ajax.php?task=invoice_read",
     success : function(inv_data) {
@@ -125,19 +127,22 @@ function checkSaveInvoice(invId, inv_status) {
   var bValid = true;
   allFields.removeClass("ui-state-error");
   // bValid = bValid && checkLength(inv_num, "Номер", 1, 3);
-  var inv_products = "";
   var p = apiTableProducts.rows().data();
-  for (var i = 0; i < p.length; i++) {
-    if (inv_products != "")
-      inv_products += ",";
-    inv_products += "['" + NullTo(p[i][0], "") + "','" + NullTo(p[i][1], "")
-        + "'," + NullTo(p[i][2], "") + "," + NullTo(p[i][3], "") + ","
-        + NullTo(p[i][4], "") + "," + $("#inv_num").val() + "]";
-  }
-  inv_products = "[" + inv_products + "]";
+  var pAr = new Array();
+  for (var i = 0; i < p.length; i++) pAr[i] = p[i];
 
   if (!bValid)
     return;
+
+  var oData = {
+    "rbo_invoices" : {
+      "invId" : invId,
+      "inv_num" : $("#inv_num").val(),
+      "inv_date": $("#inv_date").val(),
+      "inv_manager": $("#inv_manager").val(),
+      "inv_products" : pAr
+    }
+  };
 
   var taskCmd = "invoice_create";
   if (invId != 0)
@@ -145,13 +150,7 @@ function checkSaveInvoice(invId, inv_status) {
   $.ajax({
     dataType : 'json',
     type : "POST",
-    data : {
-      "rbo_invoices" : "{invId:" + invId + ",inv_num:" + $("#inv_num").val()
-          + ",inv_date:'" + $("#inv_date").val() + "',inv_manager:'"
-          + $("#inv_manager").val() + "',inv_products:" + inv_products + "}"
-    // "inv_cust" : $("#inv_cust").val(),
-    // "inv_firm" : $("#inv_firm").val()
-    },
+    data : oData,
     url : ajaxPath + "ajax.php?task=" + taskCmd,
     success : function(inv_data) {
       alert(inv_data);

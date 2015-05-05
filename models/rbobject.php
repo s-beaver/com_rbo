@@ -8,13 +8,9 @@ class RbObject {
  public $table_name = ""; // наименование таблицы БД в которой хранится объект, по совместительству - название переменной для передачи данных через input буфер
  public $flds = array (); // ассоциативный массив, где ключ - название поле таблицы БД, а значение - тип поля из списка: numeric, string, datetime
  public $sysflds = array ("created_by" => "string","created_on" => "datetime",
-   "modified_by" => "string","modified_on" => "datetime" 
- ); // ассоциативный массив системных полей таблицы
- public $buffer; /*
-                  * Значения для загрузки в таблицу. Ассоциативный массив, или массив ассоциативных массивов
-                  * Результат загрузки значений из таблицы. Ассоциативный массив, или массив ассоциативных массивов
-                  */
- 
+   "modified_by" => "string","modified_on" => "datetime" ); // ассоциативный массив системных полей таблицы
+ public $buffer; // Значения для загрузки в таблицу. Ассоциативный массив, или массив ассоциативных массивов. Результат загрузки значений из таблицы. Ассоциативный массив, или массив ассоциативных массивов
+                 
  // =================================================================
  public function __construct() {
   $this->user_name = JFactory::getUser ()->username;
@@ -23,11 +19,10 @@ class RbObject {
  }
  
  // =================================================================
- public function getInputBuffer() {
+ public function getInputBuffer() {//должно приходить в виде массива
   $input = JFactory::getApplication ()->input;
-  $inp_str = $input->getString ($this->table_name); // Читаем то, что записано в буфере. Формат буфера - одно поле, совпадающее с именем таблицв в БД
-  $buffMixed = $this->oJson->decode ($inp_str);
-  $this->buffer = ( object ) $buffMixed;
+  $inp_str = $input->get ($this->table_name, null, null); // Читаем то, что записано в буфере. Формат буфера - одно поле, совпадающее с именем таблицв в БД
+  $this->buffer = ( object ) $inp_str;
  }
  
  // =================================================================
@@ -51,6 +46,16 @@ class RbObject {
    $condAr [] = "$key=$value";
   }
   return $condAr;
+ }
+ 
+ // =================================================================
+ public function getKeyField() {
+  $buffProp = get_object_vars ($this->buffer);
+  foreach ( $buffProp as $key => $value ) {
+   if (strpos($value,"KEY_FIELD")>=0)  return $key; 
+  }
+  JLog::add (get_class ($this) . "->getKeyField() " . print_r ($this->buffer, true), JLog::ERROR, 'com_rbo');
+  throw new Exception('Не найдено ключевое поле');
  }
  
  // =================================================================
@@ -83,6 +88,30 @@ class RbObject {
  
  // =================================================================
  public function updateObject() {
+  //$query->queryBatch - транзакции
+  $db = JFactory::getDBO ();
+  $result = $db->updateObject($this->table_name, $this->buffer, $this->getKeyField());
+  
+/*  // Fields to update.
+  $fields = array(
+    $db->quoteName('profile_value') . ' = ' . $db->quote('Updating custom message for user 1001.'),
+    $db->quoteName('ordering') . ' = 2'
+  );
+  
+  // Conditions for which records should be updated.
+  $conditions = array(
+    $db->quoteName('user_id') . ' = 42',
+    $db->quoteName('profile_key') . ' = ' . $db->quote('custom.message')
+  );
+  
+  $query = $db->getQuery (true);
+  $query->update ($this->table_name);
+  $query->set ($fields);
+  $query->where ($conditions);
+  $db->setQuery($query);
+  $result = $db->execute();*/
+
+  
  }
  
  // =================================================================

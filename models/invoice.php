@@ -9,7 +9,7 @@ class RbOInvoice extends RbObject {
   parent::__construct ();
   
   $this->table_name = "rbo_invoices";
-  $this->flds ["invId"] = "numeric";
+  $this->flds ["invId"] = "numeric,KEY_FIELD";
   $this->flds ["inv_num"] = "string";
   $this->flds ["inv_date"] = "datetime";
   $this->flds ["inv_sum"] = "numeric";
@@ -26,7 +26,7 @@ class RbOInvoice extends RbObject {
   parent::readObject();
   
   $input = JFactory::getApplication ()->input;
-  $input->set ("rbo_invoices_products", "{inv_num:'" . $this->buffer->inv_num . "'}");
+  $input->set ("rbo_invoices_products", array("inv_num"=>$this->buffer->inv_num));
   $prod = new RbOInvProducts ();
   $prod->readObject ();
   $this->buffer->inv_products = $prod->buffer;
@@ -35,6 +35,9 @@ class RbOInvoice extends RbObject {
  
  // =================================================================
  public function updateObject() {
+  parent::updateObject();
+  return;
+  
   $db = JFactory::getDBO ();
   $q = "UPDATE rbo_invoices SET inv_num=" . $this->inv_num . ", inv_date=STR_TO_DATE('" .
      $this->inv_date . "','%d.%m.%Y'), inv_cust='" . $this->inv_cust . "', inv_sum='" .
