@@ -14,11 +14,12 @@ class RbOInvoice extends RbObject {
     $this->flds ["inv_date"] = array ("type" => "date" );
     $this->flds ["inv_sum"] = array ("type" => "numeric" );
     $this->flds ["inv_status"] = array ("type" => "string" );
-    $this->flds ["inv_rem"] = array ("type" => "string" );
-    $this->flds ["inv_firm"] = array ("type" => "string" );
     $this->flds ["inv_manager"] = array ("type" => "string" );
+    $this->flds ["inv_cust"] = array ("type" => "string" );
+    $this->flds ["inv_firm"] = array ("type" => "string" );
+    $this->flds ["inv_rem"] = array ("type" => "string" );
     
-    $this->getInputBuffer (); 
+    $this->getInputBuffer ();
   }
   
   // =================================================================
@@ -36,6 +37,14 @@ class RbOInvoice extends RbObject {
   
   // =================================================================
   public function updateObject() {
+    $invId = $this->buffer->invId;
+    $inv_products = $this->buffer->inv_products;
     parent::updateObject ();
+    
+    $input = JFactory::getApplication ()->input;
+    $input->set ("rbo_invoices_products", $inv_products);
+    $prod = new RbOInvProducts ();
+    $prod->updateObject ();
+    $this->response = $this->response && $prod->response;
   }
 }

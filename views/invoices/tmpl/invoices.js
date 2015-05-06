@@ -129,7 +129,8 @@ function checkSaveInvoice(invId, inv_status) {
   // bValid = bValid && checkLength(inv_num, "Номер", 1, 3);
   var p = apiTableProducts.rows().data();
   var pAr = new Array();
-  for (var i = 0; i < p.length; i++) pAr[i] = p[i];
+  for (var i = 0; i < p.length; i++)
+    pAr[i] = p[i];
 
   if (!bValid)
     return;
@@ -138,8 +139,12 @@ function checkSaveInvoice(invId, inv_status) {
     "rbo_invoices" : {
       "invId" : invId,
       "inv_num" : $("#inv_num").val(),
-      "inv_date": $("#inv_date").val(),
-      "inv_manager": $("#inv_manager").val(),
+      "inv_date" : $("#inv_date").val(),
+      "inv_sum" : $("#inv_sum").val(),
+      "inv_status" : $("#inv_status").val(),
+      "inv_manager" : $("#inv_manager").val(),
+      "inv_cust" : $("#inv_cust").val(),
+      "inv_firm" : $("#inv_firm").val(),
       "inv_products" : pAr
     }
   };
@@ -153,10 +158,8 @@ function checkSaveInvoice(invId, inv_status) {
     data : oData,
     url : ajaxPath + "ajax.php?task=" + taskCmd,
     success : function(inv_data) {
-      alert(inv_data);
-      /*
-       * $("#neworder-form").dialog("close"); oTable.fnDraw();
-       */
+      $("#neworder-form").dialog("close");
+      oTable.fnDraw();
     }
   });
 
@@ -183,12 +186,12 @@ function deleteInvoice(invId) {
 function showInvoiceForm(i) {
   $("#inv_num").val(i.inv_num);
   $("#inv_date").val(i.inv_date);
-  // $("#inv_cust") - array
   $("#inv_sum").val(i.inv_sum);
   $("#inv_status").val(i.inv_status);
-  $("#inv_rem").val(i.inv_rem);
+  $("#inv_manager :contains('" + i.inv_manager + "')").prop("selected", "selected");
+  $("#inv_cust").val(i.inv_cust);
   $("#inv_firm :contains('" + i.inv_firm + "')").prop("selected", "selected");
-  $("#inv_manager :contains('" + i.inv_m + "')").prop("selected", "selected");
+  $("#inv_rem").val(i.inv_rem);
   var readOnly = setRW(i.inv_status) ? "" : "&read_only=1";
 
   oTableProducts.fnClearTable();
@@ -269,19 +272,26 @@ $(document).ready(function() {
     },
     "aoColumns" : [ {
       "sTitle" : "Номер",
-      "sWidth" : "100"
+      "sClass" : "center",
+      "mData" : "inv_num"
     }, {
       "sTitle" : "Дата",
-      "sWidth" : "200"
+      "mData" : "inv_date"
     }, {
-      "sTitle" : "Покупатель"
+      "sTitle" : "Покупатель",
+      "mData" : "inv_cust"
     }, {
-      "sTitle" : "Сумма"
+      "sTitle" : "Сумма",
+      "sClass" : "center",
+      "mData" : "inv_sum"
     }, {
       "sTitle" : "Статус",
       "sClass" : "center",
-      "sWidth" : "100"
-    }, ],
+      "mData" : "inv_status"
+    }, {
+      "sTitle" : "Менеджер",
+      "mData" : "inv_manager"
+    } ],
     "oLanguage" : {
       "sProcessing" : "Подождите...",
       "sLengthMenu" : "Показать _MENU_ строк",
@@ -321,22 +331,27 @@ $(document).ready(function() {
     "ordering" : false,
     "aoColumns" : [ {
       "sTitle" : "Код",
-      "sWidth" : "100"
+      "sWidth" : "100",
+      "mData" : "product_code"
     }, {
       "sTitle" : "Наименование",
-      "sWidth" : "450"
+      "sWidth" : "450",
+      "mData" : "product_name"
     }, {
       "sTitle" : "Цена",
       "sClass" : "center",
-      "sWidth" : "100"
+      "sWidth" : "100",
+      "mData" : "product_price"
     }, {
       "sTitle" : "К-во",
       "sClass" : "center",
-      "sWidth" : "100"
+      "sWidth" : "100",
+      "mData" : "product_cnt"
     }, {
       "sTitle" : "Сумма",
       "sClass" : "center",
-      "sWidth" : "100"
+      "sWidth" : "100",
+      "mData" : "product_sum"
     }, ]
   });
 

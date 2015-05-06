@@ -13,7 +13,7 @@ class RbOInvProducts extends RbObject {
   $this->flds ["product_name"] = array("type"=>"string");
   $this->flds ["product_cnt"] = array("type"=>"numeric");
   $this->flds ["product_price"] = array("type"=>"numeric");
-  $this->flds ["product_cnt*product_price"] = array("type"=>"numeric","read_only"=>true); // или добавить поле sum или поле только для чтения
+  $this->flds ["product_sum"] = array("type"=>"numeric","read_only"=>true, "formula"=>"product_cnt*product_price");
   $this->flds ["invId"] = array("type"=>"string","is_key"=>true);
   
   $this->getInputBuffer (); 

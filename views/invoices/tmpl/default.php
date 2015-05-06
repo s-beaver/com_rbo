@@ -92,6 +92,7 @@
                   class="text ui-widget-content ui-corner-all"
                   style="width: 120px">
                   <option value=""></option>
+                  <option value="выставлен">выставлен</option>
                   <option value="оплачен">оплачен</option>
                 </select>
                 <label for="inv_manager">Менеджер</label>
