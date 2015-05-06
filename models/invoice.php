@@ -3,67 +3,39 @@ jimport ('etc.json_lib');
 include_once "models/rbobject.php";
 include_once "models/invproducts.php";
 class RbOInvoice extends RbObject {
- 
- // =================================================================
- public function __construct() {
-  parent::__construct ();
   
-  $this->table_name = "rbo_invoices";
-  $this->flds ["invId"] = "numeric,KEY_FIELD";
-  $this->flds ["inv_num"] = "string";
-  $this->flds ["inv_date"] = "datetime";
-  $this->flds ["inv_sum"] = "numeric";
-  $this->flds ["inv_status"] = "string";
-  $this->flds ["inv_rem"] = "string";
-  $this->flds ["inv_firm"] = "string";
-  $this->flds ["inv_manager"] = "string";
+  // =================================================================
+  public function __construct() {
+    parent::__construct ();
+    
+    $this->table_name = "rbo_invoices";
+    $this->flds ["invId"] = array ("type" => "numeric","is_key" => true );
+    $this->flds ["inv_num"] = array ("type" => "string" );
+    $this->flds ["inv_date"] = array ("type" => "date" );
+    $this->flds ["inv_sum"] = array ("type" => "numeric" );
+    $this->flds ["inv_status"] = array ("type" => "string" );
+    $this->flds ["inv_rem"] = array ("type" => "string" );
+    $this->flds ["inv_firm"] = array ("type" => "string" );
+    $this->flds ["inv_manager"] = array ("type" => "string" );
+    
+    $this->getInputBuffer (); 
+  }
   
-  $this->getInputBuffer (); // Получаем из input значения полей для массива flds
- }
- 
- // =================================================================
- public function readObject() {
-  parent::readObject();
+  // =================================================================
+  public function readObject() {
+    $invId = $this->buffer->invId;
+    parent::readObject ();
+    
+    $input = JFactory::getApplication ()->input;
+    $input->set ("rbo_invoices_products", array ("invId" => $invId ));
+    $prod = new RbOInvProducts ();
+    $prod->readObject ();
+    $this->buffer->inv_products = $prod->buffer; // получился объект, у которого свойство inv_products - не ассоциативный массив. Не согласовано. Наверное надо переходить на объект. См. datatables.net
+    $this->response = $this->oJson->encode ($this->buffer);
+  }
   
-  $input = JFactory::getApplication ()->input;
-  $input->set ("rbo_invoices_products", array("inv_num"=>$this->buffer->inv_num));
-  $prod = new RbOInvProducts ();
-  $prod->readObject ();
-  $this->buffer->inv_products = $prod->buffer;
-  $this->response = $this->oJson->encode ($this->buffer);
- }
- 
- // =================================================================
- public function updateObject() {
-  parent::updateObject();
-  return;
-  
-  $db = JFactory::getDBO ();
-  $q = "UPDATE rbo_invoices SET inv_num=" . $this->inv_num . ", inv_date=STR_TO_DATE('" .
-     $this->inv_date . "','%d.%m.%Y'), inv_cust='" . $this->inv_cust . "', inv_sum='" .
-     $this->inv_sum . "', inv_status='" . $this->inv_status . "', inv_rem='" . $this->inv_rem . "' " .
-     "inv_firm='" . $this->inv_firm . "', inv_manager='" . $this->inv_text . "', modified_by='" .
-     $this->modified_by . "', modified_on='" . $this->modified_on . "' " .
-     "FROM rbo_invoices WHERE invId=" . $this->invId;
-  
-  $res ["result"] = $q;
-  $this->response = $this->oJson->encode ($res);
-  return;
-  
-  $db->setQuery ($q);
-  $db->query ();
-  
-  $res ["result"] = "success";
-  $this->response = $this->oJson->encode ($res);
- }
+  // =================================================================
+  public function updateObject() {
+    parent::updateObject ();
+  }
 }
-
-
-/*$q = "SELECT product_code, product_name, product_cnt, product_price, product_cnt*product_price " .
-  "FROM rbo_invoices_products WHERE inv_num=" . $this->buffer->inv_num;
-$this->db->setQuery ($q);
-$this->buffer->inv_products = $this->db->loadRowList ();
-$this->response = $this->oJson->encode ($this->buffer);
-*/
-
-

@@ -9,14 +9,14 @@ class RbOInvProducts extends RbObject {
   
   $this->is_multiple = true;
   $this->table_name = "rbo_invoices_products";
-  $this->flds ["product_code"] = "string";
-  $this->flds ["product_name"] = "string";
-  $this->flds ["product_cnt"] = "numeric";
-  $this->flds ["product_price"] = "numeric";
-  $this->flds ["product_cnt*product_price"] = "numeric,READ_ONLY"; // или добавить поле sum или поле только для чтения
-  $this->flds ["inv_num"] = "string,KEY_FIELD";
+  $this->flds ["product_code"] = array("type"=>"string");
+  $this->flds ["product_name"] = array("type"=>"string");
+  $this->flds ["product_cnt"] = array("type"=>"numeric");
+  $this->flds ["product_price"] = array("type"=>"numeric");
+  $this->flds ["product_cnt*product_price"] = array("type"=>"numeric","read_only"=>true); // или добавить поле sum или поле только для чтения
+  $this->flds ["invId"] = array("type"=>"string","is_key"=>true);
   
-  $this->getInputBuffer (); // Получаем из input значения полей для массива flds
+  $this->getInputBuffer (); 
  }
 }
 

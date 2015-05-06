@@ -80,12 +80,13 @@ class RbOInvoiceList
     $iTotalDisplayRecords = $db->getAffectedRows ();
 
     $s = '';
-	
+
+    
     $iCnt=0;
     foreach ($data_rows_assoc_list as $v) {
 	if ($s!='') $s.=',';
 	$s.='{"0":"<a class=aid_ href='.$v['invID'].'>'.$v['inv_num'].'</a>",';
-        $s.='"1":"['.$v['inv_date'].']",';
+        $s.='"1":"'.JFactory::getDate($v['inv_date'])->toFormat('%d %b %Y (%a)').'",';
 	$s.='"2":"'.$v['inv_cust']  .'",';
 	$s.='"3":"'.$v['inv_sum']   .'",';
 	$s.='"4":"'.$v['inv_status']   .'",';
@@ -99,15 +100,6 @@ class RbOInvoiceList
       ',"iTotalDisplayRecords":'.$iTotalRecords.
       ',"aaData":['.$s.']}';
  
-  }
-
-  public function getSelectList($current)
-  {
-    return $current;
-    $option_list = array("заказано"=>"заказано","отменено"=>"отменено");
-    $s = "";
-    foreach ($option_list as $k=>$v) $s .= "<option value='$k'>$v</option>";
-    return "<select id=sid_ value=$current>$s</select>";
   }
 
   public function getinvList()
