@@ -92,6 +92,7 @@
                   class="text ui-widget-content ui-corner-all"
                   style="width: 120px">
                   <option value=""></option>
+                  <option value="выставлен">выставлен</option>
                   <option value="оплачен">оплачен</option>
                 </select>
                 <label for="inv_manager">Менеджер</label>
@@ -108,9 +109,9 @@
           </tr>
           <tr>
             <td>
-              <div class="crop">
+              <div class="crop" ><a id="add_product" href="">
                 <img class="crop_img_off"
-                  src="components/com_rbo/images/icon-32-new.png" />
+                  src="components/com_rbo/images/icon-32-new.png" /></a>
               </div>
               <div style="float: right">
                 <label for="inv_cust">Покупатель</label>

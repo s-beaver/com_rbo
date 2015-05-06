@@ -73,7 +73,7 @@ class RbOInvoiceList
     $db->setQuery($q);
     $iTotalRecords = $db->loadResult();
 
-    $q = "SELECT invID, inv_num, inv_date, inv_cust, inv_sum, inv_status FROM rbo_invoices ORDER BY invId DESC $sLimit";
+    $q = "SELECT invID, inv_num, inv_date, inv_cust, inv_sum, inv_status, inv_manager FROM rbo_invoices ORDER BY invId DESC $sLimit";
     
     $db->setQuery($q);
     $data_rows_assoc_list = $db->loadAssocList();
@@ -83,17 +83,20 @@ class RbOInvoiceList
 
     
     $iCnt=0;
-    foreach ($data_rows_assoc_list as $v) {
-	if ($s!='') $s.=',';
-	$s.='{"0":"<a class=aid_ href='.$v['invID'].'>'.$v['inv_num'].'</a>",';
-        $s.='"1":"'.JFactory::getDate($v['inv_date'])->toFormat('%d %b %Y (%a)').'",';
-	$s.='"2":"'.$v['inv_cust']  .'",';
-	$s.='"3":"'.$v['inv_sum']   .'",';
-	$s.='"4":"'.$v['inv_status']   .'",';
-	$s.='"DT_RowId":"dtrid_'.$v['invID'].'"}';
-        $iCnt++;
-    }             
 
+    foreach ($data_rows_assoc_list as $v) {
+      if ($s!='') $s.=',';
+      $s.='{"inv_num":"<a class=aid_ href='.$v['invID'].'>'.$v['inv_num'].'</a>",';
+      //$s.='"inv_date":"'.JFactory::getDate($v['inv_date'])->toFormat('%d %b %Y (%a)').'",';
+      $s.='"inv_date":"'.JFactory::getDate($v['inv_date'])->format('d M Y (D)').'",';//https://php.net/manual/en/function.date.php
+      $s.='"inv_cust":"'.$v['inv_cust']  .'",';
+      $s.='"inv_sum":"'.$v['inv_sum']   .'",';
+      $s.='"inv_status":"'.$v['inv_status']   .'",';
+      $s.='"inv_manager":"'.$v['inv_manager']   .'",';
+      $s.='"DT_RowId":"dtrid_'.$v['invID'].'"}';
+      $iCnt++;
+    }
+    
     $this->inv_list = 
       '{"sEcho":'.$sEcho.
       ',"iTotalRecords":'.$iTotalRecords.
