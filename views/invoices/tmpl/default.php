@@ -87,7 +87,7 @@
           </tr>
           <tr>
             <td>
-              <a id="add_product" href=""> <img
+              <a href="javascript:showProductForm()"> <img
                 src="components/com_rbo/images/icon-32-new-on.png" /></a>
               <div style="float: right">
                 <label for="inv_cust">Покупатель</label>
@@ -124,7 +124,7 @@
               <input type="text" name="prod_search" id="prod_search"
                 class="text ui-widget-content ui-corner-all"
                 style='width: 150px' value="" />
-              <a id="add_product" href=""> <img
+              <a href=""> <img
                 src="components/com_rbo/images/icon-32-search-on.png" /></a>
             </td>
           </tr>
@@ -135,7 +135,7 @@
                 class="text ui-widget-content ui-corner-all"
                 style='text-align: right; width: 500px' value="" />
               </select>
-            </td>
+              </td>
           </tr>
           <tr>
             <td>

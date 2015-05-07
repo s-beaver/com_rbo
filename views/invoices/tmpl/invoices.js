@@ -5,7 +5,8 @@ var apiTableProducts;
 var comPath = "/components/com_rbo/";
 var allFields;
 var tips;
-var editing_productObject;
+var editing_lineNo;
+var lines_before_update;
 
 // ===================================================================================
 function IsNull(vVal) {
@@ -110,7 +111,6 @@ function readInvoice(invId) {
     url : comPath + "ajax.php?task=invoice_read",
     success : function(inv_data) {
       showInvoiceForm(inv_data);
-      setOnClickForProducts();
     }
   });
 }
@@ -188,10 +188,8 @@ function showInvoiceForm(i) {
   $("#inv_rem").val(i.inv_rem);
   var readOnly = setRW(i.inv_status);
 
-  for (var x = 0; x < i.inv_products.length; x++) {
-    i.inv_products[x].product_click = "<a id='edit_product' href='" + x + "'>"
-        + "<img src='" + comPath + "images/icon-32-edit-on.png'/>" + "</a>";
-  }
+  for (var x = 0; x < i.inv_products.length; x++)
+    i.inv_products[x].lineNo = x;
   oTableProducts.fnClearTable();
   oTableProducts.fnAddData(i.inv_products);
 
@@ -204,7 +202,7 @@ function showInvoiceForm(i) {
     },
 
     "Отмена" : function() {
-      $("#neworder-form").dialog("close")
+      $("#neworder-form").dialog("close");
     }
   }
 
@@ -240,30 +238,47 @@ function showInvoiceForm(i) {
 }
 
 // ===================================================================================
-function showProductForm(x) {// x-номер редактируемой строки
+function showProductForm(x) {// x-номер редактируемой строки, x=null-добавляем
+  editing_lineNo = x;
 
-  editing_productObject = oTableProducts.fnGetData(x);
-  var p = editing_productObject;
+  var p = oTableProducts.fnGetData(x);
+  if (IsNull(p))
+    lines_before_update = 0;
+  else
+    lines_before_update = p.length;
 
-  $('#prod_name option').remove();
-  $('#prod_name').append('<option value="">' + p.product_name + '</option>');
-  $("#prod_name :contains('" + p.product_name + "')").prop("selected",
-      "selected");
-  $("#prod_price").val(p.product_price);
-  $("#prod_cnt").val(p.product_cnt);
-  $("#prod_sum").val(p.product_sum);
+  if (x >= 0) {
+    $("#prodId").val(p.productId);
+    $("#prod_code").val(p.product_code);
+    $('#prod_name option').remove();
+    $('#prod_name').append('<option value="">' + p.product_name + '</option>');
+    $("#prod_name :contains('" + p.product_name + "')").prop("selected",
+        "selected");
+    $("#prod_price").val(p.product_price);
+    $("#prod_cnt").val(p.product_cnt);
+    $("#prod_sum").val(p.product_sum);
+  }
 
   $("#newline-form").dialog({
     title : "Позиция - " + p.product_code,
     buttons : {
       "Сохранить" : function() {
-        var p = editing_productObject;
+        var p = {};
+        p.productId = $("#prodId").val();
+        p.product_code = $("#prod_code").val();
         p.product_name = $('#prod_name option:selected').text();
         p.product_price = $("#prod_price").val();
         p.product_cnt = $("#prod_cnt").val();
         p.product_sum = $("#prod_sum").val();
-        oTableProducts.fnUpdate(p, x);
-        setOnClickForProducts();
+        if (editing_lineNo >= 0) {
+          p.lineNo = editing_lineNo;
+          oTableProducts.fnUpdate(p, x);
+        }
+        else {
+          p.lineNo = lines_before_update;
+          oTableProducts.fnAddData(p);
+        }
+
         $("#newline-form").dialog("close");
       },
 
@@ -277,7 +292,6 @@ function showProductForm(x) {// x-номер редактируемой стро
   $("#newline-form").dialog("open");
 
 }
-// ===================================================================================
 
 // ===================================================================================
 function calcSum() {
@@ -286,154 +300,152 @@ function calcSum() {
 }
 
 // ===================================================================================
-function setHandlers() {
-  $("a[class^=aid_]").each(function(index, value) {
-    $(this).click(function() {
-      var invId = $(this).attr('href');
-      readInvoice(invId);
-      return false;
-    });
-  });
+$(document)
+    .ready(
+        function() {
+          allFields = $("#inv_num").add($("#inv_date")).add($("#inv_sum")).add(
+              $("#inv_manager")).add($("#inv_cust")).add($("#inv_firm"));
+          tips = $(".validateTips");
 
-}
+          oTable = $('#TableInv').dataTable(
+              {
+                "bJQueryUI" : true,
+                "bProcessing" : true,
+                "bServerSide" : true,
+                "aaSorting" : [ [ 1, "desc" ] ],
+                "sAjaxSource" : comPath + "ajax.php?task=get_invoice_list",
+                "fnServerData" : function(sSource, aoData, fnCallback,
+                    oSettings) {
+                  oSettings.jqXHR = $.ajax({
+                    "dataType" : 'json',
+                    "type" : "POST",
+                    "data" : aoData,
+                    "url" : sSource,
+                    "success" : function(json) {
+                      fnCallback(json);
+                    }
+                  });
+                },
+                "aoColumns" : [
+                    {
+                      "sTitle" : "Номер",
+                      "sClass" : "center",
+                      "mData" : function(source, type, val) {
+                        return "<a href='javascript:readInvoice("
+                            + source.invID + ")'>" + source.inv_num + "</a>";
+                      }
+                    }, {
+                      "sTitle" : "Дата",
+                      "mData" : "inv_date"
+                    }, {
+                      "sTitle" : "Покупатель",
+                      "mData" : "inv_cust"
+                    }, {
+                      "sTitle" : "Сумма",
+                      "sClass" : "center",
+                      "mData" : "inv_sum"
+                    }, {
+                      "sTitle" : "Статус",
+                      "sClass" : "center",
+                      "mData" : "inv_status"
+                    }, {
+                      "sTitle" : "Менеджер",
+                      "mData" : "inv_manager"
+                    } ],
+                "oLanguage" : {
+                  "sProcessing" : "Подождите...",
+                  "sLengthMenu" : "Показать _MENU_ строк",
+                  "sZeroRecords" : "Записи отсутствуют.",
+                  "sInfo" : "Счета с _START_ по _END_ (всего: _TOTAL_)",
+                  "sInfoEmpty" : "Счетов нет",
+                  "sInfoFiltered" : "(отфильтровано из _MAX_ записей)",
+                  "sInfoPostFix" : "",
+                  "sSearch" : "Поиск:",
+                  "sUrl" : "",
+                  "oPaginate" : {
+                    "sFirst" : "В начало",
+                    "sPrevious" : "Предыдущие",
+                    "sNext" : "Следующие",
+                    "sLast" : "В конец"
+                  }
+                }
+              });
 
-// ===================================================================================
-function setOnClickForProducts() {
-  $("a[id^=edit_product]").each(function(index, value) {
-    $(this).click(function() {
-      showProductForm($(this).attr('href'));
-      return false;
-    });
-  });
-}
-
-// ===================================================================================
-$(document).ready(
-    function() {
-      allFields = $("#inv_num").add($("#inv_date")).add($("#inv_sum")).add(
-          $("#inv_manager")).add($("#inv_cust")).add($("#inv_firm"));
-      tips = $(".validateTips");
-
-      oTable = $('#TableInv').dataTable({
-        "bJQueryUI" : true,
-        "bProcessing" : true,
-        "bServerSide" : true,
-        "aaSorting" : [ [ 1, "desc" ] ],
-        "sAjaxSource" : comPath + "ajax.php?task=get_invoice_list",
-        "fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
-          oSettings.jqXHR = $.ajax({
-            "dataType" : 'json',
-            "type" : "POST",
-            "data" : aoData,
-            "url" : sSource,
-            "success" : function(json) {
-              fnCallback(json);
-              setHandlers();
-            }
+          $("#neworder-form").dialog({
+            autoOpen : false,
+            height : 550,
+            width : 900,
+            modal : true
           });
-        },
-        "aoColumns" : [ {
-          "sTitle" : "Номер",
-          "sClass" : "center",
-          "mData" : "inv_num"
-        }, {
-          "sTitle" : "Дата",
-          "mData" : "inv_date"
-        }, {
-          "sTitle" : "Покупатель",
-          "mData" : "inv_cust"
-        }, {
-          "sTitle" : "Сумма",
-          "sClass" : "center",
-          "mData" : "inv_sum"
-        }, {
-          "sTitle" : "Статус",
-          "sClass" : "center",
-          "mData" : "inv_status"
-        }, {
-          "sTitle" : "Менеджер",
-          "mData" : "inv_manager"
-        } ],
-        "oLanguage" : {
-          "sProcessing" : "Подождите...",
-          "sLengthMenu" : "Показать _MENU_ строк",
-          "sZeroRecords" : "Записи отсутствуют.",
-          "sInfo" : "Счета с _START_ по _END_ (всего: _TOTAL_)",
-          "sInfoEmpty" : "Счетов нет",
-          "sInfoFiltered" : "(отфильтровано из _MAX_ записей)",
-          "sInfoPostFix" : "",
-          "sSearch" : "Поиск:",
-          "sUrl" : "",
-          "oPaginate" : {
-            "sFirst" : "В начало",
-            "sPrevious" : "Предыдущие",
-            "sNext" : "Следующие",
-            "sLast" : "В конец"
-          }
-        }
-      });
 
-      $("#neworder-form").dialog({
-        autoOpen : false,
-        height : 550,
-        width : 900,
-        modal : true
-      });
+          $("#newline-form").dialog({
+            autoOpen : false,
+            height : 300,
+            width : 650,
+            modal : true
+          });
 
-      $("#newline-form").dialog({
-        autoOpen : false,
-        height : 300,
-        width : 650,
-        modal : true
-      });
+          $("#dialog-confirm").dialog({
+            autoOpen : false
+          });
 
-      $("#dialog-confirm").dialog({
-        autoOpen : false
-      });
+          oTableProducts = $('#TableProducts')
+              .dataTable(
+                  {
+                    "bPaginate" : false,
+                    "searching" : false,
+                    "ordering" : false,
+                    "aoColumns" : [
+                        {
+                          "sTitle" : "Код",
+                          "sWidth" : "100",
+                          "mData" : "product_code"
+                        },
+                        {
+                          "sTitle" : "Наименование",
+                          "sWidth" : "450",
+                          "mData" : "product_name"
+                        },
+                        {
+                          "sTitle" : "Цена",
+                          "sClass" : "center",
+                          "sWidth" : "100",
+                          "mData" : "product_price"
+                        },
+                        {
+                          "sTitle" : "К-во",
+                          "sClass" : "center",
+                          "sWidth" : "100",
+                          "mData" : "product_cnt"
+                        },
+                        {
+                          "sTitle" : "Сумма",
+                          "sClass" : "center",
+                          "sWidth" : "100",
+                          "mData" : "product_sum"
+                        },
+                        {
+                          "sTitle" : "Ред.",
+                          "sClass" : "center",
+                          "sWidth" : "50",
+                          "mData" : function(source, type, val) {
+                            return "<a id='edit_product' href='javascript:showProductForm("
+                                + source.lineNo
+                                + ")'>"
+                                + "<img src='"
+                                + comPath + "images/icon-32-edit-on.png'/></a>";
+                          }
+                        } ]
+                  });
 
-      oTableProducts = $('#TableProducts').dataTable({
-        "bPaginate" : false,
-        "searching" : false,
-        "ordering" : false,
-        "aoColumns" : [ {
-          "sTitle" : "Код",
-          "sWidth" : "100",
-          "mData" : "product_code"
-        }, {
-          "sTitle" : "Наименование",
-          "sWidth" : "450",
-          "mData" : "product_name"
-        }, {
-          "sTitle" : "Цена",
-          "sClass" : "center",
-          "sWidth" : "100",
-          "mData" : "product_price"
-        }, {
-          "sTitle" : "К-во",
-          "sClass" : "center",
-          "sWidth" : "100",
-          "mData" : "product_cnt"
-        }, {
-          "sTitle" : "Сумма",
-          "sClass" : "center",
-          "sWidth" : "100",
-          "mData" : "product_sum"
-        }, {
-          "sTitle" : "Ред.",
-          "sClass" : "center",
-          "sWidth" : "50",
-          "mData" : "product_click"
-        } ]
-      });
+          apiTableProducts = oTableProducts.api();
+          $('#TableProducts tbody').on('dblclick', 'tr', function() {
+            $(this).toggleClass('selected');
+          });
 
-      apiTableProducts = oTableProducts.api();
-      $('#TableProducts tbody').on('dblclick', 'tr', function() {
-        $(this).toggleClass('selected');
-      });
+          $("#inv_date").datepicker({
+            showButtonPanel : true,
+            dateFormat : "dd.mm.yy"
+          });
 
-      $("#inv_date").datepicker({
-        showButtonPanel : true,
-        dateFormat : "dd.mm.yy"
-      });
-
-    });
+        });
