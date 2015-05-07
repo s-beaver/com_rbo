@@ -9,6 +9,7 @@ class RbOInvProducts extends RbObject {
   
   $this->is_multiple = true;
   $this->table_name = "rbo_invoices_products";
+  $this->flds ["productId"] = array("type"=>"numeric");
   $this->flds ["product_code"] = array("type"=>"string");
   $this->flds ["product_name"] = array("type"=>"string");
   $this->flds ["product_cnt"] = array("type"=>"numeric");

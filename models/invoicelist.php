@@ -87,7 +87,6 @@ class RbOInvoiceList
     foreach ($data_rows_assoc_list as $v) {
       if ($s!='') $s.=',';
       $s.='{"inv_num":"<a class=aid_ href='.$v['invID'].'>'.$v['inv_num'].'</a>",';
-      //$s.='"inv_date":"'.JFactory::getDate($v['inv_date'])->toFormat('%d %b %Y (%a)').'",';
       $s.='"inv_date":"'.JFactory::getDate($v['inv_date'])->format('d M Y (D)').'",';//https://php.net/manual/en/function.date.php
       $s.='"inv_cust":"'.$v['inv_cust']  .'",';
       $s.='"inv_sum":"'.$v['inv_sum']   .'",';

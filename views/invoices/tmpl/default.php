@@ -39,28 +39,6 @@
 	margin-bottom: 0px;
 	padding: .2em;
 }
-
-.crop {
-	float: left;
-	overflow: hidden;
-	position: relative;
-	width: 32px;
-	height: 32px;
-}
-
-.crop_img_on {
-	position: absolute;
-	float: left;
-	top: 0px;
-	left: 0px;
-	top: 0px;
-}
-
-.crop_img_off {
-	position: absolute;
-	top: -32px;
-	left: 0px;
-}
 </style>
 
 </head>
@@ -109,10 +87,8 @@
           </tr>
           <tr>
             <td>
-              <div class="crop" ><a id="add_product" href="">
-                <img class="crop_img_off"
-                  src="components/com_rbo/images/icon-32-new.png" /></a>
-              </div>
+              <a id="add_product" href=""> <img
+                src="components/com_rbo/images/icon-32-new-on.png" /></a>
               <div style="float: right">
                 <label for="inv_cust">Покупатель</label>
                 <input type="text" name="inv_cust" id="inv_cust"
@@ -132,6 +108,53 @@
             <td>
               <table id="TableProducts" class="display compact"></table>
             </td>
+          </tr>
+        </table>
+      </fieldset>
+    </form>
+  </div>
+
+  <div id="newline-form" title="Позиция">
+    <form id="newline-form-form" method="post" action="">
+      <fieldset style='padding: 0'>
+        <table border="0">
+          <tr>
+            <td>
+              <label for="prod_search">Поиск</label>
+              <input type="text" name="prod_search" id="prod_search"
+                class="text ui-widget-content ui-corner-all"
+                style='width: 150px' value="" />
+              <a id="add_product" href=""> <img
+                src="components/com_rbo/images/icon-32-search-on.png" /></a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="prod_name">Название</label>
+              <select name="prod_name" id="prod_name"
+                class="text ui-widget-content ui-corner-all"
+                style='text-align: right; width: 500px' value="" />
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="prod_price">Цена</label>
+              <input type="text" name="prod_price" id="prod_price"
+                class="text ui-widget-content ui-corner-all"
+                style='text-align: center; width: 50px' value="" onChange=calcSum() />
+              <label for="prod_cnt">р.&nbsp;Х&nbsp;</label>
+              <input type="text" name="prod_cnt" id="prod_cnt"
+                class="text ui-widget-content ui-corner-all"
+                style='text-align: center; width: 30px' value="" onChange=calcSum() />
+              <label for="prod_sum">ед.&nbsp;=&nbsp;</label>
+              <input disabled type="text" name="prod_sum" id="prod_sum"
+                class="text ui-widget-content ui-corner-all"
+                style='text-align: center; width: 50px' value="" />
+              р.
+              <input style="visibility:hidden" id="prodId" value="" />
+              <input style="visibility:hidden" id="prod_code" value="" />
+              </td>
           </tr>
         </table>
       </fieldset>

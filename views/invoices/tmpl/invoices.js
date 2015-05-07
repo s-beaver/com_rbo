@@ -2,9 +2,10 @@
 var oTable;
 var oTableProducts;
 var apiTableProducts;
-var ajaxPath = "/components/com_rbo/";
+var comPath = "/components/com_rbo/";
 var allFields;
 var tips;
+var editing_productObject;
 
 // ===================================================================================
 function IsNull(vVal) {
@@ -62,11 +63,7 @@ function checkRegexp(o, regexp, n) {
 }
 
 // ===================================================================================
-/**
- * Ask("123","Удалить","Отмена",function(){deleteOrder(invId)},null);
- * 
- */
-function Ask(sText, okText, cancelText, fnOk, fnCancel) {
+function Ask(sText, okText, cancelText, fnOk, fnCancel) {// Ask("123","Удалить","Отмена",function(){deleteOrder(invId)},null);
   $("#dialog-confirm").html(sText);
   var bOk = {};
   bOk[okText] = function(arg) {
@@ -110,9 +107,10 @@ function readInvoice(invId) {
         "invId" : invId
       }
     },
-    url : ajaxPath + "ajax.php?task=invoice_read",
+    url : comPath + "ajax.php?task=invoice_read",
     success : function(inv_data) {
       showInvoiceForm(inv_data);
+      setOnClickForProducts();
     }
   });
 }
@@ -151,7 +149,7 @@ function checkSaveInvoice(invId, inv_status) {
     dataType : 'json',
     type : "POST",
     data : oData,
-    url : ajaxPath + "ajax.php?task=" + taskCmd,
+    url : comPath + "ajax.php?task=" + taskCmd,
     success : function(inv_data) {
       $("#neworder-form").dialog("close");
       oTable.fnDraw();
@@ -168,7 +166,7 @@ function deleteInvoice(invId) {
     data : {
       "invId" : invId
     },
-    url : ajaxPath + "ajax.php?task=invoice_delete",
+    url : comPath + "ajax.php?task=invoice_delete",
     success : function(inv_data) {
       oTable.fnDraw();
     }
@@ -190,6 +188,10 @@ function showInvoiceForm(i) {
   $("#inv_rem").val(i.inv_rem);
   var readOnly = setRW(i.inv_status);
 
+  for (var x = 0; x < i.inv_products.length; x++) {
+    i.inv_products[x].product_click = "<a id='edit_product' href='" + x + "'>"
+        + "<img src='" + comPath + "images/icon-32-edit-on.png'/>" + "</a>";
+  }
   oTableProducts.fnClearTable();
   oTableProducts.fnAddData(i.inv_products);
 
@@ -234,6 +236,53 @@ function showInvoiceForm(i) {
   });
 
   $("#neworder-form").dialog("open");
+
+}
+
+// ===================================================================================
+function showProductForm(x) {// x-номер редактируемой строки
+
+  editing_productObject = oTableProducts.fnGetData(x);
+  var p = editing_productObject;
+
+  $('#prod_name option').remove();
+  $('#prod_name').append('<option value="">' + p.product_name + '</option>');
+  $("#prod_name :contains('" + p.product_name + "')").prop("selected",
+      "selected");
+  $("#prod_price").val(p.product_price);
+  $("#prod_cnt").val(p.product_cnt);
+  $("#prod_sum").val(p.product_sum);
+
+  $("#newline-form").dialog({
+    title : "Позиция - " + p.product_code,
+    buttons : {
+      "Сохранить" : function() {
+        var p = editing_productObject;
+        p.product_name = $('#prod_name option:selected').text();
+        p.product_price = $("#prod_price").val();
+        p.product_cnt = $("#prod_cnt").val();
+        p.product_sum = $("#prod_sum").val();
+        oTableProducts.fnUpdate(p, x);
+        setOnClickForProducts();
+        $("#newline-form").dialog("close");
+      },
+
+      "Отмена" : function() {
+        $("#newline-form").dialog("close");
+      }
+    },
+    resizable : true
+  });
+
+  $("#newline-form").dialog("open");
+
+}
+// ===================================================================================
+
+// ===================================================================================
+function calcSum() {
+  $("#prod_sum").val($("#prod_price").val() * $("#prod_cnt").val());
+
 }
 
 // ===================================================================================
@@ -246,11 +295,16 @@ function setHandlers() {
     });
   });
 
-  $("a[id=add_product]").click(function() {
-    alert("add_product");
-    return false;
-  });
+}
 
+// ===================================================================================
+function setOnClickForProducts() {
+  $("a[id^=edit_product]").each(function(index, value) {
+    $(this).click(function() {
+      showProductForm($(this).attr('href'));
+      return false;
+    });
+  });
 }
 
 // ===================================================================================
@@ -265,7 +319,7 @@ $(document).ready(
         "bProcessing" : true,
         "bServerSide" : true,
         "aaSorting" : [ [ 1, "desc" ] ],
-        "sAjaxSource" : ajaxPath + "ajax.php?task=get_invoice_list",
+        "sAjaxSource" : comPath + "ajax.php?task=get_invoice_list",
         "fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
           oSettings.jqXHR = $.ajax({
             "dataType" : 'json',
@@ -323,10 +377,14 @@ $(document).ready(
         autoOpen : false,
         height : 550,
         width : 900,
-        modal : true,
-        close : function() {
-          // allFields.val( "" ).removeClass( "ui-state-error" );
-        }
+        modal : true
+      });
+
+      $("#newline-form").dialog({
+        autoOpen : false,
+        height : 300,
+        width : 650,
+        modal : true
       });
 
       $("#dialog-confirm").dialog({
@@ -360,11 +418,16 @@ $(document).ready(
           "sClass" : "center",
           "sWidth" : "100",
           "mData" : "product_sum"
-        }, ]
+        }, {
+          "sTitle" : "Ред.",
+          "sClass" : "center",
+          "sWidth" : "50",
+          "mData" : "product_click"
+        } ]
       });
 
       apiTableProducts = oTableProducts.api();
-      $('#TableProducts tbody').on('click', 'tr', function() {
+      $('#TableProducts tbody').on('dblclick', 'tr', function() {
         $(this).toggleClass('selected');
       });
 
