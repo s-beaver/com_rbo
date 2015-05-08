@@ -273,8 +273,7 @@ function showProductForm(x) {// x-номер редактируемой стро
         if (editing_lineNo >= 0) {
           p.lineNo = editing_lineNo;
           oTableProducts.fnUpdate(p, x);
-        }
-        else {
+        } else {
           p.lineNo = lines_before_update;
           oTableProducts.fnAddData(p);
         }
@@ -294,9 +293,53 @@ function showProductForm(x) {// x-номер редактируемой стро
 }
 
 // ===================================================================================
+function productSearch() {
+  $.ajax({
+    dataType : 'json',
+    type : "POST",
+    data : {
+      "search" : $("#prod_search").val()
+    },
+    url : comPath + "ajax.php?task=product_search",
+    success : function(p) {
+      $('#prod_name option').remove();
+      for (var i = 0; i < p.result.length; i++) {
+        $('#prod_name').append(
+            '<option value="' + p.result[i].productID + "|" + p.result[i].price
+                + "|" + p.result[i].product_code + '">' + p.result[i].name
+                + '</option>');
+        if (i == 0) {
+          $("#prod_name :contains('" + p.result[i].name + "')").prop(
+              "selected", "selected");
+        }
+      }
+      setProductPrice();
+      if (p.count > p.result.length) {
+        $('#prod_name').append(
+            '<option value="-1">=== Найдено позиций:' + p.count
+                + ' (уточните поиск)</option>');
+      }
+
+    }
+  });
+}
+
+// ===================================================================================
+function setProductPrice() {
+  var oVal = $("#prod_name :selected").val();
+  var arProd = oVal.split("|");
+  $("#prodId").val(arProd[0]);
+  $("#prod_price").val(arProd[1]);
+  $("#prod_code").val(arProd[2]);
+  $("#prod_cnt").val(1);
+  calcSum();
+  
+  
+}
+
+// ===================================================================================
 function calcSum() {
   $("#prod_sum").val($("#prod_price").val() * $("#prod_cnt").val());
-
 }
 
 // ===================================================================================

@@ -64,7 +64,15 @@ switch ($cmd) {
    break;
   }
  
- default :
+ case "product_search" :
+  {
+   include_once "models/productsearch.php";
+   $inv = new RbOProductSearch();
+   $inv->getListBySubstr();
+   break;
+  }
+  
+  default :
   {
    echo "";
   }

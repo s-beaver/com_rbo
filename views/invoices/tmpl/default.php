@@ -47,7 +47,7 @@
   <div id="neworder-form" title="Новый счёт">
     <form id="neworder-form-form" method="post" action="">
       <fieldset style='padding: 0'>
-        <table border="0">
+        <table>
           <tr>
             <td>
               <div style="float: left">
@@ -117,14 +117,14 @@
   <div id="newline-form" title="Позиция">
     <form id="newline-form-form" method="post" action="">
       <fieldset style='padding: 0'>
-        <table border="0">
+        <table>
           <tr>
             <td>
               <label for="prod_search">Поиск</label>
               <input type="text" name="prod_search" id="prod_search"
                 class="text ui-widget-content ui-corner-all"
                 style='width: 150px' value="" />
-              <a href=""> <img
+              <a href="javascript:productSearch()"> <img
                 src="components/com_rbo/images/icon-32-search-on.png" /></a>
             </td>
           </tr>
@@ -133,28 +133,30 @@
               <label for="prod_name">Название</label>
               <select name="prod_name" id="prod_name"
                 class="text ui-widget-content ui-corner-all"
-                style='text-align: right; width: 500px' value="" />
+                style="text-align: right; width: 500px" value="" onChange=setProductPrice() />
               </select>
-              </td>
+            </td>
           </tr>
           <tr>
             <td>
               <label for="prod_price">Цена</label>
               <input type="text" name="prod_price" id="prod_price"
                 class="text ui-widget-content ui-corner-all"
-                style='text-align: center; width: 50px' value="" onChange=calcSum() />
+                style="text-align: center; width: 50px" value=""
+                onChange=calcSum() />
               <label for="prod_cnt">р.&nbsp;Х&nbsp;</label>
               <input type="text" name="prod_cnt" id="prod_cnt"
                 class="text ui-widget-content ui-corner-all"
-                style='text-align: center; width: 30px' value="" onChange=calcSum() />
+                style="text-align: center; width: 30px" value=""
+                onChange=calcSum() />
               <label for="prod_sum">ед.&nbsp;=&nbsp;</label>
               <input disabled type="text" name="prod_sum" id="prod_sum"
                 class="text ui-widget-content ui-corner-all"
-                style='text-align: center; width: 50px' value="" />
+                style="text-align: center; width: 50px" value="" />
               р.
-              <input style="visibility:hidden" id="prodId" value="" />
-              <input style="visibility:hidden" id="prod_code" value="" />
-              </td>
+              <input style="visibility: hidden" id="prodId" value="" />
+              <input style="visibility: hidden" id="prod_code" value="" />
+            </td>
           </tr>
         </table>
       </fieldset>
