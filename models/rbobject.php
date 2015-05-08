@@ -8,9 +8,11 @@ class RbObject {
   public $flds = array (); // ассоциативный массив, где ключ - название поле таблицы БД, а значение - тип поля из списка: numeric, string, datetime
                            // public $flds = array (); // ассоциативный массив системных полей таблицы
   public $buffer; // Значения для загрузки в таблицу. Ассоциативный массив, или массив ассоциативных массивов. Результат загрузки значений из таблицы. Ассоциативный массив, или массив ассоциативных массивов
-                  
+  public $parentKeyValue = 0; // если $is_multiple, то отсюда берется значение ключа для связи с родительской таблицей. Название ключа выбирается из flds
+                              
   // =================================================================
-  public function __construct() {
+  public function __construct($parentKeyValue) {
+    $this->parentKeyValue = $parentKeyValue;
     $this->oJson = new Services_JSON ();
     $this->flds ["created_by"] = array ("type" => "string" );
     $this->flds ["created_on"] = array ("type" => "datetime" );
@@ -55,14 +57,20 @@ class RbObject {
   }
   
   // =================================================================
-  public function getWhereClause($buffer) {
-    $buffer = ( object ) $buffer;
-    $buffProp = get_object_vars ($buffer);
-    foreach ( $buffProp as $key => $value ) {
-      if ($this->flds [$key] ["is_key"]) return "$key=$value";
+  public function getWhereClause() {
+    if ($this->is_multiple) {
+      foreach ( $this->flds as $fldname => $fldvalue ) {
+        if ($fldvalue ["is_key"]) return "$fldname=" . $this->parentKeyValue;
+      }
+    } else {
+      $buffer = ( object ) $this->buffer;
+      $buffProp = get_object_vars ($buffer);
+      foreach ( $buffProp as $key => $value ) {
+        if ($this->flds [$key] ["is_key"]) return "$key=$value";
+      }
     }
-    JLog::add (get_class ($this) . "->getWhereClause() " . print_r ($buffer, true), 
-        JLog::ERROR, 'com_rbo');
+    JLog::add (get_class ($this) . "->getWhereClause() " . print_r ($buffer, true), JLog::ERROR, 
+        'com_rbo');
     throw new Exception ('Не найдено ключевое поле');
   }
   
@@ -78,7 +86,7 @@ class RbObject {
   }
   
   // =================================================================
-  public function getSetForUpdateClause($db, $buffer) { // должен возвращать массив
+  public function getSetForUpdateClause($db, $buffer) { // заменить на перебор flds вместо buffer (см. ниже)
     $currentTime = new JDate ('now');
     $buffer = ( object ) $buffer;
     $buffer->modified_by = JFactory::getUser ()->username;
@@ -87,6 +95,7 @@ class RbObject {
     $setFlds = get_object_vars ($buffer);
     $setAr = array ();
     foreach ( $setFlds as $key => $value ) {
+      if (! isset ($this->flds [$key])) continue;
       if (is_array ($value) || is_object ($value)) continue;
       if ($this->flds [$key] ["read_only"]) continue;
       switch ($this->flds [$key] ["type"]) {
@@ -115,13 +124,50 @@ class RbObject {
   }
   
   // =================================================================
+  public function getArraysForInsert($db, $buffer) {
+    $buffer = ( object ) $buffer;
+    $flds_names = array ();
+    $flds_vals = array ();
+    foreach ( $this->flds as $fldname => $fldvalue ) {
+      if ($fldvalue ["read_only"]) continue;
+      if (! isset ($buffer->{$fldname})) continue;
+      switch ($fldvalue ["type"]) {
+        case "string" :
+          {
+            $flds_names [] = $db->quoteName ($fldname);
+            $flds_vals [] = $db->quote ($buffer->{$fldname});
+            break;
+          }
+        case "date" :
+          {
+            $flds_names [] = $db->quoteName ($fldname);
+            $flds_vals [] = "STR_TO_DATE('" . $buffer->{$fldname} . "','%d.%m.%Y')";
+            break;
+          }
+        case "datetime" :
+          {
+            $flds_names [] = $db->quoteName ($fldname);
+            $flds_vals [] = "STR_TO_DATE('" . $buffer->{$fldname} . "','%d.%m.%Y %H:%i:00')";
+            break;
+          }
+        default :
+          {
+            $flds_names [] = $db->quoteName ($fldname);
+            $flds_vals [] = $buffer->{$fldname};
+          }
+      }
+    }
+    return array ($flds_names,implode (",", $flds_vals) );
+  }
+  
+  // =================================================================
   public function readObject() {
     $db = JFactory::getDBO ();
     $query = $db->getQuery (true);
     
     $query->select ($this->getFieldsForSelectClause ());
     $query->from ($this->table_name);
-    $query->where ($this->getWhereClause ($this->buffer));
+    $query->where ($this->getWhereClause ());
     
     try {
       $db->setQuery ($query);
@@ -147,7 +193,7 @@ class RbObject {
           $query->clear ();
           $query->update ($db->quoteName ($this->table_name));
           $query->set ($this->getSetForUpdateClause ($db, $value));
-          $query->where ($this->getWhereClause ($value));
+          $query->where ($this->getWhereClause ());
           $db->setQuery ($query);
           $result = $result && $db->execute ();
         }
@@ -155,7 +201,7 @@ class RbObject {
       } else {
         $query->update ($db->quoteName ($this->table_name));
         $query->set ($this->getSetForUpdateClause ($db, $this->buffer));
-        $query->where ($this->getWhereClause ($this->buffer));
+        $query->where ($this->getWhereClause ());
         $db->setQuery ($query);
         $result = $db->execute ();
       }
@@ -169,9 +215,45 @@ class RbObject {
   
   // =================================================================
   public function createObject() {
+    $db = JFactory::getDBO ();
+    $query = $db->getQuery (true);
+    
+    try {
+      if ($this->is_multiple) {
+        $result = true;
+        foreach ( $this->buffer as $key => $value ) {
+          $query->clear ();
+          $ins = $this->getArraysForInsert ($db, $value);
+          $query->insert ($db->quoteName ($this->table_name));
+          $query->columns ($ins [0]);
+          $query->values ($ins [1]);
+          $db->setQuery ($query);
+          $result = $result && $db->execute ();
+        }
+        if (! $result) throw new Exception ('Ошибка при создании записи в БД');
+      } else {
+        $ins = $this->getArraysForInsert ($db, $this->buffer);
+        $query->insert ($db->quoteName ($this->table_name));
+        $query->columns ($ins [0]);
+        $query->values ($ins [1]);
+        $db->setQuery ($query);
+        $result = $db->execute ();
+      }
+    } catch ( Exception $e ) {
+      JLog::add (
+          get_class ($this) . ":" . $e->getMessage () . " buffer=" . print_r ($this->buffer, true), 
+          JLog::ERROR, 'com_rbo');
+    }
+    $this->response = $result;
   }
   
   // =================================================================
   public function deleteObject() {
+    $db = JFactory::getDBO ();
+    $query = $db->getQuery (true);
+    $query->delete ($db->quoteName ($this->table_name));
+    $query->where ($this->getWhereClause ());
+    $db->setQuery ($query);
+    $result = $db->execute ();
   }
 }

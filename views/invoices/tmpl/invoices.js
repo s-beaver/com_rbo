@@ -208,21 +208,14 @@ function showInvoiceForm(i) {
 
   if (!readOnly) {
     oBtns["Удалить"] = function() {
-      $("#dialog-confirm").html("Счёт будет удален. Продолжить?");
-      $("#dialog-confirm").dialog({
-        title : "Удалить счёт",
-        buttons : {
-          "Удалить" : function() {
+
+      Ask("Счёт будет удален. Продолжить?", "Удалить счёт", "Отмена",
+          function() {
             $("#dialog-confirm").dialog("close");
             deleteInvoice(i.invId);
-          },
-          "Отмена" : function() {
-            $("#dialog-confirm").dialog("close");
-          }
-        }
-      });
-      $("#dialog-confirm").dialog("open");
+          }, null);
     }
+
   }
 
   $("#neworder-form").dialog({
@@ -262,6 +255,15 @@ function showProductForm(x) {// x-номер редактируемой стро
   $("#newline-form").dialog({
     title : "Позиция - " + p.product_code,
     buttons : {
+      "Удалить" : function() {
+        Ask("Удалить строку из счета?", "Удалить", "Отмена", function() {
+          if (editing_lineNo >= 0) {
+            oTableProducts.fnDeleteRow(editing_lineNo);
+          }
+          $("#newline-form").dialog("close");
+        }, null);
+      },
+
       "Сохранить" : function() {
         var p = {};
         p.productId = $("#prodId").val();
@@ -333,8 +335,7 @@ function setProductPrice() {
   $("#prod_code").val(arProd[2]);
   $("#prod_cnt").val(1);
   calcSum();
-  
-  
+
 }
 
 // ===================================================================================

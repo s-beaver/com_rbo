@@ -4,8 +4,8 @@ include_once "models/rbobject.php";
 class RbOInvProducts extends RbObject {
  
  // =================================================================
- public function __construct() {
-  parent::__construct ();
+ public function __construct($parentKeyValue) {
+  parent::__construct ($parentKeyValue);
   
   $this->is_multiple = true;
   $this->table_name = "rbo_invoices_products";

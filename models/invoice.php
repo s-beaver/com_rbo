@@ -5,8 +5,8 @@ include_once "models/invproducts.php";
 class RbOInvoice extends RbObject {
   
   // =================================================================
-  public function __construct() {
-    parent::__construct ();
+  public function __construct($parentKeyValue) {
+    parent::__construct ($parentKeyValue);
     
     $this->table_name = "rbo_invoices";
     $this->flds ["invId"] = array ("type" => "numeric","is_key" => true );
@@ -29,7 +29,7 @@ class RbOInvoice extends RbObject {
     
     $input = JFactory::getApplication ()->input;
     $input->set ("rbo_invoices_products", array ("invId" => $invId ));
-    $prod = new RbOInvProducts ();
+    $prod = new RbOInvProducts ($invId);
     $prod->readObject ();
     $this->buffer->inv_products = $prod->buffer; // получился объект, у которого свойство inv_products - не ассоциативный массив. Не согласовано. Наверное надо переходить на объект. См. datatables.net
     $this->response = $this->oJson->encode ($this->buffer);
@@ -39,12 +39,16 @@ class RbOInvoice extends RbObject {
   public function updateObject() {
     $invId = $this->buffer->invId;
     $inv_products = $this->buffer->inv_products;
+    foreach ( $inv_products as &$p ) {
+      $p["invId"] = $invId;
+    }
     parent::updateObject ();
-    
+
     $input = JFactory::getApplication ()->input;
     $input->set ("rbo_invoices_products", $inv_products);
-    $prod = new RbOInvProducts ();
-    $prod->updateObject ();
+    $prod = new RbOInvProducts ($invId);
+    $prod->deleteObject();    
+    $prod->createObject ();
     $this->response = $this->response && $prod->response;
   }
 }
