@@ -2,6 +2,7 @@
 var oTable;
 var oTableProducts;
 var apiTableProducts;
+var oTableTools;
 var comPath = "/components/com_rbo/";
 var allFields;
 var tips;
@@ -35,9 +36,22 @@ function NullTo(oTest, sVoz) {
 // ===================================================================================
 function updateTips(t) {
   tips.text(t).addClass("ui-state-highlight");
+  tips.show();
   setTimeout(function() {
     tips.removeClass("ui-state-highlight", 1500);
+    tips.hide();
   }, 500);
+}
+
+// ===================================================================================
+function checkNotEmpty(o, n) {
+  if (o.val().length == 0) {
+    o.addClass("ui-state-error");
+    updateTips("Заполните поле " + n);
+    return false;
+  } else {
+    return true;
+  }
 }
 
 // ===================================================================================
@@ -88,7 +102,7 @@ function Ask(sText, okText, cancelText, fnOk, fnCancel) {// Ask("123","Удал�
 // ===================================================================================
 function setRW(sStatus) {
 
-  if (sStatus == "выставлен" || sStatus == "оплачен") {
+  if (sStatus == "выставлен" || sStatus == "оплачен" || sStatus == "удален") {
     allFields.attr("disabled", "disabled");
     return true;
   } else {
@@ -119,7 +133,9 @@ function readInvoice(invId) {
 function checkSaveInvoice(invId, inv_status) {
   var bValid = true;
   allFields.removeClass("ui-state-error");
-  // bValid = bValid && checkLength(inv_num, "Номер", 1, 3);
+  bValid = bValid && checkNotEmpty($("#inv_num"), "Номер");
+  bValid = bValid && checkNotEmpty($("#inv_date"), "Дата");
+  bValid = bValid && checkNotEmpty($("#inv_manager"), "Менеджер");
   var p = apiTableProducts.rows().data();
   var pAr = new Array();
   for (var i = 0; i < p.length; i++)
@@ -143,7 +159,7 @@ function checkSaveInvoice(invId, inv_status) {
   };
 
   var taskCmd = "invoice_create";
-  if (invId != 0)
+  if (!IsNull(invId) && invId > 0)
     taskCmd = "invoice_update";
   $.ajax({
     dataType : 'json',
@@ -159,12 +175,31 @@ function checkSaveInvoice(invId, inv_status) {
 }
 
 // ===================================================================================
+function createInvoice() {
+  $.ajax({
+    dataType : 'json',
+    type : "POST",
+    //data : {},
+    url : comPath + "ajax.php?task=get_inv_num",
+    success : function(p) {
+      $('#inv_num').val(p.new_inv_num);
+      $('#inv_date').val(p.new_inv_date);
+    }
+  });
+
+  showInvoiceForm({});
+
+}
+
+// ===================================================================================
 function deleteInvoice(invId) {
   $.ajax({
     dataType : 'json',
     type : "POST",
     data : {
-      "invId" : invId
+      "rbo_invoices" : {
+        "invId" : invId
+      }
     },
     url : comPath + "ajax.php?task=invoice_delete",
     success : function(inv_data) {
@@ -188,35 +223,35 @@ function showInvoiceForm(i) {
   $("#inv_rem").val(i.inv_rem);
   var readOnly = setRW(i.inv_status);
 
-  for (var x = 0; x < i.inv_products.length; x++)
-    i.inv_products[x].lineNo = x;
   oTableProducts.fnClearTable();
-  oTableProducts.fnAddData(i.inv_products);
-
-  var oBtns = {
-    "Печатать" : function() {
-    },
-
-    "Сохранить" : function() {
-      checkSaveInvoice(i.invId, "")
-    },
-
-    "Отмена" : function() {
-      $("#neworder-form").dialog("close");
-    }
+  if (!IsNull(i.inv_products) && i.inv_products.length > 0) {
+    for (var x = 0; x < i.inv_products.length; x++)
+      i.inv_products[x].lineNo = x;
+    oTableProducts.fnAddData(i.inv_products);
   }
 
+  var oBtns = {};
   if (!readOnly) {
     oBtns["Удалить"] = function() {
 
       Ask("Счёт будет удален. Продолжить?", "Удалить счёт", "Отмена",
           function() {
-            $("#dialog-confirm").dialog("close");
             deleteInvoice(i.invId);
           }, null);
     }
 
   }
+
+  oBtns["Печатать"] = function() {
+  };
+
+  oBtns["Сохранить"] = function() {
+    checkSaveInvoice(i.invId, "");
+  };
+
+  oBtns["Отмена"] = function() {
+    $("#neworder-form").dialog("close");
+  };
 
   $("#neworder-form").dialog({
     height : 550,
@@ -280,6 +315,13 @@ function showProductForm(x) {// x-номер редактируемой стро
           oTableProducts.fnAddData(p);
         }
 
+        var pAll = oTableProducts.fnGetData();
+        var iSum = 0;
+        for (var x = 0; x < pAll.length; x++) {
+          iSum += Number(pAll[x].product_sum);
+        }
+        $('#inv_sum').val(iSum);
+
         $("#newline-form").dialog("close");
       },
 
@@ -329,6 +371,7 @@ function productSearch() {
 // ===================================================================================
 function setProductPrice() {
   var oVal = $("#prod_name :selected").val();
+  $("#newline-form").dialog("option", "title", "Позиция - " + oVal);
   var arProd = oVal.split("|");
   $("#prodId").val(arProd[0]);
   $("#prod_price").val(arProd[1]);
@@ -347,8 +390,8 @@ function calcSum() {
 $(document)
     .ready(
         function() {
-          allFields = $("#inv_num").add($("#inv_date")).add($("#inv_sum")).add(
-              $("#inv_manager")).add($("#inv_cust")).add($("#inv_firm"));
+          allFields = $("#inv_num").add($("#inv_date")).add($("#inv_manager"))
+              .add($("#inv_cust")).add($("#inv_firm"));
           tips = $(".validateTips");
 
           oTable = $('#TableInv').dataTable(
@@ -356,6 +399,10 @@ $(document)
                 "bJQueryUI" : true,
                 "bProcessing" : true,
                 "bServerSide" : true,
+                // "dom": 'HFT<"toolbar"><t>lfrtip',
+                "tableTools" : {
+                  "sSwfPath" : "/swf/copy_csv_xls_pdf.swf"
+                },
                 "aaSorting" : [ [ 1, "desc" ] ],
                 "sAjaxSource" : comPath + "ajax.php?task=get_invoice_list",
                 "fnServerData" : function(sSource, aoData, fnCallback,
@@ -414,6 +461,13 @@ $(document)
                   }
                 }
               });
+
+          /*
+           * oTableTools = new $.fn.dataTable.TableTools( oTable, { "buttons": [
+           * "copy", "csv", "xls", "pdf", { "type": "print", "buttonText":
+           * "Print me!" } ] } ); $( oTableTools.fnContainer()
+           * ).insertAfter('div.info');
+           */
 
           $("#neworder-form").dialog({
             autoOpen : false,
@@ -479,7 +533,25 @@ $(document)
                                 + "<img src='"
                                 + comPath + "images/icon-32-edit-on.png'/></a>";
                           }
-                        } ]
+                        } ],
+                    "oLanguage" : {
+                      "sProcessing" : "Подождите...",
+                      "sLengthMenu" : "Показать _MENU_ строк",
+                      "sZeroRecords" : "Записи отсутствуют.",
+                      "sInfo" : "Строки с _START_ по _END_ (всего: _TOTAL_)",
+                      "sInfoEmpty" : "Строк нет",
+                      "sInfoFiltered" : "(отфильтровано из _MAX_ записей)",
+                      "sInfoPostFix" : "",
+                      "sSearch" : "Поиск:",
+                      "sUrl" : "",
+                      "oPaginate" : {
+                        "sFirst" : "В начало",
+                        "sPrevious" : "Предыдущие",
+                        "sNext" : "Следующие",
+                        "sLast" : "В конец"
+                      }
+                    }
+
                   });
 
           apiTableProducts = oTableProducts.api();

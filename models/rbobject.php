@@ -14,10 +14,6 @@ class RbObject {
   public function __construct($parentKeyValue) {
     $this->parentKeyValue = $parentKeyValue;
     $this->oJson = new Services_JSON ();
-    $this->flds ["created_by"] = array ("type" => "string" );
-    $this->flds ["created_on"] = array ("type" => "datetime" );
-    $this->flds ["modified_by"] = array ("type" => "string" );
-    $this->flds ["modified_on"] = array ("type" => "datetime" );
   }
   
   // =================================================================
@@ -87,10 +83,7 @@ class RbObject {
   
   // =================================================================
   public function getSetForUpdateClause($db, $buffer) { // заменить на перебор flds вместо buffer (см. ниже)
-    $currentTime = new JDate ('now');
     $buffer = ( object ) $buffer;
-    $buffer->modified_by = JFactory::getUser ()->username;
-    $buffer->modified_on = $currentTime->format ('d.m.Y H:i:00', true); // https://php.net/manual/en/function.date.php время добавить - скорректировать timezone
     
     $setFlds = get_object_vars ($buffer);
     $setAr = array ();
@@ -131,28 +124,31 @@ class RbObject {
     foreach ( $this->flds as $fldname => $fldvalue ) {
       if ($fldvalue ["read_only"]) continue;
       if (! isset ($buffer->{$fldname})) continue;
+      $flds_names [] = $db->quoteName ($fldname);
       switch ($fldvalue ["type"]) {
         case "string" :
           {
-            $flds_names [] = $db->quoteName ($fldname);
             $flds_vals [] = $db->quote ($buffer->{$fldname});
             break;
           }
         case "date" :
           {
-            $flds_names [] = $db->quoteName ($fldname);
             $flds_vals [] = "STR_TO_DATE('" . $buffer->{$fldname} . "','%d.%m.%Y')";
             break;
           }
         case "datetime" :
           {
-            $flds_names [] = $db->quoteName ($fldname);
             $flds_vals [] = "STR_TO_DATE('" . $buffer->{$fldname} . "','%d.%m.%Y %H:%i:00')";
+            break;
+          }
+        case "numeric" :
+          {
+            if ($buffer->{$fldname}=="") $buffer->{$fldname}=0;
+            $flds_vals [] = $buffer->{$fldname};
             break;
           }
         default :
           {
-            $flds_names [] = $db->quoteName ($fldname);
             $flds_vals [] = $buffer->{$fldname};
           }
       }
@@ -238,6 +234,7 @@ class RbObject {
         $query->values ($ins [1]);
         $db->setQuery ($query);
         $result = $db->execute ();
+        $this->buffer->invId = $db->insertid(); 
       }
     } catch ( Exception $e ) {
       JLog::add (

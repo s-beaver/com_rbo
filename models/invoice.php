@@ -2,6 +2,7 @@
 jimport ('etc.json_lib');
 include_once "models/rbobject.php";
 include_once "models/invproducts.php";
+include_once "models/rbohelper.php";
 class RbOInvoice extends RbObject {
   
   // =================================================================
@@ -18,6 +19,11 @@ class RbOInvoice extends RbObject {
     $this->flds ["inv_cust"] = array ("type" => "string" );
     $this->flds ["inv_firm"] = array ("type" => "string" );
     $this->flds ["inv_rem"] = array ("type" => "string" );
+    
+    $this->flds ["created_by"] = array ("type" => "string" );
+    $this->flds ["created_on"] = array ("type" => "datetime" );
+    $this->flds ["modified_by"] = array ("type" => "string" );
+    $this->flds ["modified_on"] = array ("type" => "datetime" );
     
     $this->getInputBuffer ();
   }
@@ -39,16 +45,60 @@ class RbOInvoice extends RbObject {
   public function updateObject() {
     $invId = $this->buffer->invId;
     $inv_products = $this->buffer->inv_products;
+    
+    $this->buffer->modified_by = JFactory::getUser ()->username;
+    $this->buffer->modified_on = RbOHelper::getCurrentTimeForDb();
+    
     foreach ( $inv_products as &$p ) {
-      $p["invId"] = $invId;
+      $p ["invId"] = $invId;
     }
     parent::updateObject ();
-
+    
     $input = JFactory::getApplication ()->input;
     $input->set ("rbo_invoices_products", $inv_products);
     $prod = new RbOInvProducts ($invId);
-    $prod->deleteObject();    
+    $prod->deleteObject ();
     $prod->createObject ();
     $this->response = $this->response && $prod->response;
+  }
+  
+  // =================================================================
+  public function createObject() {
+    $inv_products = $this->buffer->inv_products;
+    
+    $this->buffer->created_by = JFactory::getUser ()->username;
+    $this->buffer->created_on = RbOHelper::getCurrentTimeForDb();
+    
+    parent::createObject ();
+    
+    $invId = $this->buffer->invId;  
+    foreach ( $inv_products as &$p ) {
+      $p ["invId"] = $invId;
+    }
+    
+    $input = JFactory::getApplication ()->input;
+    $input->set ("rbo_invoices_products", $inv_products);
+    $prod = new RbOInvProducts ($invId);
+    $prod->createObject ();
+    $this->response = $this->response && $prod->response;
+  }
+  
+  // =================================================================
+  public function deleteObject() {
+    $db = JFactory::getDBO ();
+    $query = $db->getQuery (true);
+    
+    try {
+      $query->update ($db->quoteName ($this->table_name));
+      $query->set ("inv_status='удален'");
+      $query->where ($this->getWhereClause ());
+      $db->setQuery ($query);
+      $result = $db->execute ();
+    } catch ( Exception $e ) {
+      JLog::add (
+          get_class ($this) . ":" . $e->getMessage () . " buffer=" . print_r ($this->buffer, true), 
+          JLog::ERROR, 'com_rbo');
+    }
+    $this->response = $result;
   }
 }

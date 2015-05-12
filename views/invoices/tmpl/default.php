@@ -39,12 +39,20 @@
 	margin-bottom: 0px;
 	padding: .2em;
 }
+
+.validateTips {
+	border: 1px solid transparent;
+	padding: 0.3em;
+}
 </style>
 
 </head>
 <body>
+  <a href="javascript:createInvoice()"> <img
+    src="components/com_rbo/images/icon-32-new-on.png" /></a>
 
   <div id="neworder-form" title="Новый счёт">
+    <!--  p class="validateTips" style="visibility: hidden">Заполните обязательные поля</p-->              
     <form id="neworder-form-form" method="post" action="">
       <fieldset style='padding: 0'>
         <table>
@@ -62,7 +70,7 @@
               </div>
               <div style="float: right">
                 <label for="inv_sum">Сумма</label>
-                <input type="text" name="inv_sum" id="inv_sum"
+                <input disabled type="text" name="inv_sum" id="inv_sum"
                   class="text ui-widget-content ui-corner-all"
                   style='text-align: right; width: 70px' value="" />
                 <label for="inv_status">Статус</label>
@@ -72,11 +80,13 @@
                   <option value=""></option>
                   <option value="выставлен">выставлен</option>
                   <option value="оплачен">оплачен</option>
+                  <option value="удален">удален</option>
                 </select>
                 <label for="inv_manager">Менеджер</label>
                 <select id="inv_manager" name="inv_manager"
                   class="text ui-widget-content ui-corner-all"
                   style="width: 120px">
+                  <option value=""></option>
                   <option value="Алексей">Алексей</option>
                   <option value="Аня">Аня</option>
                   <option value="Володя">Володя</option>
@@ -133,7 +143,8 @@
               <label for="prod_name">Название</label>
               <select name="prod_name" id="prod_name"
                 class="text ui-widget-content ui-corner-all"
-                style="text-align: right; width: 500px" value="" onChange=setProductPrice() />
+                style="text-align: right; width: 500px" value=""
+                onChange=setProductPrice() />
               </select>
             </td>
           </tr>
@@ -167,5 +178,7 @@
     Продолжить?</div>
 
   <table id="TableInv" class="display compact"></table>
+
+  <div class="toolbar">!RbO!</div>
 </body>
 </html>
