@@ -18,66 +18,6 @@ body {
 	font-size: 8pt;
 }
 
-.width {
-	display: table;
-	width: 100%;
-	border1: solid 1px grey;
-}
-
-.width10 {
-	display: table-cell;
-	width: 10%;
-}
-
-.width20 {
-	display: table-cell;
-	width: 20%;
-}
-
-.width30 {
-	display: table-cell;
-	width: 30%;
-}
-
-.width40 {
-	display: table-cell;
-	width: 40%;
-}
-
-.width50 {
-	display: table-cell;
-	width: 50%;
-}
-
-.width60 {
-	display: table-cell;
-	width: 60%;
-}
-
-.width70 {
-	display: table-cell;
-	width: 70%;
-}
-
-.width80 {
-	display: table-cell;
-	width: 80%;
-}
-
-.width90 {
-	display: table-cell;
-	width: 90%;
-}
-
-.width100 {
-	display: table-cell;
-	width: 100%;
-}
-
-[class~=row] {
-	display: table-row;
-}
-
 table {
 	border-collapse: collapse;
 }
@@ -87,17 +27,36 @@ table, th, td {
 	padding: 5px;
 }
 
+.table_no_border {
+	border: 0;
+	width: 100%;
+}
+
+.table_no_border tr td {
+	border: 0;
+}
+
 .inv_num {
 	font-size: 150%;
 	font-weight: bold;
 	margin: 10px;
 }
 
-.inv_recv, .inv_header {
+.inv_recv, .inv_header, .inv_sum_words {
 	font-size: 10pt;
 }
 
-.inv_sign {
+.inv_products {
+	width: 100%;
+	padding: 2px;
+}
+
+.inv_products thead * {
+	text-align: center;
+	font-weight: bold;
+}
+
+[class~=inv_sign] {
 	font-size: 10pt;
 	text-align: center;
 }
@@ -107,21 +66,37 @@ table, th, td {
 	border-width: 1px;
 }
 
-.inv_products {
-	width: 100%;
+.img_stamp {
+	position: absolute;
+	left: 0px;
+	top: 200px;
+	height: 32mm;
+	width: 32mm;
+	overflow: visible;
+	z-index: -1;
 }
 </style>
 
 </head>
-<body style="width: 180mm">
-  <div class="inv_top">
-    <div class="width30">===ЛОГОТИП===</div>
-    <div class="width70">Внимание! Оплата данного счета означает
-      согласие с условиями поставки товара. Уведомление об оплате
-      обязательно, в противном случае не гарантируется наличие товара на
-      складе. Товар отпускается по факту прихода денег на р/с
-      Поставщика, самовывозом, при наличии доверенности и паспорта</div>
+<body style="width: 180mm;">
+  <div style="visibility: hidden" id="invid_transfer"><?php
+  $input = JFactory::getApplication ()->input;
+  echo $input->getCmd ('invid');
+  ?>
   </div>
+  <table class="table_no_border">
+    <tr>
+      <td>
+        <img src="components/com_rbo/images/logo.jpg"
+          style="width: 54mm;" />
+      </td>
+      <td>Внимание! Оплата данного счета означает согласие с условиями
+        поставки товара. Уведомление об оплате обязательно, в противном
+        случае не гарантируется наличие товара на складе. Товар
+        отпускается по факту прихода денег на р/с Поставщика,
+        самовывозом, при наличии доверенности и паспорта</td>
+    </tr>
+  </table>
   <br>
 
   <div class="inv_recv">
@@ -159,14 +134,16 @@ table, th, td {
     <div>Счет действителен в течение 3 банковских дней с даты его
       выставления</div>
     <hr noshade>
-    <div class="row">
-      <div class="width10">Поставщик:</div>
-      <div class="width90" id="inv_firm">ххООО Робик.РУхх</div>
-    </div>
-    <div class="row">
-      <div class="width10">Покупатель:</div>
-      <div class="width90" id="inv_cust">ххПокупательхх</div>
-    </div>
+    <table class="table_no_border">
+      <tr>
+        <td style="width: 10%">Поставщик:</td>
+        <td style="width: 90%" id="inv_firm">ххООО Робик.РУхх</td>
+      </tr>
+      <tr>
+        <td style="width: 10%">Покупатель:</td>
+        <td style="width: 90%" id="inv_cust">ххПокупательхх</td>
+      </tr>
+    </table>
   </div>
 
   <table class="inv_products">
@@ -175,26 +152,39 @@ table, th, td {
         <td>№</td>
         <td>Товары (работы, услуги)</td>
         <td>К-во</td>
-        <td>Цена</td>
-        <td>Сумма</td>
+        <td>Цена, руб</td>
+        <td>Сумма, руб</td>
       </tr>
     </thead>
     <tbody id="inv_products"></tbody>
+    <tfoot id="inv_products">
+      <tr>
+        <td colspan=4>Итого</td>
+        <td id="inv_sum" style='text-align: right'>ххСуммаИтогохх</td>
+      </tr>
+    </tfoot>
   </table>
+
+  <div class="inv_sum_words">
+    Сумма прописью: <span id="inv_sum_words"></span>
+  </div>
 
   <div class="inv_condition"></div>
   <hr noshade>
   <br>
-  <div class="inv_sign">
-    <div class="width30">Менеджер</div>
-    <div class="width40">
-      <div class="underlined">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-      <div>подпись</div>
-    </div>
-    <div class="width30">
-      <div id="inv_manager" class="underlined">ххМенеджерхх</div>
-      <div>расшифровка</div>
-    </div>
-  </div>
+
+  <table class="table_no_border inv_sign">
+    <tr>
+      <td>Менеджер</td>
+      <td>
+        <div class="underlined">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+      </td>
+      <td id="inv_manager" class="underlined">ххМенеджерхх</td>
+    </tr>
+  </table>
+
+  <!-- img id="img_sign" class="img_sign" src=""/-->
+  <img id="img_stamp" class="img_stamp" src="" />
+
 </body>
 </html>

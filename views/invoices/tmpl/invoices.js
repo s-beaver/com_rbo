@@ -153,6 +153,7 @@ function showInvoiceForm(i) {
   }
 
   oBtns["Печатать"] = function() {
+    window.open('index.php?option=com_rbo&view=invprint&format=raw&invid='+i.invId, '_blank');
   };
 
   oBtns["Сохранить"] = function() {

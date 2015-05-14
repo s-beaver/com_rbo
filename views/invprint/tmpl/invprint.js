@@ -22,44 +22,55 @@ function fillInvoicePrintForm(i) {
   $("#inv_num").html(i.inv_num);
   $("#inv_date").html(i.inv_date);
 
-  var f = i.inv_firm_details;
-  $("#inv_firm").html(
-      implode(", ", f.f_name, "ИНН " + f.f_inn, "КПП " + f.f_kpp, f.f_addr,
-          f.f_phone));
-  $("#f_bank").html(f.f_bank);
-  $("#f_bik").html(f.f_bik);
-  $("#f_rch").html(f.f_rch);
-  $("#f_kch").html(f.f_kch);
-  $("#f_name").html(f.f_fullname);
-  $("#f_inn").html(f.f_inn);
-  $("#f_kpp").html(f.f_kpp);
+  if (!IsNull(i.inv_firm_details)) {
+    var f = i.inv_firm_details;
+    var arFirm = [ f.f_name, "ИНН " + f.f_inn, "КПП " + f.f_kpp, f.f_addr,
+        f.f_phone ];
+    $("#inv_firm").html(arFirm.join());
+    $("#f_bank").html(f.f_bank);
+    $("#f_bik").html(f.f_bik);
+    $("#f_rch").html(f.f_rch);
+    $("#f_kch").html(f.f_kch);
+    $("#f_name").html(f.f_fullname);
+    $("#f_inn").html(f.f_inn);
+    $("#f_kpp").html(f.f_kpp);
+  }
 
   $("#inv_cust").html(i.inv_cust);
 
   $("#inv_manager").html(i.inv_manager_details);
 
-  var sPr="";
+  var sPr = "";
   if (!IsNull(i.inv_products) && i.inv_products.length > 0) {
     for (var x = 0; x < i.inv_products.length; x++) {
       sPr += "<tr>";
-      sPr += "<td>"+(x+1)+"</td>";//#
-      sPr += "<td>"+i.inv_products[x].product_name+"</td>";
-      sPr += "<td>"+i.inv_products[x].product_cnt+"</td>";
-      sPr += "<td>"+i.inv_products[x].product_price+"</td>";
-      sPr += "<td>"+i.inv_products[x].product_sum+"</td>";
+      sPr += "<td style='text-align: center'>" + (x + 1) + "</td>";// #
+      sPr += "<td style='text-align: left'>" + i.inv_products[x].product_name
+          + "</td>";
+      sPr += "<td style='text-align: center'>" + i.inv_products[x].product_cnt
+          + "</td>";
+      sPr += "<td style='text-align: right'>" + i.inv_products[x].product_price
+          + "</td>";
+      sPr += "<td style='text-align: right'>" + i.inv_products[x].product_sum
+          + "</td>";
       sPr += "</tr>";
     }
   }
   $("#inv_products").html(sPr);
+  $("#inv_sum").html(i.inv_sum);
+  $("#inv_sum_words").html(number_to_string(i.inv_sum));
 
-  /*
-   * $("#inv_sum").val(i.inv_sum); $("#inv_manager :contains('" + i.inv_manager +
-   * "')").prop("selected", "selected"); $("#inv_cust").val(i.inv_cust); var
-   * 
-   */
+  var iManOffset = $("#inv_manager").offset();
+  iManOffset.top -= 50;
+  iManOffset.left -= 50;
+
+  if (!IsNull(i.inv_firm_details))
+    $("#img_stamp").attr("src", "components/com_rbo/images/" + f.f_stamp);
+  $("#img_stamp").offset(iManOffset);
 
 }
 
+// ===================================================================================
 $(document).ready(function() {
-  readInvoice(1625);
+  readInvoice($("#invid_transfer").html());
 })
