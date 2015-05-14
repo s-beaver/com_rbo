@@ -3,6 +3,7 @@ jimport ('etc.json_lib');
 include_once "models/rbobject.php";
 include_once "models/invproducts.php";
 include_once "models/rbohelper.php";
+include_once "configuration.php";
 class RbOInvoice extends RbObject {
   
   // =================================================================
@@ -37,7 +38,11 @@ class RbOInvoice extends RbObject {
     $input->set ("rbo_invoices_products", array ("invId" => $invId ));
     $prod = new RbOInvProducts ($invId);
     $prod->readObject ();
-    $this->buffer->inv_products = $prod->buffer; // получился объект, у которого свойство inv_products - не ассоциативный массив. Не согласовано. Наверное надо переходить на объект. См. datatables.net
+    $this->buffer->inv_products = $prod->buffer;
+
+    $cfg = new RboConfig();
+    $this->buffer->inv_firm_details = $cfg->firms[$this->buffer->inv_firm];
+    $this->buffer->inv_manager_details = $cfg->managers[$this->buffer->inv_manager];
     $this->response = $this->oJson->encode ($this->buffer);
   }
   
@@ -100,5 +105,10 @@ class RbOInvoice extends RbObject {
           JLog::ERROR, 'com_rbo');
     }
     $this->response = $result;
+  }
+  
+  // =================================================================
+  public function printInv() {
+    
   }
 }

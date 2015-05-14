@@ -10,96 +10,6 @@ var editing_lineNo;
 var lines_before_update;
 
 // ===================================================================================
-function IsNull(vVal) {
-  var und = void null;
-  switch (vVal) {
-  case und:
-  case null:
-  case undefined:
-  case NaN: {
-    return true;
-  }
-  default: {
-    return false;
-  }
-  }
-}
-
-// ===================================================================================
-function NullTo(oTest, sVoz) {
-  if (IsNull(oTest))
-    return sVoz;
-  else
-    return oTest;
-}
-
-// ===================================================================================
-function updateTips(t) {
-  tips.text(t).addClass("ui-state-highlight");
-  tips.show();
-  setTimeout(function() {
-    tips.removeClass("ui-state-highlight", 1500);
-    tips.hide();
-  }, 500);
-}
-
-// ===================================================================================
-function checkNotEmpty(o, n) {
-  if (o.val().length == 0) {
-    o.addClass("ui-state-error");
-    updateTips("Заполните поле " + n);
-    return false;
-  } else {
-    return true;
-  }
-}
-
-// ===================================================================================
-function checkLength(o, n, min, max) {
-  if (o.val().length > max || o.val().length < min) {
-    o.addClass("ui-state-error");
-    updateTips("Длина поля " + n + "  должна быть не менее " + min
-        + "  и не более " + max + " символов");
-    return false;
-  } else {
-    return true;
-  }
-}
-
-// ===================================================================================
-function checkRegexp(o, regexp, n) {
-  if (!(regexp.test(o.val()))) {
-    o.addClass("ui-state-error");
-    updateTips(n);
-    return false;
-  } else {
-    return true;
-  }
-}
-
-// ===================================================================================
-function Ask(sText, okText, cancelText, fnOk, fnCancel) {// Ask("123","Удалить","Отмена",function(){deleteOrder(invId)},null);
-  $("#dialog-confirm").html(sText);
-  var bOk = {};
-  bOk[okText] = function(arg) {
-    $("#dialog-confirm").dialog("close");
-    fnOk(arg);
-  };
-  bOk[cancelText] = function() {
-    $("#dialog-confirm").dialog("close");
-  }
-
-  $("#dialog-confirm").dialog({
-    resizable : false,
-    height : 180,
-    modal : true,
-    buttons : bOk
-  });
-
-  $("#dialog-confirm").dialog("open");
-}
-
-// ===================================================================================
 function setRW(sStatus) {
 
   if (sStatus == "выставлен" || sStatus == "оплачен" || sStatus == "удален") {
@@ -133,9 +43,9 @@ function readInvoice(invId) {
 function checkSaveInvoice(invId, inv_status) {
   var bValid = true;
   allFields.removeClass("ui-state-error");
-  bValid = bValid && checkNotEmpty($("#inv_num"), "Номер");
-  bValid = bValid && checkNotEmpty($("#inv_date"), "Дата");
-  bValid = bValid && checkNotEmpty($("#inv_manager"), "Менеджер");
+  bValid = bValid && checkNotEmpty($("#inv_num"), "Номер", tips);
+  bValid = bValid && checkNotEmpty($("#inv_date"), "Дата", tips);
+  bValid = bValid && checkNotEmpty($("#inv_manager"), "Менеджер", tips);
   var p = apiTableProducts.rows().data();
   var pAr = new Array();
   for (var i = 0; i < p.length; i++)
@@ -179,7 +89,7 @@ function createInvoice() {
   $.ajax({
     dataType : 'json',
     type : "POST",
-    //data : {},
+    // data : {},
     url : comPath + "ajax.php?task=get_inv_num",
     success : function(p) {
       $('#inv_num').val(p.new_inv_num);
@@ -237,7 +147,7 @@ function showInvoiceForm(i) {
       Ask("Счёт будет удален. Продолжить?", "Удалить счёт", "Отмена",
           function() {
             deleteInvoice(i.invId);
-          }, null);
+          }, null, "#dialog-confirm");
     }
 
   }
@@ -296,7 +206,7 @@ function showProductForm(x) {// x-номер редактируемой стро
             oTableProducts.fnDeleteRow(editing_lineNo);
           }
           $("#newline-form").dialog("close");
-        }, null);
+        }, null, "#dialog-confirm");
       },
 
       "Сохранить" : function() {
