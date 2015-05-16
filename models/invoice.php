@@ -14,6 +14,9 @@ class RbOInvoice extends RbObject {
     $this->flds ["invId"] = array ("type" => "numeric","is_key" => true );
     $this->flds ["inv_num"] = array ("type" => "string" );
     $this->flds ["inv_date"] = array ("type" => "date" );
+    $this->flds ["inv_ship_type"] = array ("type" => "string" );
+    $this->flds ["inv_ship_num"] = array ("type" => "string" );
+    $this->flds ["inv_ship_date"] = array ("type" => "date" );
     $this->flds ["inv_sum"] = array ("type" => "numeric" );
     $this->flds ["inv_status"] = array ("type" => "string" );
     $this->flds ["inv_manager"] = array ("type" => "string" );
@@ -39,10 +42,10 @@ class RbOInvoice extends RbObject {
     $prod = new RbOInvProducts ($invId);
     $prod->readObject ();
     $this->buffer->inv_products = $prod->buffer;
-
-    $cfg = new RboConfig();
-    $this->buffer->inv_firm_details = $cfg->firms[$this->buffer->inv_firm];
-    $this->buffer->inv_manager_details = $cfg->managers[$this->buffer->inv_manager];
+    
+    $cfg = new RboConfig ();
+    $this->buffer->inv_firm_details = $cfg->firms [$this->buffer->inv_firm];
+    $this->buffer->inv_manager_details = $cfg->managers [$this->buffer->inv_manager];
     $this->response = $this->oJson->encode ($this->buffer);
   }
   
@@ -52,7 +55,7 @@ class RbOInvoice extends RbObject {
     $inv_products = $this->buffer->inv_products;
     
     $this->buffer->modified_by = JFactory::getUser ()->username;
-    $this->buffer->modified_on = RbOHelper::getCurrentTimeForDb();
+    $this->buffer->modified_on = RbOHelper::getCurrentTimeForDb ();
     
     foreach ( $inv_products as &$p ) {
       $p ["invId"] = $invId;
@@ -72,11 +75,11 @@ class RbOInvoice extends RbObject {
     $inv_products = $this->buffer->inv_products;
     
     $this->buffer->created_by = JFactory::getUser ()->username;
-    $this->buffer->created_on = RbOHelper::getCurrentTimeForDb();
+    $this->buffer->created_on = RbOHelper::getCurrentTimeForDb ();
     
     parent::createObject ();
     
-    $invId = $this->buffer->invId;  
+    $invId = $this->buffer->invId;
     foreach ( $inv_products as &$p ) {
       $p ["invId"] = $invId;
     }
@@ -109,6 +112,5 @@ class RbOInvoice extends RbObject {
   
   // =================================================================
   public function printInv() {
-    
   }
 }

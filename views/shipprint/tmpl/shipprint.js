@@ -21,6 +21,10 @@ function readInvoice(invId) {
 function fillInvoicePrintForm(i) {
   $("#inv_num").html(i.inv_num);
   $("#inv_date").html(i.inv_date);
+  $("#inv_based_on").html("По счету №" + i.inv_num + " от " + i.inv_date);
+
+  $("#inv_ship_num").html(i.inv_ship_num);
+  $("#inv_ship_date").html(i.inv_ship_date);
 
   if (!IsNull(i.inv_firm_details)) {
     var f = i.inv_firm_details;
@@ -41,7 +45,7 @@ function fillInvoicePrintForm(i) {
   $("#inv_manager").html(i.inv_manager_details);
 
   var sPr = "";
-  var iCntSum = 0;
+  var iCntSum=0;
   if (!IsNull(i.inv_products) && i.inv_products.length > 0) {
     for (var x = 0; x < i.inv_products.length; x++) {
       sPr += "<tr>";
@@ -60,15 +64,14 @@ function fillInvoicePrintForm(i) {
       iCntSum += Number(i.inv_products[x].product_cnt);
     }
   }
-
   $("#inv_products").html(sPr);
   $("#inv_cnt_sum").html(iCntSum);
   $("#inv_sum").html(i.inv_sum);
   $("#inv_sum_words").html(number_to_string(i.inv_sum));
 
-  var iManOffset = $("#inv_manager").offset();
-  iManOffset.top -= 50;
-  iManOffset.left -= 50;
+  var iManOffset = $("#stamp_anchor").offset();
+  iManOffset.top -= 10;
+  iManOffset.left += 100;
 
   if (!IsNull(i.inv_firm_details))
     $("#img_stamp").attr("src", "components/com_rbo/images/" + f.f_stamp);

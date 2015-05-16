@@ -206,8 +206,8 @@ function number_to_string(_number) {
       _count++;
     }
   }
-  /*if (_number_decimals)
-    _string += decimals_parser(_number_decimals);*/
+  if (_number_decimals)
+    _string += decimals_parser(_number_decimals);
   var _string1 = _string.substr(0, 1).toUpperCase();
   var _string2 = _string.substr(1);
   return _string1+_string2;
