@@ -1,3 +1,8 @@
+var monthAr = new Array("", "январь", "февраль", "март", "апрель", "май",
+    "июнь", "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь");
+var monthAr1 = new Array("", "января", "февраля", "марта", "апреля", "мая", "июня",
+    "июля", "августа", "сентября", "октября", "ноября", "декабря");
+
 // ===================================================================================
 function IsNull(vVal) {
   var und = void null;
@@ -93,7 +98,15 @@ function Ask(sText, okText, cancelText, fnOk, fnCancel, sElemSelector) {
 }
 
 // ===================================================================================
-function number_to_string(_number) {
+function convertDate(d) {// в формате 01.12.2015
+  var re = new RegExp("(\\.([0-9]{1,2})\\.)");
+  return d.replace(re, function(a, b, c) {
+    return " " + monthAr1[Number(c)] + " "
+  });
+}
+
+// ===================================================================================
+function number_to_string(_number, _no_first_upper, _no_rub) {
   var _arr_numbers = new Array();
   _arr_numbers[1] = new Array('', 'один', 'два', 'три', 'четыре', 'пять',
       'шесть', 'семь', 'восемь', 'девять', 'десять', 'одиннадцать',
@@ -103,7 +116,7 @@ function number_to_string(_number) {
       'пятьдесят', 'шестьдесят', 'семьдесят', 'восемьдесят', 'девяносто');
   _arr_numbers[3] = new Array('', 'сто', 'двести', 'триста', 'четыреста',
       'пятьсот', 'шестьсот', 'семьсот', 'восемьсот', 'девятьсот');
-  //++++++++++++++++++
+  // ++++++++++++++++++
   function number_parser(_num, _desc) {
     var _string = '';
     var _num_hundred = '';
@@ -123,6 +136,7 @@ function number_to_string(_number) {
     switch (_desc) {
     case 0:
       var _last_num = parseFloat(_num.substr(-1));
+      if (_no_rub) break;
       if (_last_num == 1)
         _string += 'рубль';
       else if (_last_num > 1 && _last_num < 5)
@@ -163,8 +177,8 @@ function number_to_string(_number) {
     _string = _string.replace('  ', ' ');
     return _string;
   }
-  
-  //++++++++++++++++++
+
+  // ++++++++++++++++++
   function decimals_parser(_num) {
     var _first_num = _num.substr(0, 1);
     var _second_num = parseFloat(_num.substr(1, 2));
@@ -177,8 +191,10 @@ function number_to_string(_number) {
       _string += ' копеек';
     return _string;
   }
-  
 
+  _no_rub = NullTo(_no_rub, false);
+  _no_first_upper = NullTo(_no_first_upper, false);
+  
   if (!_number || _number == 0)
     return false;
   if (typeof _number !== 'number') {
@@ -206,9 +222,10 @@ function number_to_string(_number) {
       _count++;
     }
   }
-  if (_number_decimals)
+  if (_number_decimals && !_no_rub)
     _string += decimals_parser(_number_decimals);
+  if (_no_first_upper) return _string;
   var _string1 = _string.substr(0, 1).toUpperCase();
   var _string2 = _string.substr(1);
-  return _string1+_string2;
+  return _string1 + _string2;
 }

@@ -29,18 +29,21 @@ function fillInvoicePrintForm(i) {
   if (!IsNull(i.inv_firm_details)) {
     var f = i.inv_firm_details;
     var arFirm = [ f.f_name, "ИНН " + f.f_inn, "КПП " + f.f_kpp, f.f_addr,
-        f.f_phone ];
-    $("#inv_firm").html(arFirm.join());
-    $("#f_bank").html(f.f_bank);
-    $("#f_bik").html(f.f_bik);
-    $("#f_rch").html(f.f_rch);
-    $("#f_kch").html(f.f_kch);
-    $("#f_name").html(f.f_fullname);
-    $("#f_inn").html(f.f_inn);
-    $("#f_kpp").html(f.f_kpp);
+        f.f_phone, "банк "+f.f_bank, "БИК "+f.f_bik, "р/сч "+f.f_rch, "к/сч "+f.f_kch];
+    $("[id^='inv_firm']").each(function(x, elem) {
+      $(this).html(arFirm.join());
+    });
+    $("[id^='firm_okpo']").each(function(x, elem) {
+      $(this).html(f.f_okpo);
+    });
   }
 
-  $("#inv_cust").html(i.inv_cust);
+  $("[id^='inv_cust']").each(function(x, elem) {
+    $(this).html(i.inv_cust);
+  });
+  $("[id^='cust_okpo']").each(function(x, elem) {
+    $(this).html("&nbsp;");
+  });
 
   $("#inv_manager").html(i.inv_manager_details);
 
@@ -55,30 +58,39 @@ function fillInvoicePrintForm(i) {
       sPr += "<td style='text-align: left'>" + i.inv_products[x].product_code
           + "</td>";
       sPr += "<td style='text-align: center'>" + i.inv_products[x].product_uom
-      + "</td>";
-      sPr += "<td style='text-align: left'>&nbsp;</td>";//код по ОКЕИ
-      sPr += "<td style='text-align: left'>-</td>";//вид упаковки 
-      sPr += "<td style='text-align: left'>-</td>";//к-во в одном месте 
-      sPr += "<td style='text-align: left'>-</td>";//к-во мест 
-      sPr += "<td style='text-align: left'>-</td>";//масса брутто
+          + "</td>";
+      sPr += "<td style='text-align: left'>&nbsp;</td>";// код по ОКЕИ
+      sPr += "<td style='text-align: left'>-</td>";// вид упаковки
+      sPr += "<td style='text-align: left'>-</td>";// к-во в одном месте
+      sPr += "<td style='text-align: left'>-</td>";// к-во мест
+      sPr += "<td style='text-align: left'>-</td>";// масса брутто
       sPr += "<td style='text-align: center'>" + i.inv_products[x].product_cnt
           + "</td>";
       sPr += "<td style='text-align: right'>" + i.inv_products[x].product_price
-          + "</td>";
+          + ",00</td>";
       sPr += "<td style='text-align: right'>" + i.inv_products[x].product_sum
-          + "</td>";
-      sPr += "<td style='text-align: left'>-</td>";//ставка НДС
-      sPr += "<td style='text-align: left'>0,00</td>";//сумма НДС
+          + ",00</td>";
+      sPr += "<td style='text-align: left'>-</td>";// ставка НДС
+      sPr += "<td style='text-align: center'>0,00</td>";// сумма НДС
       sPr += "<td style='text-align: right'>" + i.inv_products[x].product_sum
-      + "</td>";//сумма с НДС
+          + ",00</td>";// сумма с НДС
       sPr += "</tr>";
       iCntSum += Number(i.inv_products[x].product_cnt);
     }
   }
   $("#inv_products").html(sPr);
   $("#inv_cnt_sum").html(iCntSum);
-  $("#inv_sum").html(i.inv_sum);
+  $("[id^='inv_sum']").each(function(x, elem) {
+    $(this).html(i.inv_sum + ",00");
+  });
   $("#inv_sum_words").html(number_to_string(i.inv_sum));
+
+  $("[id^='doc_date_footer']").each(function(x, elem) {
+    $(this).html(convertDate(i.inv_ship_date));
+  });
+  
+  $("#doc_cnt_words").html(number_to_string(i.inv_products.length, true, true));
+  
 
   var iManOffset = $("#stamp_anchor").offset();
   iManOffset.top -= 10;
