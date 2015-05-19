@@ -10,19 +10,20 @@ class RbOInvoice extends RbObject {
   public function __construct($parentKeyValue) {
     parent::__construct ($parentKeyValue);
     
-    $this->table_name = "rbo_invoices";
-    $this->flds ["invId"] = array ("type" => "numeric","is_key" => true );
-    $this->flds ["inv_num"] = array ("type" => "string" );
-    $this->flds ["inv_date"] = array ("type" => "date" );
-    $this->flds ["inv_ship_type"] = array ("type" => "string" );
-    $this->flds ["inv_ship_num"] = array ("type" => "string" );
-    $this->flds ["inv_ship_date"] = array ("type" => "date" );
-    $this->flds ["inv_sum"] = array ("type" => "numeric" );
-    $this->flds ["inv_status"] = array ("type" => "string" );
-    $this->flds ["inv_manager"] = array ("type" => "string" );
-    $this->flds ["inv_cust"] = array ("type" => "string" );
-    $this->flds ["inv_firm"] = array ("type" => "string" );
-    $this->flds ["inv_rem"] = array ("type" => "string" );
+    $this->table_name = "rbo_docs";
+    $this->flds ["docId"] = array ("type" => "numeric","is_key" => true );
+    $this->flds ["doc_num"] = array ("type" => "string" );
+    $this->flds ["doc_date"] = array ("type" => "date" );
+    $this->flds ["doc_type"] = array ("type" => "string" );
+    $this->flds ["doc_status"] = array ("type" => "string" );
+    $this->flds ["doc_base"] = array ("type" => "numeric" );
+
+    $this->flds ["doc_cust"] = array ("type" => "string" );
+    
+    $this->flds ["doc_sum"] = array ("type" => "numeric" );
+    $this->flds ["doc_manager"] = array ("type" => "string" );
+    $this->flds ["doc_firm"] = array ("type" => "string" );
+    $this->flds ["doc_rem"] = array ("type" => "string" );
     
     $this->flds ["created_by"] = array ("type" => "string" );
     $this->flds ["created_on"] = array ("type" => "datetime" );
@@ -34,37 +35,37 @@ class RbOInvoice extends RbObject {
   
   // =================================================================
   public function readObject() {
-    $invId = $this->buffer->invId;
+    $docId = $this->buffer->docId;
     parent::readObject ();
     
     $input = JFactory::getApplication ()->input;
-    $input->set ("rbo_invoices_products", array ("invId" => $invId ));
-    $prod = new RbOInvProducts ($invId);
+    $input->set ("rbo_docs_products", array ("docId" => $docId ));
+    $prod = new RbOInvProducts ($docId);
     $prod->readObject ();
-    $this->buffer->inv_products = $prod->buffer;
+    $this->buffer->doc_products = $prod->buffer;
     
     $cfg = new RboConfig ();
-    $this->buffer->inv_firm_details = $cfg->firms [$this->buffer->inv_firm];
-    $this->buffer->inv_manager_details = $cfg->managers [$this->buffer->inv_manager];
+    $this->buffer->doc_firm_details = $cfg->firms [$this->buffer->doc_firm];
+    $this->buffer->doc_manager_details = $cfg->managers [$this->buffer->doc_manager];
     $this->response = $this->oJson->encode ($this->buffer);
   }
   
   // =================================================================
   public function updateObject() {
-    $invId = $this->buffer->invId;
-    $inv_products = $this->buffer->inv_products;
+    $docId = $this->buffer->docId;
+    $doc_products = $this->buffer->doc_products;
     
     $this->buffer->modified_by = JFactory::getUser ()->username;
     $this->buffer->modified_on = RbOHelper::getCurrentTimeForDb ();
     
-    foreach ( $inv_products as &$p ) {
-      $p ["invId"] = $invId;
+    foreach ( $doc_products as &$p ) {
+      $p ["docId"] = $docId;
     }
     parent::updateObject ();
     
     $input = JFactory::getApplication ()->input;
-    $input->set ("rbo_invoices_products", $inv_products);
-    $prod = new RbOInvProducts ($invId);
+    $input->set ("rbo_docs_products", $doc_products);
+    $prod = new RbOInvProducts ($docId);
     $prod->deleteObject ();
     $prod->createObject ();
     $this->response = $this->response && $prod->response;
@@ -72,21 +73,21 @@ class RbOInvoice extends RbObject {
   
   // =================================================================
   public function createObject() {
-    $inv_products = $this->buffer->inv_products;
+    $doc_products = $this->buffer->doc_products;
     
     $this->buffer->created_by = JFactory::getUser ()->username;
     $this->buffer->created_on = RbOHelper::getCurrentTimeForDb ();
     
     parent::createObject ();
     
-    $invId = $this->buffer->invId;
-    foreach ( $inv_products as &$p ) {
-      $p ["invId"] = $invId;
+    $docId = $this->buffer->docId;
+    foreach ( $doc_products as &$p ) {
+      $p ["docId"] = $docId;
     }
     
     $input = JFactory::getApplication ()->input;
-    $input->set ("rbo_invoices_products", $inv_products);
-    $prod = new RbOInvProducts ($invId);
+    $input->set ("rbo_docs_products", $doc_products);
+    $prod = new RbOInvProducts ($docId);
     $prod->createObject ();
     $this->response = $this->response && $prod->response;
   }
@@ -98,7 +99,7 @@ class RbOInvoice extends RbObject {
     
     try {
       $query->update ($db->quoteName ($this->table_name));
-      $query->set ("inv_status='удален'");
+      $query->set ("doc_status='удален'");
       $query->where ($this->getWhereClause ());
       $db->setQuery ($query);
       $result = $db->execute ();
