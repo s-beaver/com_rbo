@@ -1,4 +1,3 @@
-'use strict';
 var oTable;
 var oTableProducts;
 var apiTableProducts;
@@ -14,6 +13,9 @@ function setRW(sStatus) {
 
   if (sStatus == "выставлен" || sStatus == "оплачен" || sStatus == "удален") {
     allFields.attr("disabled", "disabled");
+    $("[id^='edit_product']").each(function(x, elem) {
+      $(this).attr("href", "javascript:;");
+    });
     return true;
   } else {
     allFields.removeAttr("disabled");
@@ -28,8 +30,8 @@ function readInvoice(invId) {
     dataType : 'json',
     type : "POST",
     data : {
-      "rbo_invoices" : {
-        "invId" : invId
+      "rbo_docs" : {
+        "docId" : invId
       }
     },
     url : comPath + "ajax.php?task=invoice_read",
@@ -55,16 +57,16 @@ function checkSaveInvoice(invId, inv_status) {
     return;
 
   var oData = {
-    "rbo_invoices" : {
-      "invId" : invId,
-      "inv_num" : $("#inv_num").val(),
-      "inv_date" : $("#inv_date").val(),
-      "inv_sum" : $("#inv_sum").val(),
-      "inv_status" : $("#inv_status").val(),
-      "inv_manager" : $("#inv_manager").val(),
-      "inv_cust" : $("#inv_cust").val(),
-      "inv_firm" : $("#inv_firm").val(),
-      "inv_products" : pAr
+    "rbo_docs" : {
+      "docId" : invId,
+      "doc_num" : $("#inv_num").val(),
+      "doc_date" : $("#inv_date").val(),
+      "doc_sum" : $("#inv_sum").val(),
+      "doc_status" : $("#inv_status").val(),
+      "doc_manager" : $("#inv_manager").val(),
+      "doc_cust" : $("#inv_cust").val(),
+      "doc_firm" : $("#inv_firm").val(),
+      "doc_products" : pAr
     }
   };
 
@@ -92,8 +94,8 @@ function createInvoice() {
     // data : {},
     url : comPath + "ajax.php?task=get_inv_num",
     success : function(p) {
-      $('#inv_num').val(p.new_inv_num);
-      $('#inv_date').val(p.new_inv_date);
+      $('#inv_num').val(p.new_num);
+      $('#inv_date').val(p.new_date);
     }
   });
 
@@ -107,8 +109,8 @@ function deleteInvoice(invId) {
     dataType : 'json',
     type : "POST",
     data : {
-      "rbo_invoices" : {
-        "invId" : invId
+      "rbo_docs" : {
+        "docId" : invId
       }
     },
     url : comPath + "ajax.php?task=invoice_delete",
@@ -122,23 +124,23 @@ function deleteInvoice(invId) {
 
 // ===================================================================================
 function showInvoiceForm(i) {
-  $("#inv_num").val(i.inv_num);
-  $("#inv_date").val(i.inv_date);
-  $("#inv_sum").val(i.inv_sum);
-  $("#inv_status").val(i.inv_status);
-  $("#inv_manager :contains('" + i.inv_manager + "')").prop("selected",
+  $("#inv_num").val(i.doc_num);
+  $("#inv_date").val(i.doc_date);
+  $("#inv_sum").val(i.doc_sum);
+  $("#inv_status").val(i.doc_status);
+  $("#inv_manager :contains('" + i.doc_manager + "')").prop("selected",
       "selected");
-  $("#inv_cust").val(i.inv_cust);
-  $("#inv_firm :contains('" + i.inv_firm + "')").prop("selected", "selected");
-  $("#inv_rem").val(i.inv_rem);
-  var readOnly = setRW(i.inv_status);
+  $("#inv_cust").val(i.doc_cust);
+  $("#inv_firm :contains('" + i.doc_firm + "')").prop("selected", "selected");
+  $("#inv_rem").val(i.doc_rem);
 
   oTableProducts.fnClearTable();
-  if (!IsNull(i.inv_products) && i.inv_products.length > 0) {
-    for (var x = 0; x < i.inv_products.length; x++)
-      i.inv_products[x].lineNo = x;
-    oTableProducts.fnAddData(i.inv_products);
+  if (!IsNull(i.doc_products) && i.doc_products.length > 0) {
+    for (var x = 0; x < i.doc_products.length; x++)
+      i.doc_products[x].lineNo = x;
+    oTableProducts.fnAddData(i.doc_products);
   }
+  var readOnly = setRW(i.doc_status);
 
   var oBtns = {};
   if (!readOnly) {
@@ -146,18 +148,18 @@ function showInvoiceForm(i) {
 
       Ask("Счёт будет удален. Продолжить?", "Удалить счёт", "Отмена",
           function() {
-            deleteInvoice(i.invId);
+            deleteInvoice(i.docId);
           }, null, "#dialog-confirm");
     }
 
   }
 
   oBtns["Печатать"] = function() {
-    window.open('index.php?option=com_rbo&view=invprint&format=raw&invid='+i.invId, '_blank');
+    window.open('index.php?option=com_rbo&view=printinv&format=raw&docid='+i.docId, '_blank');
   };
 
   oBtns["Сохранить"] = function() {
-    checkSaveInvoice(i.invId, "");
+    checkSaveInvoice(i.docId, "");
   };
 
   oBtns["Отмена"] = function() {
@@ -167,7 +169,7 @@ function showInvoiceForm(i) {
   $("#neworder-form").dialog({
     height : 550,
     width : 900,
-    title : "Счёт №" + i.inv_num,
+    title : "Счёт №" + i.doc_num,
     buttons : oBtns,
     resizable : true
   });
@@ -334,25 +336,25 @@ $(document)
                       "sClass" : "center",
                       "mData" : function(source, type, val) {
                         return "<a href='javascript:readInvoice("
-                            + source.invID + ")'>" + source.inv_num + "</a>";
+                            + source.docID + ")'>" + source.doc_num + "</a>";
                       }
                     }, {
                       "sTitle" : "Дата",
-                      "mData" : "inv_date"
+                      "mData" : "doc_date"
                     }, {
                       "sTitle" : "Покупатель",
-                      "mData" : "inv_cust"
+                      "mData" : "doc_cust"
                     }, {
                       "sTitle" : "Сумма",
                       "sClass" : "center",
-                      "mData" : "inv_sum"
+                      "mData" : "doc_sum"
                     }, {
                       "sTitle" : "Статус",
                       "sClass" : "center",
-                      "mData" : "inv_status"
+                      "mData" : "doc_status"
                     }, {
                       "sTitle" : "Менеджер",
-                      "mData" : "inv_manager"
+                      "mData" : "doc_manager"
                     } ],
                 "oLanguage" : {
                   "sProcessing" : "Подождите...",

@@ -3,9 +3,9 @@ defined('_JEXEC') or die;
 
 jimport('joomla.application.component.view');
 
-//http://robik.ru/index.php?option=com_rbo&view=invprint&format=raw
+//http://robik.ru/index.php?option=com_rbo&view=printinv&format=raw
 
-class RbOViewInvPrint extends JViewLegacy
+class RbOViewPrintInv extends JViewLegacy
 {
 	public function display($tpl = null) 
 	{

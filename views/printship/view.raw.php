@@ -1,11 +1,11 @@
 <?php
 defined('_JEXEC') or die;
 
+//http://robik.ru/index.php?option=com_rbo&view=printship&format=raw
+
 jimport('joomla.application.component.view');
 
-//http://robik.ru/index.php?option=com_rbo&view=invprint&format=raw
-
-class RbOViewTorg12 extends JViewLegacy
+class RbOViewPrintShip extends JViewLegacy
 {
 	public function display($tpl = null) 
 	{

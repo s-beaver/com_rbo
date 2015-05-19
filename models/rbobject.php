@@ -234,7 +234,7 @@ class RbObject {
         $query->values ($ins [1]);
         $db->setQuery ($query);
         $result = $db->execute ();
-        $this->buffer->invId = $db->insertid(); 
+        $this->buffer->docId = $db->insertid();//Это неправльно как-то!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! не должно быть тут inv 
       }
     } catch ( Exception $e ) {
       JLog::add (

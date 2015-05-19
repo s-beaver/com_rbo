@@ -74,7 +74,7 @@ switch ($cmd) {
   
   case "get_inv_num" :
     {
-      RbOHelper::getNextInvNumber ();
+      RbOHelper::getNextDocNumber ('счет');
       break;
     }
   

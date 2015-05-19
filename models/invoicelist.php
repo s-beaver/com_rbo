@@ -3,11 +3,11 @@
 class RbOInvoiceList
 {
   public $user_id="";
-  public $inv_list="";
+  public $doc_list="";
 
   public function __construct () {
 
-    $aColumns = array( 'invId', 'inv_time', 'cust_lastname');
+    $aColumns = array( 'docId', 'doc_time', 'cust_lastname');
 
     $db = JFactory::getDBO();
     $this->user =& JFactory::getUser ();
@@ -69,11 +69,11 @@ class RbOInvoiceList
     }*/
 
     $sWhere = $is_admin?"":"WHERE phUserID=".$this->user->id;
-    $q = "SELECT count(*) FROM rbo_invoices ".$sWhere;
+    $q = "SELECT count(*) FROM rbo_docs ".$sWhere;
     $db->setQuery($q);
     $iTotalRecords = $db->loadResult();
 
-    $q = "SELECT invID, inv_num, inv_date, inv_cust, inv_sum, inv_status, inv_manager FROM rbo_invoices ORDER BY invId DESC $sLimit";
+    $q = "SELECT docID, doc_num, doc_date, doc_cust, doc_sum, doc_status, doc_manager FROM rbo_docs ORDER BY docId DESC $sLimit";
     
     $db->setQuery($q);
     $data_rows_assoc_list = $db->loadAssocList();
@@ -86,18 +86,17 @@ class RbOInvoiceList
 
     foreach ($data_rows_assoc_list as $v) {
       if ($s!='') $s.=',';
-      $s.='{"inv_num":"'.$v['inv_num']  .'",';
-      $s.='"invID":"'.$v['invID']  .'",';
-      $s.='"inv_date":"'.JFactory::getDate($v['inv_date'])->format('d M Y (D)').'",';//https://php.net/manual/en/function.date.php
-      $s.='"inv_cust":"'.$v['inv_cust']  .'",';
-      $s.='"inv_sum":"'.$v['inv_sum']   .'",';
-      $s.='"inv_status":"'.$v['inv_status']   .'",';
-      $s.='"inv_manager":"'.$v['inv_manager']   .'"}';
-      //$s.='"DT_RowId":"dtrid_'.$v['invID'].'"}';
+      $s.='{"doc_num":"'.$v['doc_num']  .'",';
+      $s.='"docID":"'.$v['docID']  .'",';
+      $s.='"doc_date":"'.JFactory::getDate($v['doc_date'])->format('d M Y (D)').'",';//https://php.net/manual/en/function.date.php
+      $s.='"doc_cust":"'.$v['doc_cust']  .'",';
+      $s.='"doc_sum":"'.$v['doc_sum']   .'",';
+      $s.='"doc_status":"'.$v['doc_status']   .'",';
+      $s.='"doc_manager":"'.$v['doc_manager']   .'"}';
       $iCnt++;
     }
     
-    $this->inv_list = 
+    $this->doc_list = 
       '{"sEcho":'.$sEcho.
       ',"iTotalRecords":'.$iTotalRecords.
       ',"iTotalDisplayRecords":'.$iTotalRecords.
@@ -107,7 +106,7 @@ class RbOInvoiceList
 
   public function getinvList()
   {
-    return $this->inv_list;
+    return $this->doc_list;
   }
 
   
