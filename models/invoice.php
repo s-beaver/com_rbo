@@ -2,6 +2,7 @@
 jimport ('etc.json_lib');
 include_once "models/rbobject.php";
 include_once "models/invproducts.php";
+include_once "models/rbocust.php";
 include_once "models/rbohelper.php";
 include_once "configuration.php";
 class RbOInvoice extends RbObject {
@@ -18,7 +19,7 @@ class RbOInvoice extends RbObject {
     $this->flds ["doc_status"] = array ("type" => "string" );
     $this->flds ["doc_base"] = array ("type" => "numeric" );
 
-    $this->flds ["doc_cust"] = array ("type" => "string" );
+    $this->flds ["custId"] = array ("type" => "numeric" );
     
     $this->flds ["doc_sum"] = array ("type" => "numeric" );
     $this->flds ["doc_manager"] = array ("type" => "string" );
@@ -36,13 +37,19 @@ class RbOInvoice extends RbObject {
   // =================================================================
   public function readObject() {
     $docId = $this->buffer->docId;
+    $this->parentKeyValue = $docId; 
     parent::readObject ();
+    $custId = $this->buffer->custId;
     
     $input = JFactory::getApplication ()->input;
-    $input->set ("rbo_docs_products", array ("docId" => $docId ));
+    //$input->set ("rbo_docs_products", array ("docId" => $docId ));//может быть уберется
     $prod = new RbOInvProducts ($docId);
     $prod->readObject ();
     $this->buffer->doc_products = $prod->buffer;
+
+    $cust = new RbOCust ($custId);
+    $cust->readObject ();
+    $this->buffer->doc_cust = $cust->buffer->cust_name; 
     
     $cfg = new RboConfig ();
     $this->buffer->doc_firm_details = $cfg->firms [$this->buffer->doc_firm];

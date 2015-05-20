@@ -99,6 +99,7 @@ function Ask(sText, okText, cancelText, fnOk, fnCancel, sElemSelector) {
 
 // ===================================================================================
 function convertDate(d) {// в формате 01.12.2015
+  if (IsNull(d)) return "";
   var re = new RegExp("(\\.([0-9]{1,2})\\.)");
   return d.replace(re, function(a, b, c) {
     return " " + monthAr1[Number(c)] + " "

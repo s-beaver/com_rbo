@@ -14,7 +14,7 @@
   src="libraries/DataTables-1.10.6/media/js/jquery.dataTables.min.js"></script>
 
 <script src="components/com_rbo/library/lib.js"></script>
-<script src="components/com_rbo/views/invoices/tmpl/invoices.js"></script>
+<script src="components/com_rbo/models/invoices.js"></script>
 
 <style>
 #neworder-form * label input {

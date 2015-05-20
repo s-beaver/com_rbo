@@ -54,6 +54,12 @@ class RbObject {
   
   // =================================================================
   public function getWhereClause() {
+
+    foreach ( $this->flds as $fldname => $fldvalue ) {
+      if ($fldvalue ["is_key"]) return "$fldname=" . $this->parentKeyValue;
+    }
+    return;//ПРОБА!!!!!!!!!!!!!!!!!!
+    
     if ($this->is_multiple) {
       foreach ( $this->flds as $fldname => $fldvalue ) {
         if ($fldvalue ["is_key"]) return "$fldname=" . $this->parentKeyValue;
@@ -143,7 +149,7 @@ class RbObject {
           }
         case "numeric" :
           {
-            if ($buffer->{$fldname}=="") $buffer->{$fldname}=0;
+            if ($buffer->{$fldname} == "") $buffer->{$fldname} = 0;
             $flds_vals [] = $buffer->{$fldname};
             break;
           }
@@ -234,7 +240,7 @@ class RbObject {
         $query->values ($ins [1]);
         $db->setQuery ($query);
         $result = $db->execute ();
-        $this->buffer->docId = $db->insertid();//Это неправльно как-то!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! не должно быть тут inv 
+        $this->buffer->docId = $db->insertid (); // Это неправльно как-то!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! не должно быть тут inv
       }
     } catch ( Exception $e ) {
       JLog::add (

@@ -10,7 +10,7 @@
 <script src="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
 
 <script src="components/com_rbo/library/lib.js"></script>
-<script src="components/com_rbo/views/shipprint/tmpl/shipprint.js"></script>
+<script src="components/com_rbo/models/printship.js"></script>
 
 <style>
 body {
@@ -79,9 +79,9 @@ table, th, td {
 
 </head>
 <body style="width: 180mm;">
-  <div style="visibility: hidden" id="invid_transfer"><?php
+  <div style="visibility: hidden" id="docid_transfer"><?php
   $input = JFactory::getApplication ()->input;
-  echo $input->getCmd ('invid');
+  echo $input->getCmd ('docid');
   ?>
   </div>
 
