@@ -64,6 +64,7 @@ function checkSaveInvoice(invId, inv_status) {
       "doc_sum" : $("#inv_sum").val(),
       "doc_status" : $("#inv_status").val(),
       "doc_manager" : $("#inv_manager").val(),
+      "custId" : $("#custId").val(),// скрытое поле в форме выбора клиента
       "doc_cust" : $("#inv_cust").val(),
       "doc_firm" : $("#inv_firm").val(),
       "doc_products" : pAr
@@ -130,8 +131,9 @@ function showInvoiceForm(i) {
   $("#inv_status").val(i.doc_status);
   $("#inv_manager :contains('" + i.doc_manager + "')").prop("selected",
       "selected");
+  $("#custId").val(i.custId);// скрытое поле в форме выбора клиента
   $("#inv_cust").val(i.doc_cust);
-  $("#inv_firm :contains('" + i.doc_firm + "')").prop("selected", "selected");
+  $("#inv_firm :contains('" + i.doc_firm.toUpperCase() + "')").prop("selected", "selected");
   $("#inv_rem").val(i.doc_rem);
 
   oTableProducts.fnClearTable();
@@ -155,7 +157,8 @@ function showInvoiceForm(i) {
   }
 
   oBtns["Печатать"] = function() {
-    window.open('index.php?option=com_rbo&view=printinv&format=raw&docid='+i.docId, '_blank');
+    window.open('index.php?option=com_rbo&view=printinv&format=raw&docid='
+        + i.docId, '_blank');
   };
 
   oBtns["Сохранить"] = function() {
@@ -176,6 +179,83 @@ function showInvoiceForm(i) {
 
   $("#neworder-form").dialog("open");
 
+}
+
+// ===================================================================================
+function showCustEditForm() {
+  var custId = $("#custId").val();
+  var custName = $("#inv_cust").val();
+  $('#cust_name option').remove();
+  $('#cust_name').append('<option value="">' + custName + '</option>');
+  $("#cust_name :contains('" + custName + "')").prop("selected", "selected");
+
+  $("#cust-form").dialog({
+    title : "Выбор покупателя",
+    buttons : {
+      "Очистить" : function() {
+        $("#custId").val(0);
+        $('#cust_name option').remove();
+        $("#inv_cust").val("");
+        $("#cust-form").dialog("close");
+      },
+
+      "Сохранить" : function() {
+        //$("#inv_cust").val($('#cust_name option:selected').text());
+        $("#cust-form").dialog("close");
+      },
+
+      "Отмена" : function() {
+        $("#custId").val(custId);
+        $("#inv_cust").val(custName);
+        $("#cust-form").dialog("close");
+      }
+    },
+    resizable : true
+  });
+
+  $("#cust-form").dialog("open");
+
+  return false;
+}
+
+// ===================================================================================
+function custSearch() {
+  $.ajax({
+    dataType : 'json',
+    type : "POST",
+    data : {
+      "search" : $("#cust_search").val()
+    },
+    url : comPath + "ajax.php?task=cust_search",
+    success : function(p) {
+      $('#cust_name option').remove();
+      for (var i = 0; i < p.result.length; i++) {
+        $('#cust_name').append(
+            '<option value="' + p.result[i].custId + '">'
+                + p.result[i].cust_name + '</option>');
+        if (i == 0) {
+          $("#cust_name :contains('" + p.result[i].cust_name + "')").prop(
+              "selected", "selected");
+        }
+      }
+      setCustomer();
+      if (p.count > p.result.length) {
+        $('#prod_name').append(
+            '<option value="-1">=== Найдено позиций:' + p.count
+                + ' (уточните поиск)</option>');
+      }
+
+    }
+  });
+}
+
+//===================================================================================
+function setCustomer() {
+  var oValId = $("#cust_name :selected").val();
+  var oValName = $("#cust_name :selected").html();
+  $("#cust-form").dialog("option", "title", oValId+"|"+oValName);
+  $("#custId").val(oValId);
+  $("#inv_cust").val(oValName);
 }
 
 // ===================================================================================
@@ -291,7 +371,6 @@ function setProductPrice() {
   $("#prod_code").val(arProd[2]);
   $("#prod_cnt").val(1);
   calcSum();
-
 }
 
 // ===================================================================================
@@ -303,8 +382,14 @@ function calcSum() {
 $(document)
     .ready(
         function() {
+
+          $("#cedit").click(function(event) {
+            showCustEditForm();
+            return false;
+          });
+
           allFields = $("#inv_num").add($("#inv_date")).add($("#inv_manager"))
-              .add($("#inv_cust")).add($("#inv_firm"));
+              .add($("#inv_firm"));
           tips = $(".validateTips");
 
           oTable = $('#TableInv').dataTable(
@@ -390,6 +475,13 @@ $(document)
           });
 
           $("#newline-form").dialog({
+            autoOpen : false,
+            height : 300,
+            width : 650,
+            modal : true
+          });
+
+          $("#cust-form").dialog({
             autoOpen : false,
             height : 300,
             width : 650,

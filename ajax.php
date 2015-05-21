@@ -68,7 +68,13 @@ switch ($cmd) {
   
   case "product_search" :
     {
-      RbOHelper::getListBySubstr ();
+      RbOHelper::getProductListBySubstr ();
+      break;
+    }
+  
+  case "cust_search" :
+    {
+      RbOHelper::getCustListBySubstr ();
       break;
     }
   
@@ -78,7 +84,7 @@ switch ($cmd) {
       break;
     }
   
-    default :
+  default :
     {
       echo "";
     }

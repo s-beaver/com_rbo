@@ -60,6 +60,7 @@ class RbOInvoice extends RbObject {
   // =================================================================
   public function updateObject() {
     $docId = $this->buffer->docId;
+    $this->parentKeyValue = $docId; 
     $doc_products = $this->buffer->doc_products;
     
     $this->buffer->modified_by = JFactory::getUser ()->username;
@@ -84,6 +85,7 @@ class RbOInvoice extends RbObject {
     
     $this->buffer->created_by = JFactory::getUser ()->username;
     $this->buffer->created_on = RbOHelper::getCurrentTimeForDb ();
+    $this->buffer->doc_type = "счет";
     
     parent::createObject ();
     
@@ -101,6 +103,8 @@ class RbOInvoice extends RbObject {
   
   // =================================================================
   public function deleteObject() {
+    $docId = $this->buffer->docId;
+    $this->parentKeyValue = $docId; 
     $db = JFactory::getDBO ();
     $query = $db->getQuery (true);
     

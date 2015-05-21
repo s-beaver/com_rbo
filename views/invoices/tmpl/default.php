@@ -101,9 +101,10 @@
                 src="components/com_rbo/images/icon-32-new-on.png" /></a>
               <div style="float: right">
                 <label for="inv_cust">Покупатель</label>
-                <input type="text" name="inv_cust" id="inv_cust"
+                <input disabled type="text" name="inv_cust" id="inv_cust"
                   class="text ui-widget-content ui-corner-all"
                   style='width: 450px' value="" />
+                <button id="cedit">..</button>
                 <label for="inv_firm">Фирма</label>
                 <select id="inv_firm" name="inv_firm"
                   class="text ui-widget-content ui-corner-all"
@@ -144,7 +145,7 @@
               <select name="prod_name" id="prod_name"
                 class="text ui-widget-content ui-corner-all"
                 style="text-align: right; width: 500px" value=""
-                onChange=setProductPrice() />
+                onChange="setProductPrice()" />
               </select>
             </td>
           </tr>
@@ -174,6 +175,40 @@
     </form>
   </div>
 
+  <div id="cust-form" title="Позиция">
+    <form id="cust-form-form" method="post" action="">
+      <fieldset style='padding: 0'>
+        <table>
+          <tr>
+            <td>
+              <label for="cust_search">Поиск</label>
+              <input type="text" name="cust_search" id="cust_search"
+                class="text ui-widget-content ui-corner-all"
+                style='width: 150px' value="" />
+              <a href="javascript:custSearch()"> <img
+                src="components/com_rbo/images/icon-32-search-on.png" /></a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="cust_name">Название</label>
+              <select name="cust_name" id="cust_name"
+                class="text ui-widget-content ui-corner-all"
+                style="text-align: right; width: 500px" value=""
+                onChange="setCustomer()" />
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input style="visibility: hidden" id="custId" value="" />
+            </td>
+          </tr>
+        </table>
+      </fieldset>
+    </form>
+  </div>
+  
   <div id="dialog-confirm" title="Удалить счёт?">Счёт будет удален.
     Продолжить?</div>
 
