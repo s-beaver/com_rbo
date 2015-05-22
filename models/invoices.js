@@ -7,10 +7,39 @@ var allFields;
 var tips;
 var editing_lineNo;
 var lines_before_update;
+var arSearchedCust = new Array(); // массив объектов содержащих поля покупателя
+var oCust = {
+  cust_data : {}
+}; //объект, содержащий поля покупателя, пришедший из запроса к БД
+var bCustInput = 'select';
+
+//===================================================================================
+function convertSelect2Input() {
+  if (bCustInput == 'select') {
+    tag = $('#cust_name').parent().html();
+    tag = tag.replace("<select", "<input type=\"text\"");
+    tag = tag.replace("onChange", "onChange1");
+    tag = tag.replace(">", "/>");
+    tag = tag.replace("</select>", "");
+    $('#cust_name').parent().html(tag);
+    bCustInput = 'input';
+  }
+}
+
+//===================================================================================
+function convertInput2Select() {
+  if (bCustInput == 'input') {
+    tag = $('#cust_name').parent().html();
+    tag = tag.replace("<input type=\"text\"", "<select");
+    tag = tag.replace("onChange1", "onChange");
+    tag = tag.replace("/>", "></select>");
+    $('#cust_name').parent().html(tag);
+    bCustInput = 'select';
+  }
+}
 
 // ===================================================================================
 function setRW(sStatus) {
-
   if (sStatus == "выставлен" || sStatus == "оплачен" || sStatus == "удален") {
     allFields.attr("disabled", "disabled");
     $("[id^='edit_product']").each(function(x, elem) {
@@ -21,7 +50,6 @@ function setRW(sStatus) {
     allFields.removeAttr("disabled");
     return false;
   }
-
 }
 
 // ===================================================================================
@@ -42,7 +70,7 @@ function readInvoice(invId) {
 }
 
 // ===================================================================================
-function checkSaveInvoice(invId, inv_status) {
+function saveInvoice(invId, inv_status) {
   var bValid = true;
   allFields.removeClass("ui-state-error");
   bValid = bValid && checkNotEmpty($("#inv_num"), "Номер", tips);
@@ -56,6 +84,9 @@ function checkSaveInvoice(invId, inv_status) {
   if (!bValid)
     return;
 
+  if (oCust.cust_name == "")
+    $("#custId").val("-1");//значит мы сознательно удаляем покупателя из счета
+
   var oData = {
     "rbo_docs" : {
       "docId" : invId,
@@ -65,7 +96,7 @@ function checkSaveInvoice(invId, inv_status) {
       "doc_status" : $("#inv_status").val(),
       "doc_manager" : $("#inv_manager").val(),
       "custId" : $("#custId").val(),// скрытое поле в форме выбора клиента
-      "doc_cust" : $("#inv_cust").val(),
+      "doc_cust" : oCust,
       "doc_firm" : $("#inv_firm").val(),
       "doc_products" : pAr
     }
@@ -84,7 +115,6 @@ function checkSaveInvoice(invId, inv_status) {
       oTable.fnDraw();
     }
   });
-
 }
 
 // ===================================================================================
@@ -92,16 +122,13 @@ function createInvoice() {
   $.ajax({
     dataType : 'json',
     type : "POST",
-    // data : {},
     url : comPath + "ajax.php?task=get_inv_num",
     success : function(p) {
       $('#inv_num').val(p.new_num);
       $('#inv_date').val(p.new_date);
     }
   });
-
   showInvoiceForm({});
-
 }
 
 // ===================================================================================
@@ -129,10 +156,12 @@ function showInvoiceForm(i) {
   $("#inv_date").val(i.doc_date);
   $("#inv_sum").val(i.doc_sum);
   $("#inv_status").val(i.doc_status);
-  $("#inv_manager :contains('" + i.doc_manager + "')").prop("selected",
-      "selected");
-  $("#custId").val(i.custId);// скрытое поле в форме выбора клиента
-  $("#inv_cust").val(i.doc_cust);
+  $("#inv_manager :contains('" + i.doc_manager + "')").prop("selected", "selected");
+  oCust = NullTo(i.doc_cust, {
+    cust_data : {}
+  });
+  oCust.cust_data = NullTo(oCust.cust_data, {});
+  setCustFlds('saved');
   $("#inv_firm :contains('" + i.doc_firm.toUpperCase() + "')").prop("selected", "selected");
   $("#inv_rem").val(i.doc_rem);
 
@@ -148,21 +177,19 @@ function showInvoiceForm(i) {
   if (!readOnly) {
     oBtns["Удалить"] = function() {
 
-      Ask("Счёт будет удален. Продолжить?", "Удалить счёт", "Отмена",
-          function() {
-            deleteInvoice(i.docId);
-          }, null, "#dialog-confirm");
+      Ask("Счёт будет удален. Продолжить?", "Удалить счёт", "Отмена", function() {
+        deleteInvoice(i.docId);
+      }, null, "#dialog-confirm");
     }
 
   }
 
   oBtns["Печатать"] = function() {
-    window.open('index.php?option=com_rbo&view=printinv&format=raw&docid='
-        + i.docId, '_blank');
+    window.open('index.php?option=com_rbo&view=printinv&format=raw&docid=' + i.docId, '_blank');
   };
 
   oBtns["Сохранить"] = function() {
-    checkSaveInvoice(i.docId, "");
+    saveInvoice(i.docId, "");
   };
 
   oBtns["Отмена"] = function() {
@@ -178,35 +205,42 @@ function showInvoiceForm(i) {
   });
 
   $("#neworder-form").dialog("open");
-
 }
 
 // ===================================================================================
-function showCustEditForm() {
+function showCustForm() {
   var custId = $("#custId").val();
   var custName = $("#inv_cust").val();
-  $('#cust_name option').remove();
-  $('#cust_name').append('<option value="">' + custName + '</option>');
-  $("#cust_name :contains('" + custName + "')").prop("selected", "selected");
+  arSearchedCust = new Array();
+  if (bCustInput == 'select') {
+    $('#cust_name option').remove();
+    $('#cust_name').append('<option value="">' + custName + '</option>');
+    $("#cust_name :contains('" + custName + "')").prop("selected", "selected");
+  }
+  setCustFlds('saved');
 
   $("#cust-form").dialog({
     title : "Выбор покупателя",
     buttons : {
+      "Новый покупатель" : function() {
+        setCustFlds('clear');
+        convertSelect2Input();
+      },
+
       "Очистить" : function() {
-        $("#custId").val(0);
-        $('#cust_name option').remove();
-        $("#inv_cust").val("");
+        setCustFlds('clear');
         $("#cust-form").dialog("close");
       },
 
       "Сохранить" : function() {
-        //$("#inv_cust").val($('#cust_name option:selected').text());
+        if (bCustInput == 'input')
+          $("#inv_cust").val($("#cust_name").val());
+        saveCustFlds();
         $("#cust-form").dialog("close");
       },
 
       "Отмена" : function() {
-        $("#custId").val(custId);
-        $("#inv_cust").val(custName);
+        setCustFlds('saved');
         $("#cust-form").dialog("close");
       }
     },
@@ -228,34 +262,90 @@ function custSearch() {
     },
     url : comPath + "ajax.php?task=cust_search",
     success : function(p) {
+      arSearchedCust = p.result;
+      convertInput2Select();
       $('#cust_name option').remove();
-      for (var i = 0; i < p.result.length; i++) {
-        $('#cust_name').append(
-            '<option value="' + p.result[i].custId + '">'
-                + p.result[i].cust_name + '</option>');
-        if (i == 0) {
-          $("#cust_name :contains('" + p.result[i].cust_name + "')").prop(
-              "selected", "selected");
+      if (p.result.length > 0) {
+        for (var i = 0; i < p.result.length; i++) {
+          $('#cust_name').append('<option value="' + i + '">' + p.result[i].cust_name + '</option>');
+          if (i == 0) {
+            $("#cust_name :contains('" + p.result[i].cust_name + "')").prop("selected", "selected");
+          }
         }
+        if (p.count > p.result.length) {
+          $('#prod_name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
+        }
+        setCustFlds('selected');
       }
-      setCustomer();
-      if (p.count > p.result.length) {
-        $('#prod_name').append(
-            '<option value="-1">=== Найдено позиций:' + p.count
-                + ' (уточните поиск)</option>');
-      }
-
     }
   });
 }
 
+// ===================================================================================
+/*
+ * Устанавливает все поля покупателя в форму. Данные берет в зависимости от
+ * параметра cmd. Если параметр равен 'saved', то берет объекта oCust, если
+ * параметр равен 'selected', то берет текущую позицию в элементе cust_name
+ * считает это порядовым номером в массиве arSearchedCust. Если параметр равен
+ * 'clear', то очищает поля
+ */
+function setCustFlds(cmd) {
+  cmd = NullTo(cmd, 'saved');
+  var f = {};
+  var fd = {};
+  if (cmd == 'clear') {
+    arSearchedCust = new Array();
+    oCust = {
+      cust_data : {}
+    };
+    if (bCustInput == 'select')
+      $('#cust_name option').remove();
+    else
+      $('#cust_name').val();
+  }
+  if (cmd == 'saved') {
+    f = oCust;
+    fd = NullTo(f.cust_data, {});
+  }
+  if (cmd == 'selected') {
+    var pos = $("#cust_name :selected").val();
+    if (pos >= 0) {
+      f = arSearchedCust[pos];
+      fd = f.cust_data;
+    }
+  }
+  $("#cust-form").dialog("option", "title", f.custId + "|" + f.cust_name);
+  $("#custId").val(f.custId);
+  $("#inv_cust").val(f.cust_name);
+  //$("#cust_name").val(f.cust_name);
+  $("#cust_fullname").val(f.cust_fullname);
+  $("#cust_inn").val(fd.cust_inn);
+  $("#cust_kpp").val(fd.cust_kpp);
+  $("#cust_okpo").val(fd.cust_okpo);
+  $("#cust_addr").val(fd.cust_addr);
+  $("#cust_ogrn").val(fd.cust_ogrn);
+  $("#cust_bank").val(fd.cust_bank);
+  $("#cust_bik").val(fd.cust_bik);
+  $("#cust_rch").val(fd.cust_rch);
+  $("#cust_kch").val(fd.cust_kch);
+  $("#cust_nonds").prop("checked", (fd.cust_nonds == "1"));
+}
+
 //===================================================================================
-function setCustomer() {
-  var oValId = $("#cust_name :selected").val();
-  var oValName = $("#cust_name :selected").html();
-  $("#cust-form").dialog("option", "title", oValId+"|"+oValName);
-  $("#custId").val(oValId);
-  $("#inv_cust").val(oValName);
+function saveCustFlds() {
+  oCust.custId = $("#custId").val();
+  oCust.cust_name = $("#inv_cust").val();
+  oCust.cust_fullname = $("#cust_fullname").val();
+  oCust.cust_data.cust_inn = $("#cust_inn").val();
+  oCust.cust_data.cust_kpp = $("#cust_kpp").val();
+  oCust.cust_data.cust_okpo = $("#cust_okpo").val();
+  oCust.cust_data.cust_addr = $("#cust_addr").val();
+  oCust.cust_data.cust_ogrn = $("#cust_ogrn").val();
+  oCust.cust_data.cust_bank = $("#cust_bank").val();
+  oCust.cust_data.cust_bik = $("#cust_bik").val();
+  oCust.cust_data.cust_rch = $("#cust_rch").val();
+  oCust.cust_data.cust_kch = $("#cust_kch").val();
+  oCust.cust_data.cust_nonds = $("#cust_nonds").prop("checked") ? "1" : "0";
 }
 
 // ===================================================================================
@@ -273,8 +363,7 @@ function showProductForm(x) {// x-номер редактируемой стро
     $("#prod_code").val(p.product_code);
     $('#prod_name option').remove();
     $('#prod_name').append('<option value="">' + p.product_name + '</option>');
-    $("#prod_name :contains('" + p.product_name + "')").prop("selected",
-        "selected");
+    $("#prod_name :contains('" + p.product_name + "')").prop("selected", "selected");
     $("#prod_price").val(p.product_price);
     $("#prod_cnt").val(p.product_cnt);
     $("#prod_sum").val(p.product_sum);
@@ -342,19 +431,14 @@ function productSearch() {
       $('#prod_name option').remove();
       for (var i = 0; i < p.result.length; i++) {
         $('#prod_name').append(
-            '<option value="' + p.result[i].productID + "|" + p.result[i].price
-                + "|" + p.result[i].product_code + '">' + p.result[i].name
-                + '</option>');
+            '<option value="' + p.result[i].productID + "|" + p.result[i].price + "|" + p.result[i].product_code + '">' + p.result[i].name + '</option>');
         if (i == 0) {
-          $("#prod_name :contains('" + p.result[i].name + "')").prop(
-              "selected", "selected");
+          $("#prod_name :contains('" + p.result[i].name + "')").prop("selected", "selected");
         }
       }
       setProductPrice();
       if (p.count > p.result.length) {
-        $('#prod_name').append(
-            '<option value="-1">=== Найдено позиций:' + p.count
-                + ' (уточните поиск)</option>');
+        $('#prod_name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
       }
 
     }
@@ -379,194 +463,176 @@ function calcSum() {
 }
 
 // ===================================================================================
-$(document)
-    .ready(
-        function() {
+$(document).ready(function() {
 
-          $("#cedit").click(function(event) {
-            showCustEditForm();
-            return false;
-          });
+  $("#cedit").click(function(event) {
+    showCustForm();
+    return false;
+  });
 
-          allFields = $("#inv_num").add($("#inv_date")).add($("#inv_manager"))
-              .add($("#inv_firm"));
-          tips = $(".validateTips");
+  allFields = $("#inv_num").add($("#inv_date")).add($("#inv_manager")).add($("#inv_firm")).add($("#cedit"));
+  tips = $(".validateTips");
 
-          oTable = $('#TableInv').dataTable(
-              {
-                "bJQueryUI" : true,
-                "bProcessing" : true,
-                "bServerSide" : true,
-                // "dom": 'HFT<"toolbar"><t>lfrtip',
-                "tableTools" : {
-                  "sSwfPath" : "/swf/copy_csv_xls_pdf.swf"
-                },
-                "aaSorting" : [ [ 1, "desc" ] ],
-                "sAjaxSource" : comPath + "ajax.php?task=get_invoice_list",
-                "fnServerData" : function(sSource, aoData, fnCallback,
-                    oSettings) {
-                  oSettings.jqXHR = $.ajax({
-                    "dataType" : 'json',
-                    "type" : "POST",
-                    "data" : aoData,
-                    "url" : sSource,
-                    "success" : function(json) {
-                      fnCallback(json);
-                    }
-                  });
-                },
-                "aoColumns" : [
-                    {
-                      "sTitle" : "Номер",
-                      "sClass" : "center",
-                      "mData" : function(source, type, val) {
-                        return "<a href='javascript:readInvoice("
-                            + source.docId + ")'>" + source.doc_num + "</a>";
-                      }
-                    }, {
-                      "sTitle" : "Дата",
-                      "mData" : "doc_date"
-                    }, {
-                      "sTitle" : "Покупатель",
-                      "mData" : "doc_cust"
-                    }, {
-                      "sTitle" : "Сумма",
-                      "sClass" : "center",
-                      "mData" : "doc_sum"
-                    }, {
-                      "sTitle" : "Статус",
-                      "sClass" : "center",
-                      "mData" : "doc_status"
-                    }, {
-                      "sTitle" : "Менеджер",
-                      "mData" : "doc_manager"
-                    } ],
-                "oLanguage" : {
-                  "sProcessing" : "Подождите...",
-                  "sLengthMenu" : "Показать _MENU_ строк",
-                  "sZeroRecords" : "Записи отсутствуют.",
-                  "sInfo" : "Счета с _START_ по _END_ (всего: _TOTAL_)",
-                  "sInfoEmpty" : "Счетов нет",
-                  "sInfoFiltered" : "(отфильтровано из _MAX_ записей)",
-                  "sInfoPostFix" : "",
-                  "sSearch" : "Поиск:",
-                  "sUrl" : "",
-                  "oPaginate" : {
-                    "sFirst" : "В начало",
-                    "sPrevious" : "Предыдущие",
-                    "sNext" : "Следующие",
-                    "sLast" : "В конец"
-                  }
-                }
-              });
+  oTable = $('#TableInv').dataTable({
+    "bJQueryUI" : true,
+    "bProcessing" : true,
+    "bServerSide" : true,
+    // "dom": 'HFT<"toolbar"><t>lfrtip',
+    "tableTools" : {
+      "sSwfPath" : "/swf/copy_csv_xls_pdf.swf"
+    },
+    "aaSorting" : [ [ 1, "desc" ] ],
+    "sAjaxSource" : comPath + "ajax.php?task=get_invoice_list",
+    "fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
+      oSettings.jqXHR = $.ajax({
+        "dataType" : 'json',
+        "type" : "POST",
+        "data" : aoData,
+        "url" : sSource,
+        "success" : function(json) {
+          fnCallback(json);
+        }
+      });
+    },
+    "aoColumns" : [ {
+      "sTitle" : "Номер",
+      "sClass" : "center",
+      "mData" : function(source, type, val) {
+        return "<a href='javascript:readInvoice(" + source.docId + ")'>" + source.doc_num + "</a>";
+      }
+    }, {
+      "sTitle" : "Дата",
+      "mData" : "doc_date"
+    }, {
+      "sTitle" : "Покупатель",
+      "mData" : "doc_cust"
+    }, {
+      "sTitle" : "Сумма",
+      "sClass" : "center",
+      "mData" : "doc_sum"
+    }, {
+      "sTitle" : "Статус",
+      "sClass" : "center",
+      "mData" : "doc_status"
+    }, {
+      "sTitle" : "Менеджер",
+      "mData" : "doc_manager"
+    } ],
+    "oLanguage" : {
+      "sProcessing" : "Подождите...",
+      "sLengthMenu" : "Показать _MENU_ строк",
+      "sZeroRecords" : "Записи отсутствуют.",
+      "sInfo" : "Счета с _START_ по _END_ (всего: _TOTAL_)",
+      "sInfoEmpty" : "Счетов нет",
+      "sInfoFiltered" : "(отфильтровано из _MAX_ записей)",
+      "sInfoPostFix" : "",
+      "sSearch" : "Поиск:",
+      "sUrl" : "",
+      "oPaginate" : {
+        "sFirst" : "В начало",
+        "sPrevious" : "Предыдущие",
+        "sNext" : "Следующие",
+        "sLast" : "В конец"
+      }
+    }
+  });
 
-          /*
-           * oTableTools = new $.fn.dataTable.TableTools( oTable, { "buttons": [
-           * "copy", "csv", "xls", "pdf", { "type": "print", "buttonText":
-           * "Print me!" } ] } ); $( oTableTools.fnContainer()
-           * ).insertAfter('div.info');
-           */
+  /*
+   * oTableTools = new $.fn.dataTable.TableTools( oTable, { "buttons": [ "copy",
+   * "csv", "xls", "pdf", { "type": "print", "buttonText": "Print me!" } ] } ); $(
+   * oTableTools.fnContainer() ).insertAfter('div.info');
+   */
 
-          $("#neworder-form").dialog({
-            autoOpen : false,
-            height : 550,
-            width : 900,
-            modal : true
-          });
+  $("#neworder-form").dialog({
+    autoOpen : false,
+    height : 550,
+    width : 900,
+    modal : true
+  });
 
-          $("#newline-form").dialog({
-            autoOpen : false,
-            height : 300,
-            width : 650,
-            modal : true
-          });
+  $("#newline-form").dialog({
+    autoOpen : false,
+    height : 300,
+    width : 650,
+    modal : true
+  });
 
-          $("#cust-form").dialog({
-            autoOpen : false,
-            height : 300,
-            width : 650,
-            modal : true
-          });
+  $("#cust-form").dialog({
+    autoOpen : false,
+    height : 550,
+    width : 700,
+    modal : true
+  });
 
-          $("#dialog-confirm").dialog({
-            autoOpen : false
-          });
+  $("#dialog-confirm").dialog({
+    autoOpen : false
+  });
 
-          oTableProducts = $('#TableProducts')
-              .dataTable(
-                  {
-                    "bPaginate" : false,
-                    "searching" : false,
-                    "ordering" : false,
-                    "aoColumns" : [
-                        {
-                          "sTitle" : "Код",
-                          "sWidth" : "100",
-                          "mData" : "product_code"
-                        },
-                        {
-                          "sTitle" : "Наименование",
-                          "sWidth" : "450",
-                          "mData" : "product_name"
-                        },
-                        {
-                          "sTitle" : "Цена",
-                          "sClass" : "center",
-                          "sWidth" : "100",
-                          "mData" : "product_price"
-                        },
-                        {
-                          "sTitle" : "К-во",
-                          "sClass" : "center",
-                          "sWidth" : "100",
-                          "mData" : "product_cnt"
-                        },
-                        {
-                          "sTitle" : "Сумма",
-                          "sClass" : "center",
-                          "sWidth" : "100",
-                          "mData" : "product_sum"
-                        },
-                        {
-                          "sTitle" : "Ред.",
-                          "sClass" : "center",
-                          "sWidth" : "50",
-                          "mData" : function(source, type, val) {
-                            return "<a id='edit_product' href='javascript:showProductForm("
-                                + source.lineNo
-                                + ")'>"
-                                + "<img src='"
-                                + comPath + "images/icon-32-edit-on.png'/></a>";
-                          }
-                        } ],
-                    "oLanguage" : {
-                      "sProcessing" : "Подождите...",
-                      "sLengthMenu" : "Показать _MENU_ строк",
-                      "sZeroRecords" : "Записи отсутствуют.",
-                      "sInfo" : "Строки с _START_ по _END_ (всего: _TOTAL_)",
-                      "sInfoEmpty" : "Строк нет",
-                      "sInfoFiltered" : "(отфильтровано из _MAX_ записей)",
-                      "sInfoPostFix" : "",
-                      "sSearch" : "Поиск:",
-                      "sUrl" : "",
-                      "oPaginate" : {
-                        "sFirst" : "В начало",
-                        "sPrevious" : "Предыдущие",
-                        "sNext" : "Следующие",
-                        "sLast" : "В конец"
-                      }
-                    }
+  oTableProducts = $('#TableProducts').dataTable({
+    "bPaginate" : false,
+    "searching" : false,
+    "ordering" : false,
+    "aoColumns" : [ {
+      "sTitle" : "Код",
+      "sWidth" : "100",
+      "mData" : "product_code"
+    }, {
+      "sTitle" : "Наименование",
+      "sWidth" : "450",
+      "mData" : "product_name"
+    }, {
+      "sTitle" : "Цена",
+      "sClass" : "center",
+      "sWidth" : "100",
+      "mData" : "product_price"
+    }, {
+      "sTitle" : "К-во",
+      "sClass" : "center",
+      "sWidth" : "100",
+      "mData" : "product_cnt"
+    }, {
+      "sTitle" : "Сумма",
+      "sClass" : "center",
+      "sWidth" : "100",
+      "mData" : "product_sum"
+    }, {
+      "sTitle" : "Ред.",
+      "sClass" : "center",
+      "sWidth" : "50",
+      "mData" : function(source, type, val) {
+        return "<a id='edit_product' href='javascript:showProductForm(" + source.lineNo + ")'>" + "<img src='" + comPath + "images/icon-32-edit-on.png'/></a>";
+      }
+    } ],
+    "oLanguage" : {
+      "sProcessing" : "Подождите...",
+      "sLengthMenu" : "Показать _MENU_ строк",
+      "sZeroRecords" : "Записи отсутствуют.",
+      "sInfo" : "Строки с _START_ по _END_ (всего: _TOTAL_)",
+      "sInfoEmpty" : "Строк нет",
+      "sInfoFiltered" : "(отфильтровано из _MAX_ записей)",
+      "sInfoPostFix" : "",
+      "sSearch" : "Поиск:",
+      "sUrl" : "",
+      "oPaginate" : {
+        "sFirst" : "В начало",
+        "sPrevious" : "Предыдущие",
+        "sNext" : "Следующие",
+        "sLast" : "В конец"
+      }
+    }
 
-                  });
+  });
 
-          apiTableProducts = oTableProducts.api();
-          $('#TableProducts tbody').on('dblclick', 'tr', function() {
-            $(this).toggleClass('selected');
-          });
+  apiTableProducts = oTableProducts.api();
+  $('#TableProducts tbody').on('dblclick', 'tr', function() {
+    $(this).toggleClass('selected');
+  });
 
-          $("#inv_date").datepicker({
-            showButtonPanel : true,
-            dateFormat : "dd.mm.yy"
-          });
+  $("#inv_date").datepicker({
+    showButtonPanel : true,
+    dateFormat : "dd.mm.yy"
+  });
 
-        });
+  // $( "#cust-tabs" ).tabs();
+
+});

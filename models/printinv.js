@@ -22,9 +22,10 @@ function fillInvoicePrintForm(i) {
   $("#inv_num").html(i.doc_num);
   $("#inv_date").html(i.doc_date);
 
+  var f;
   if (!IsNull(i.doc_firm_details)) {
-    var f = i.doc_firm_details;
-    var arFirm = [ f.f_name, "ИНН " + f.f_inn, "КПП " + f.f_kpp, f.f_addr,
+    f = i.doc_firm_details;
+    var arFirm = [ f.f_fullname, "ИНН " + f.f_inn, "КПП " + f.f_kpp, f.f_addr,
         f.f_phone ];
     $("#inv_firm").html(arFirm.join());
     $("#f_bank").html(f.f_bank);
@@ -36,7 +37,13 @@ function fillInvoicePrintForm(i) {
     $("#f_kpp").html(f.f_kpp);
   }
 
-  $("#inv_cust").html(i.doc_cust);
+  if (!IsNull(i.doc_cust)) {
+    var c = i.doc_cust;
+    var cd = c.cust_data;
+    var arCust = [ c.cust_fullname, "ИНН " + cd.cust_inn, "КПП " + cd.cust_kpp, cd.cust_addr,
+        c.f_phone ];
+    $("#inv_cust").html(arCust.join());
+  }
 
   $("#inv_manager").html(i.doc_manager_details);
 

@@ -74,7 +74,9 @@ switch ($cmd) {
   
   case "cust_search" :
     {
-      RbOHelper::getCustListBySubstr ();
+      include_once "models/rbocust.php";
+      $cust = new RbOCust();
+      $cust->getCustListBySubstr ();
       break;
     }
   

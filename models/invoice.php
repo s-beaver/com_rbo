@@ -18,7 +18,7 @@ class RbOInvoice extends RbObject {
     $this->flds ["doc_type"] = array ("type" => "string" );
     $this->flds ["doc_status"] = array ("type" => "string" );
     $this->flds ["doc_base"] = array ("type" => "numeric" );
-
+    
     $this->flds ["custId"] = array ("type" => "numeric" );
     
     $this->flds ["doc_sum"] = array ("type" => "numeric" );
@@ -37,19 +37,18 @@ class RbOInvoice extends RbObject {
   // =================================================================
   public function readObject() {
     $docId = $this->buffer->docId;
-    $this->parentKeyValue = $docId; 
+    $this->parentKeyValue = $docId;
     parent::readObject ();
     $custId = $this->buffer->custId;
     
-    $input = JFactory::getApplication ()->input;
-    //$input->set ("rbo_docs_products", array ("docId" => $docId ));//может быть уберется
     $prod = new RbOInvProducts ($docId);
     $prod->readObject ();
     $this->buffer->doc_products = $prod->buffer;
-
+    
     $cust = new RbOCust ($custId);
     $cust->readObject ();
-    $this->buffer->doc_cust = $cust->buffer->cust_name; 
+    $cust->buffer->cust_data = json_decode ($cust->buffer->cust_data);
+    $this->buffer->doc_cust = $cust->buffer;
     
     $cfg = new RboConfig ();
     $this->buffer->doc_firm_details = $cfg->firms [$this->buffer->doc_firm];
@@ -59,12 +58,30 @@ class RbOInvoice extends RbObject {
   
   // =================================================================
   public function updateObject() {
+    $response = true;
     $docId = $this->buffer->docId;
-    $this->parentKeyValue = $docId; 
+    $custId = $this->buffer->custId;
+    $this->parentKeyValue = $docId;
     $doc_products = $this->buffer->doc_products;
+    $doc_cust = $this->buffer->doc_cust;
+    $doc_cust ['cust_data'] = json_encode ($doc_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
     
     $this->buffer->modified_by = JFactory::getUser ()->username;
     $this->buffer->modified_on = RbOHelper::getCurrentTimeForDb ();
+    
+    $input = JFactory::getApplication ()->input;
+    $input->set ("rbo_cust", $doc_cust);
+    $cust = new RbOCust ($custId);
+    if ($custId > 0) {
+      $cust->updateObject ();
+      $response = $response && $cust->response;
+    } elseif ($custId == - 1) {
+      $custId = 0;
+      $this->buffer->custId = 0;
+    } else {
+      $cust->createObject ();
+      $this->buffer->custId = $cust->insertid;
+    }
     
     foreach ( $doc_products as &$p ) {
       $p ["docId"] = $docId;
@@ -76,35 +93,56 @@ class RbOInvoice extends RbObject {
     $prod = new RbOInvProducts ($docId);
     $prod->deleteObject ();
     $prod->createObject ();
-    $this->response = $this->response && $prod->response;
+    $response = $response && $prod->response;
+    
+    $this->response = $this->response && $response;
   }
   
   // =================================================================
   public function createObject() {
+    $response = true;
+    $custId = $this->buffer->custId;
     $doc_products = $this->buffer->doc_products;
+    $doc_cust = $this->buffer->doc_cust;
+    $doc_cust ['cust_data'] = json_encode ($doc_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
     
     $this->buffer->created_by = JFactory::getUser ()->username;
     $this->buffer->created_on = RbOHelper::getCurrentTimeForDb ();
     $this->buffer->doc_type = "счет";
     
+    $input = JFactory::getApplication ()->input;
+    $input->set ("rbo_cust", $doc_cust);
+    $cust = new RbOCust ($custId);
+    if ($custId > 0) {
+      $cust->updateObject ();
+      $response = $response && $cust->response;
+    } elseif ($custId == - 1) {
+      $custId = 0;
+      $this->buffer->custId = 0;
+    } else {
+      $cust->createObject ();
+      $this->buffer->custId = $cust->insertid;
+    }
+    
     parent::createObject ();
     
-    $docId = $this->buffer->docId;
+    $docId = $this->insertid;
     foreach ( $doc_products as &$p ) {
       $p ["docId"] = $docId;
     }
     
-    $input = JFactory::getApplication ()->input;
     $input->set ("rbo_docs_products", $doc_products);
     $prod = new RbOInvProducts ($docId);
     $prod->createObject ();
-    $this->response = $this->response && $prod->response;
+    $response = $response && $prod->response;
+    
+    $this->response = $this->response && $response;
   }
   
   // =================================================================
   public function deleteObject() {
     $docId = $this->buffer->docId;
-    $this->parentKeyValue = $docId; 
+    $this->parentKeyValue = $docId;
     $db = JFactory::getDBO ();
     $query = $db->getQuery (true);
     

@@ -9,7 +9,8 @@ class RbObject {
                            // public $flds = array (); // ассоциативный массив системных полей таблицы
   public $buffer; // Значения для загрузки в таблицу. Ассоциативный массив, или массив ассоциативных массивов. Результат загрузки значений из таблицы. Ассоциативный массив, или массив ассоциативных массивов
   public $parentKeyValue = 0; // если $is_multiple, то отсюда берется значение ключа для связи с родительской таблицей. Название ключа выбирается из flds
-                              
+  public $insertid;
+  
   // =================================================================
   public function __construct($parentKeyValue) {
     $this->parentKeyValue = $parentKeyValue;
@@ -54,11 +55,10 @@ class RbObject {
   
   // =================================================================
   public function getWhereClause() {
-
     foreach ( $this->flds as $fldname => $fldvalue ) {
       if ($fldvalue ["is_key"]) return "$fldname=" . $this->parentKeyValue;
     }
-    return;//ПРОБА!!!!!!!!!!!!!!!!!!
+    return; // ПРОБА!!!!!!!!!!!!!!!!!!
     
     if ($this->is_multiple) {
       foreach ( $this->flds as $fldname => $fldvalue ) {
@@ -223,6 +223,7 @@ class RbObject {
     try {
       if ($this->is_multiple) {
         $result = true;
+          $this->insertid = array ();
         foreach ( $this->buffer as $key => $value ) {
           $query->clear ();
           $ins = $this->getArraysForInsert ($db, $value);
@@ -230,6 +231,7 @@ class RbObject {
           $query->columns ($ins [0]);
           $query->values ($ins [1]);
           $db->setQuery ($query);
+          $this->insertid [] = $db->insertid ();
           $result = $result && $db->execute ();
         }
         if (! $result) throw new Exception ('Ошибка при создании записи в БД');
@@ -240,7 +242,7 @@ class RbObject {
         $query->values ($ins [1]);
         $db->setQuery ($query);
         $result = $db->execute ();
-        $this->buffer->docId = $db->insertid (); // Это неправльно как-то!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! не должно быть тут inv
+        $this->insertid = $db->insertid ();
       }
     } catch ( Exception $e ) {
       JLog::add (
