@@ -24,9 +24,10 @@ $cmd = $input->getCmd ('task');
 switch ($cmd) {
   case "get_invoice_list" :
     {
-      include_once "models/invoicelist.php";
-      $invList = new RbOInvoiceList ();
-      echo $invList->getinvList ();
+      include_once "models/invoice.php";
+      $invList = new RbOInvoice ();
+      $invList->getInvList();
+      echo $invList->getResponse ();
       break;
     }
   

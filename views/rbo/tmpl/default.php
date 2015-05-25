@@ -24,6 +24,7 @@ $(function() {
     <li class="ui-widget-content1">Операции</li>
     <li class="ui-widget-content1">Справочник - покупатели</li>
     <li class="ui-widget-content1">Отчеты</li>
+    <li class="ui-widget-content1"><a href='http://robik.ru/zakrytye-materialy/39-rabota-v-uchetnoj-sisteme-robika'>Описание работы в учетной системе</a></li>
   </ol>
 </body>
 </html>

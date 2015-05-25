@@ -124,11 +124,14 @@ function createInvoice() {
     type : "POST",
     url : comPath + "ajax.php?task=get_inv_num",
     success : function(p) {
-      $('#inv_num').val(p.new_num);
-      $('#inv_date').val(p.new_date);
+      /*$('#inv_num').val(p.new_num);
+      $('#inv_date').val(p.new_date);*/
+      var i = {};
+      i.doc_num = p.new_num;
+      i.doc_date = p.new_date;
+      showInvoiceForm(i);
     }
   });
-  showInvoiceForm({});
 }
 
 // ===================================================================================
@@ -162,7 +165,8 @@ function showInvoiceForm(i) {
   });
   oCust.cust_data = NullTo(oCust.cust_data, {});
   setCustFlds('saved');
-  $("#inv_firm :contains('" + i.doc_firm.toUpperCase() + "')").prop("selected", "selected");
+  if (!IsNull(i.doc_firm))
+    $("#inv_firm :contains('" + i.doc_firm.toUpperCase() + "')").prop("selected", "selected");
   $("#inv_rem").val(i.doc_rem);
 
   oTableProducts.fnClearTable();
@@ -199,7 +203,7 @@ function showInvoiceForm(i) {
   $("#neworder-form").dialog({
     height : 550,
     width : 900,
-    title : "Счёт №" + i.doc_num,
+    title : "Счёт №" + $('#inv_num').val(),
     buttons : oBtns,
     resizable : true
   });

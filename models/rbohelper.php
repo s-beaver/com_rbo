@@ -65,7 +65,7 @@ class RbOHelper {
       $db->setQuery ($query);
       $newNumber = $db->loadResult ();
       $res = new stdClass ();
-      $res->new_num = $newNumber;
+      $res->new_num = $newNumber+1;
       $res->new_date = $currentTime->format ('d.m.Y', true);
       echo json_encode ($res);
     } catch ( Exception $e ) {
