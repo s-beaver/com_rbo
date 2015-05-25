@@ -2,6 +2,19 @@
 jimport ('etc.json_lib');
 class RbOHelper {
   // =================================================================
+  static function checkAccess() {
+    $user = JFactory::getUser ();
+    $can_access = !(array_search ("8", $user->groups) === false &&
+         array_search ("7", $user->groups) === false && array_search ("6", $user->groups) === false);
+    if (! $can_access) {
+      JLog::add ("Доступ запрещен для " . $user->name, JLog::ERROR, 'com_rbo');
+      echo ("Access denied for " . $user->name);
+      header('Refresh: 3; URL=http://robik.ru/');
+      exit;
+    }
+  }
+  
+  // =================================================================
   static function getTimeZone() {
     $userTz = JFactory::getUser ()->getParam ('timezone');
     $timeZone = JFactory::getConfig ()->getValue ('offset');
@@ -65,7 +78,7 @@ class RbOHelper {
       $db->setQuery ($query);
       $newNumber = $db->loadResult ();
       $res = new stdClass ();
-      $res->new_num = $newNumber+1;
+      $res->new_num = $newNumber + 1;
       $res->new_date = $currentTime->format ('d.m.Y', true);
       echo json_encode ($res);
     } catch ( Exception $e ) {

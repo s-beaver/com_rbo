@@ -167,10 +167,6 @@ class RbOInvoice extends RbObject {
     $aColumns = array ('docId','doc_time','cust_lastname' );
     
     $db = JFactory::getDBO ();
-    $this->user = & JFactory::getUser ();
-    $this->user_id = $this->user->id;
-    $is_admin = ! (array_search ("8", $this->user->groups) === false &&
-         array_search ("7", $this->user->groups) === false);
     
     $input = JFactory::getApplication ()->input;
     $iDisplayStart = $input->getInt ('iDisplayStart');
@@ -184,52 +180,6 @@ class RbOInvoice extends RbObject {
            intval ($_POST ['iDisplayLength']);
     }
     
-    // Ordering
-    /*
-     * $sOrder = "";
-     * if ( isset( $_POST['iSortCol_0'] ) ) {
-     * $sOrder = "ORDER BY ";
-     * for ( $i=0 ; $i<intval( $_POST['iSortingCols'] ) ; $i++ ) {
-     * if ( $_POST[ 'bSortable_'.intval($_POST['iSortCol_'.$i]) ] == "true" ) {
-     * $sOrder .= "`".$aColumns[ intval( $_POST['iSortCol_'.$i] ) ]."` ".
-     * ($_POST['sSortDir_'.$i]==='asc' ? 'asc' : 'desc') .", ";
-     * }
-     * }
-     * $sOrder = substr_replace( $sOrder, "", -2 );
-     * if ( $sOrder == "ORDER BY" ) {
-     * $sOrder = "";
-     * }
-     * }
-     */
-    
-    // Filtering
-    $sWhere = $is_admin ? "WHERE " : "WHERE phUserID=" . $this->user->id;
-    if (isset ($_POST ['sSearch']) && $_POST ['sSearch'] != "") {
-      $sWhere .= " AND (";
-      for($i = 0; $i < count ($aColumns); $i ++) {
-        $sWhere .= "`" . $aColumns [$i] . "` LIKE '%" . mysql_real_escape_string (
-            $_POST ['sSearch']) . "%' OR ";
-      }
-      $sWhere = substr_replace ($sWhere, "", - 3);
-      $sWhere .= ')';
-    }
-    
-    // Individual column filtering
-    /*
-     * for ( $i=0 ; $i<count($aColumns) ; $i++ ) {
-     * if ( isset($_POST['bSearchable_'.$i]) && $_POST['bSearchable_'.$i] == "true" && $_POST['sSearch_'.$i] != '' ) {
-     * if ( $sWhere == "" ) {
-     * $sWhere = "WHERE ";
-     * }
-     * else {
-     * $sWhere .= " AND ";
-     * }
-     * $sWhere .= "`".$aColumns[$i]."` LIKE '%".mysql_real_escape_string($_POST['sSearch_'.$i])."%' ";
-     * }
-     * }
-     */
-    
-    $sWhere = $is_admin ? "" : "WHERE phUserID=" . $this->user->id;
     $q = "SELECT count(*) FROM rbo_docs " . $sWhere;
     $db->setQuery ($q);
     $iTotalRecords = $db->loadResult ();

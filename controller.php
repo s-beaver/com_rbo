@@ -1,7 +1,7 @@
 <?php
 defined ('_JEXEC') or die ();
-
 jimport ('joomla.application.component.controller');
+include_once "models/rbohelper.php";
 class RbOController extends JControllerLegacy {
   private $user;
   public $user_id;
@@ -12,9 +12,7 @@ class RbOController extends JControllerLegacy {
     $this->user_id = $this->user->id;
   }
   function display($cachable = false) {
-    if ($this->user->guest) { // неверно! нельзя пускать всех авторизированных пользователей. Только админов
-      $this->setRedirect ("/component/users/?view=login", "Вам необходимо авторизоваться");
-    } else {}
+    RbOHelper::checkAccess ();
     parent::display ($cachable);
   }
 }

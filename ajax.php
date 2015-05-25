@@ -17,7 +17,9 @@ JLog::addLogger (array ('text_file' => 'com_rbo.php' ), JLog::ALL, array ('com_r
 
 $app = JFactory::getApplication ('site');
 $app->initialise ();
-$user = JFactory::getUser ();
+
+RbOHelper::checkAccess();
+
 $input = $app->input;
 $cmd = $input->getCmd ('task');
 
