@@ -12,7 +12,9 @@ if (! defined ('_JDEFINES')) {
 }
 
 require_once JPATH_BASE . '/includes/framework.php';
-include_once "models/rbohelper.php";
+include_once "library/rbohelper.php";
+include_once "models/rbodocument.php";
+include_once "models/rbocust.php";
 JLog::addLogger (array ('text_file' => 'com_rbo.php' ), JLog::ALL, array ('com_rbo' ));
 
 $app = JFactory::getApplication ('site');
@@ -24,48 +26,43 @@ $input = $app->input;
 $cmd = $input->getCmd ('task');
 
 switch ($cmd) {
-  case "get_invoice_list" :
+  case "get_doc_list" :
     {
-      include_once "models/invoice.php";
-      $invList = new RbOInvoice ();
-      $invList->getInvList();
-      echo $invList->getResponse ();
+      $docList = new RbODocument ();
+      $docList->getDocList();
+      echo $docList->getResponse ();
       break;
     }
   
-  case "invoice_read" :
+    case "doc_read" :
     {
-      include_once "models/invoice.php";
-      $inv = new RbOInvoice ();
-      $inv->readObject ();
-      echo $inv->getResponse ();
+      $doc = new RbODocument ();
+      $doc->readObject ();
+      echo $doc->getResponse ();
       break;
     }
   
-  case "invoice_create" :
+  case "doc_create" :
     {
-      include_once "models/invoice.php";
-      $inv = new RbOInvoice ();
-      $inv->createObject ();
-      echo $inv->getResponse ();
+      $doc = new RbODocument ();
+      $doc->createObject ();
+      echo $doc->getResponse ();
       break;
     }
   
-  case "invoice_update" :
+  case "doc_update" :
     {
-      include_once "models/invoice.php";
-      $inv = new RbOInvoice ();
-      $inv->updateObject ();
-      echo $inv->getResponse ();
+      $doc = new RbODocument ();
+      $doc->updateObject ();
+      echo $doc->getResponse ();
       break;
     }
   
-  case "invoice_delete" :
+  case "doc_delete" :
     {
-      include_once "models/invoice.php";
-      $inv = new RbOInvoice ();
-      $inv->deleteObject ();
-      echo $inv->getResponse ();
+      $doc = new RbODocument ();
+      $doc->deleteObject ();
+      echo $doc->getResponse ();
       break;
     }
   
@@ -77,15 +74,15 @@ switch ($cmd) {
   
   case "cust_search" :
     {
-      include_once "models/rbocust.php";
       $cust = new RbOCust();
       $cust->getCustListBySubstr ();
       break;
     }
   
-  case "get_inv_num" :
+  case "get_doc_num" :
     {
-      RbOHelper::getNextDocNumber ('счет');
+      $doc = new RbODocument ();
+      $doc->getNextDocNumber ();
       break;
     }
   

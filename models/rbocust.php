@@ -24,7 +24,7 @@ class RbOCust extends RbObject {
   }
   
   // =================================================================
-  public function getCustListBySubstr() { // перенести в rbocust.php
+  public function getCustListBySubstr() { 
     $input = JFactory::getApplication ()->input;
     $searchSubstr = $input->get ("search", null, null);
     
@@ -32,18 +32,11 @@ class RbOCust extends RbObject {
     $db = JFactory::getDBO ();
     $query = $db->getQuery (true);
     
-    $query->select ("count(*)");
-    $query->from ("rbo_cust");
-    $query->where ("cust_name LIKE '%" . $searchSubstr . "%'", "OR");
-    $query->where ("cust_data LIKE '%" . $searchSubstr . "%'", "OR");
-    $db->setQuery ($query);
-    $count = $db->loadResult ();
-    
     $query->clear ();
     $query->select ("custId, cust_name, cust_fullname, cust_email, cust_data, cust_phone");
     $query->from ("rbo_cust");
     $query->where ("cust_name LIKE '%" . $searchSubstr . "%'", "OR");
-    $query->where ("cust_data LIKE '%" . $searchSubstr . "%'", "OR");
+    //$query->where ("cust_data LIKE '%" . $searchSubstr . "%'", "OR");пока не хотим искать по данным
     
     try {
       $db->setQuery ($query, 0, 30);
@@ -55,7 +48,7 @@ class RbOCust extends RbObject {
     foreach ( $buffer as &$v ) {
       $v->cust_data = json_decode ($v->cust_data);
     }
-    $res->count = $count;
+    $res->count =  $db->getAffectedRows ();
     $res->result = $buffer;
     echo json_encode ($res);
   }

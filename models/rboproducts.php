@@ -1,7 +1,7 @@
 <?php
 jimport ('etc.json_lib');
 include_once "models/rbobject.php";
-class RbOInvProducts extends RbObject {
+class RbOProducts extends RbObject {
  
  // =================================================================
  public function __construct($parentKeyValue) {

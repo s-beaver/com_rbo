@@ -1,33 +1,36 @@
 'use strict';
 var comPath = "/components/com_rbo/";
 // ===================================================================================
-function readDocument(invId) {
+function readDocument(docId) {
   $.ajax({
     dataType : 'json',
     type : "POST",
     data : {
       "rbo_docs" : {
-        "docId" : invId
+        "docId" : docId,
+        "doc_type": "счет"
       }
     },
-    url : comPath + "ajax.php?task=invoice_read",
-    success : function(inv_data) {
-      fillInvoicePrintForm(inv_data);
+    url : comPath + "ajax.php?task=doc_read",
+    success : function(doc_data) {
+      fillInvoicePrintForm(doc_data);
     }
   });
+
+
 }
 
 // ===================================================================================
 function fillInvoicePrintForm(i) {
-  $("#inv_num").html(i.doc_num);
-  $("#inv_date").html(i.doc_date);
+  $("#doc_num").html(i.doc_num);
+  $("#doc_date").html(i.doc_date);
 
   var f;
   if (!IsNull(i.doc_firm_details)) {
     f = i.doc_firm_details;
     var arFirm = [ f.f_fullname, "ИНН " + f.f_inn, "КПП " + f.f_kpp, f.f_addr,
         f.f_phone ];
-    $("#inv_firm").html(arFirm.join());
+    $("#doc_firm").html(arFirm.join());
     $("#f_bank").html(f.f_bank);
     $("#f_bik").html(f.f_bik);
     $("#f_rch").html(f.f_rch);
@@ -42,10 +45,10 @@ function fillInvoicePrintForm(i) {
     var cd = c.cust_data;
     var arCust = [ c.cust_fullname, "ИНН " + cd.cust_inn, "КПП " + cd.cust_kpp, cd.cust_addr,
         c.f_phone ];
-    $("#inv_cust").html(arCust.join());
+    $("#doc_cust").html(arCust.join());
   }
 
-  $("#inv_manager").html(i.doc_manager_details);
+  $("#doc_manager").html(i.doc_manager_details);
 
   var sPr = "";
   var iCntSum = 0;
@@ -68,12 +71,12 @@ function fillInvoicePrintForm(i) {
     }
   }
 
-  $("#inv_products").html(sPr);
-  $("#inv_cnt_sum").html(iCntSum);
-  $("#inv_sum").html(i.doc_sum);
-  $("#inv_sum_words").html(number_to_string(i.doc_sum));
+  $("#doc_products").html(sPr);
+  $("#doc_cnt_sum").html(iCntSum);
+  $("#doc_sum").html(i.doc_sum);
+  $("#doc_sum_words").html(number_to_string(i.doc_sum));
 
-  var iManOffset = $("#inv_manager").offset();
+  var iManOffset = $("#doc_manager").offset();
   iManOffset.top -= 50;
   iManOffset.left -= 50;
 

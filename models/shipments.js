@@ -11,9 +11,16 @@ var arSearchedCust = new Array(); // массив объектов содерж�
 var oCust = {
   cust_data : {}
 }; //объект, содержащий поля покупателя, пришедший из запроса к БД
+var oDoc = {
+  doctId : 0,
+  doc_num : 0,
+  doc_date : 0,
+  doc_status : ""
+}
+
 var bCustInput = 'select';
-var sDocTypeTitle = 'Счет';
-var sDocType = 'счет';
+var sDocTypeTitle = 'Накладная';
+var sDocType = 'накл';
 
 //===================================================================================
 function convertSelect2Input() {
@@ -62,18 +69,22 @@ function readDoc(docId) {
     data : {
       "rbo_docs" : {
         "docId" : docId,
-        "doc_type": sDocType
+        "doc_type" : sDocType
       }
     },
     url : comPath + "ajax.php?task=doc_read",
     success : function(doc_data) {
+      oDoc.doctId = doc_data.docId;
+      oDoc.doc_num = doc_data.doc_num;
+      oDoc.doc_date = doc_data.doc_date;
+      oDoc.doc_status = doc_data.doc_status;
       showDocForm(doc_data);
     }
   });
 }
 
 // ===================================================================================
-function saveDoc(docId, doc_status) {
+function saveDoc(docId) {
   var bValid = true;
   allFields.removeClass("ui-state-error");
   bValid = bValid && checkNotEmpty($("#doc_num"), "Номер", tips);
@@ -128,11 +139,15 @@ function createDoc() {
     type : "POST",
     data : {
       "rbo_docs" : {
-        "doc_type": sDocType
+        "doc_type" : sDocType
       }
     },
     url : comPath + "ajax.php?task=get_doc_num",
     success : function(p) {
+      oDoc.doctId = 0;
+      oDoc.doc_num = p.new_num;
+      oDoc.doc_date = p.new_date;
+      oDoc.doc_status = "";
       var i = {};
       i.doc_num = p.new_num;
       i.doc_date = p.new_date;
@@ -149,7 +164,7 @@ function deleteDoc(docId) {
     data : {
       "rbo_docs" : {
         "docId" : docId,
-        "doc_type": sDocType
+        "doc_type" : sDocType
       }
     },
     url : comPath + "ajax.php?task=doc_delete",
@@ -167,6 +182,13 @@ function showDocForm(i) {
   $("#doc_date").val(i.doc_date);
   $("#doc_sum").val(i.doc_sum);
   $("#doc_status").val(i.doc_status);
+
+  var sDocBase = "";
+  $("#doc_base").val(i.doc_base);
+  if (!IsNull(i.doc_base_doc)) { 
+    sDocBase = "Счет №"+i.doc_base_doc.doc_num+" от "+i.doc_base_doc.doc_date;
+  }
+
   $("#doc_manager option:contains('" + i.doc_manager + "')").prop("selected", "selected");
   oCust = NullTo(i.doc_cust, {
     cust_data : {}
@@ -197,11 +219,11 @@ function showDocForm(i) {
   }
 
   oBtns["Печатать"] = function() {
-    window.open('index.php?option=com_rbo&view=printinv&format=raw&docid=' + i.docId, '_blank');
+    window.open('index.php?option=com_rbo&view=printtorg12&format=raw&docid=' + i.docId, '_blank');
   };
 
   oBtns["Сохранить"] = function() {
-    saveDoc(i.docId, "");
+    saveDoc(i.docId);
   };
 
   oBtns["Отмена"] = function() {
@@ -209,47 +231,51 @@ function showDocForm(i) {
   };
 
   $("#doc-form").dialog({
-    title : sDocTypeTitle+" №" + $('#doc_num').val(),
+    title : sDocTypeTitle + " №" + $('#doc_num').val(),
     buttons : oBtns
   });
 
   $("#doc-form").dialog("open");
 }
 
-// ===================================================================================
-function showCustForm() {
+//===================================================================================
+function chooseBaseDoc() {
   var custId = $("#custId").val();
   var custName = $("#doc_cust").val();
   arSearchedCust = new Array();
-  if (bCustInput == 'select') {
-    $('#cust_name option').remove();
-    $('#cust_name').append('<option value="">' + custName + '</option>');
-    $("#cust_name option:contains('" + custName + "')").prop("selected", "selected");
-  }
-  setCustFlds('saved');
+  $('#cust_name option').remove();
+  $('#cust_name').append('<option value="">' + custName + '</option>');
+  $("#cust_name option:contains('" + custName + "')").prop("selected", "selected");
 
   $("#cust-form").dialog({
-    title : "Выбор покупателя",
+    title : "Выбор документа-основания",
     buttons : {
-      "Новый покупатель" : function() {
-        setCustFlds('clear');
-        convertSelect2Input();
-      },
-
-      "Очистить" : function() {
-        setCustFlds('clear');
-        $("#cust-form").dialog("close");
-      },
-
       "Сохранить" : function() {
-        if (bCustInput == 'input')
-          $("#doc_cust").val($("#cust_name").val());
-        saveCustFlds();
+        var invId = $("#base_doc option:selected").val();
+        $.ajax({
+          dataType : 'json',
+          type : "POST",
+          data : {
+            "rbo_docs" : {
+              "docId" : invId,
+              "doc_type" : 'счет'//это правильно
+            }
+          },
+          url : comPath + "ajax.php?task=doc_read",
+          success : function(doc_data) {
+            doc_data.docId = oDoc.doctId;
+            doc_data.doc_num = oDoc.doc_num;
+            doc_data.doc_date = oDoc.doc_date;
+            doc_data.doc_status = oDoc.doc_status;
+            doc_data.base_doc = invId;
+            showDocForm(doc_data);
+          }
+        });
+
         $("#cust-form").dialog("close");
       },
 
       "Отмена" : function() {
-        setCustFlds('saved');
         $("#cust-form").dialog("close");
       }
     },
@@ -259,6 +285,28 @@ function showCustForm() {
   $("#cust-form").dialog("open");
 
   return false;
+}
+
+// ===================================================================================
+function setBaseDocList() {
+  $.ajax({
+    dataType : 'json',
+    type : "POST",
+    data : {
+      "sSearch" : $("#cust_name option:selected").html()
+    },
+    url : comPath + "ajax.php?task=get_doc_list&doc_type=счет",//счет - это правильно!
+    success : function(s) {
+      $('#base_doc option').remove();
+      p = s.aaData;
+      if (p.length > 0) {
+        for (var i = 0; i < p.length; i++) {
+          $('#base_doc').append('<option value="' + p[i].docId + '">Счет №' + p[i].doc_num + " от " + p[i].doc_date + " (" + p[i].doc_sum + '=)</option>');
+        }
+        $("#base_doc option:first").prop("selected", "selected");
+      }
+    }
+  });
 }
 
 // ===================================================================================
@@ -277,14 +325,12 @@ function custSearch() {
       if (p.result.length > 0) {
         for (var i = 0; i < p.result.length; i++) {
           $('#cust_name').append('<option value="' + i + '">' + p.result[i].cust_name + '</option>');
-          if (i == 0) {
-            $("#cust_name option:contains('" + p.result[i].cust_name + "')").prop("selected", "selected");
-          }
         }
         if (p.count > p.result.length) {
           $('#cust_name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
         }
-        setCustFlds('selected');
+        $("#cust_name option:first").prop("selected", "selected");
+        setBaseDocList();
       }
     }
   });
@@ -441,8 +487,10 @@ function productSearch() {
       for (var i = 0; i < p.result.length; i++) {
         $('#prod_name').append(
             '<option value="' + p.result[i].productID + "|" + p.result[i].price + "|" + p.result[i].product_code + '">' + p.result[i].name + '</option>');
+        if (i == 0) {
+          $("#prod_name option:contains('" + p.result[i].name + "')").prop("selected", "selected");
+        }
       }
-      $("#prod_name option:first").prop("selected", "selected");
       setProductPrice();
       if (p.count > p.result.length) {
         $('#prod_name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
@@ -472,8 +520,8 @@ function calcSum() {
 // ===================================================================================
 $(document).ready(function() {
 
-  $("#cedit").click(function(event) {
-    showCustForm();
+  $("#baseedit").click(function(event) {
+    chooseBaseDoc();
     return false;
   });
 
@@ -489,7 +537,7 @@ $(document).ready(function() {
       "sSwfPath" : "/swf/copy_csv_xls_pdf.swf"
     },
     "aaSorting" : [ [ 1, "desc" ] ],
-    "sAjaxSource" : comPath + "ajax.php?task=get_doc_list&doc_type="+sDocType,
+    "sAjaxSource" : comPath + "ajax.php?task=get_doc_list&doc_type=" + sDocType,
     "fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
       oSettings.jqXHR = $.ajax({
         "dataType" : 'json',
@@ -570,7 +618,7 @@ $(document).ready(function() {
 
   $("#cust-form").dialog({
     autoOpen : false,
-    height : 550,
+    height : 250,
     width : 700,
     modal : true,
     resizable : true

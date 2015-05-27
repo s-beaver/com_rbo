@@ -72,7 +72,7 @@ function checkRegexp(o, regexp, n, tips) {
 }
 
 /*
- * Ask("123","Удалить","Отмена",function(){deleteOrder(invId)},null,"#dialog-confirm");
+ * Ask("123","Удалить","Отмена",function(){deleteOrder(docId)},null,"#dialog-confirm");
  * 
  */
 // ===================================================================================

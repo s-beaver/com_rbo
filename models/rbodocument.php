@@ -1,15 +1,15 @@
 <?php
 jimport ('etc.json_lib');
 include_once "models/rbobject.php";
-include_once "models/invproducts.php";
+include_once "models/rboproducts.php";
 include_once "models/rbocust.php";
-include_once "models/rbohelper.php";
+include_once "../library/rbohelper.php";
 include_once "configuration.php";
-class RbOInvoice extends RbObject {
+class RbODocument extends RbObject {
   
   // =================================================================
-  public function __construct($parentKeyValue) {
-    parent::__construct ($parentKeyValue);
+  public function __construct() {
+    parent::__construct ();
     
     $this->table_name = "rbo_docs";
     $this->flds ["docId"] = array ("type" => "numeric","is_key" => true );
@@ -40,8 +40,13 @@ class RbOInvoice extends RbObject {
     $this->parentKeyValue = $docId;
     parent::readObject ();
     $custId = $this->buffer->custId;
+    $doc_base = $this->buffer->doc_base;
     
-    $prod = new RbOInvProducts ($docId);
+    /*$doc_base_doc = new RbODocument ($doc_base);
+    $doc_base_doc->readObject ();
+    $this->buffer->doc_base_doc = $doc_base_doc->buffer;*/
+    
+    $prod = new RbOProducts ($docId);
     $prod->readObject ();
     $this->buffer->doc_products = $prod->buffer;
     
@@ -64,6 +69,7 @@ class RbOInvoice extends RbObject {
     $this->parentKeyValue = $docId;
     $doc_products = $this->buffer->doc_products;
     $doc_cust = $this->buffer->doc_cust;
+    // проверить если пустой массив, то не сохранять
     $doc_cust ['cust_data'] = json_encode ($doc_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
     
     $this->buffer->modified_by = JFactory::getUser ()->username;
@@ -90,7 +96,7 @@ class RbOInvoice extends RbObject {
     
     $input = JFactory::getApplication ()->input;
     $input->set ("rbo_docs_products", $doc_products);
-    $prod = new RbOInvProducts ($docId);
+    $prod = new RbOProducts ($docId);
     $prod->deleteObject ();
     $prod->createObject ();
     $response = $response && $prod->response;
@@ -108,7 +114,7 @@ class RbOInvoice extends RbObject {
     
     $this->buffer->created_by = JFactory::getUser ()->username;
     $this->buffer->created_on = RbOHelper::getCurrentTimeForDb ();
-    $this->buffer->doc_type = "счет";
+    // $this->buffer->doc_type = $this->docType;//надо передавать через буфер
     
     $input = JFactory::getApplication ()->input;
     $input->set ("rbo_cust", $doc_cust);
@@ -132,7 +138,7 @@ class RbOInvoice extends RbObject {
     }
     
     $input->set ("rbo_docs_products", $doc_products);
-    $prod = new RbOInvProducts ($docId);
+    $prod = new RbOProducts ($docId);
     $prod->createObject ();
     $response = $response && $prod->response;
     
@@ -161,42 +167,35 @@ class RbOInvoice extends RbObject {
   }
   
   // =================================================================
-  public function getInvList() {
-    $user_id = "";
-    $doc_list = "";
-    $aColumns = array ('docId','doc_time','cust_lastname' );
-    
+  public function getDocList() { // надо уметь фильтровать по разным полям. тогда подойдет и для выбора документа-основания
     $db = JFactory::getDBO ();
     
     $input = JFactory::getApplication ()->input;
     $iDisplayStart = $input->getInt ('iDisplayStart');
     $iDisplayLength = $input->getInt ('iDisplayLength');
     $sEcho = $input->getString ('sEcho');
-    
-    // Paging
-    $sLimit = "";
-    if (isset ($_POST ['iDisplayStart']) && $_POST ['iDisplayLength'] != '-1') {
-      $sLimit = "LIMIT " . intval ($_POST ['iDisplayStart']) . ", " .
-           intval ($_POST ['iDisplayLength']);
-    }
-    
-    $q = "SELECT count(*) FROM rbo_docs " . $sWhere;
-    $db->setQuery ($q);
-    $iTotalRecords = $db->loadResult ();
-    
+    $doc_type = $input->getString ('doc_type');
+    $sSearch = $input->getString ('sSearch');
+    $sWhere = array ();
+    $sWhere [] = $db->quoteName ('doc_type') . "='" . $doc_type . "'";
+    if (isset($sSearch) && $sSearch!="") 
+      $sWhere [] = $db->quoteName ('rc.cust_name') . " LIKE '%" . $sSearch . "%'";
+      
     $query = $db->getQuery (true);
+    
+    $query->clear ();
     $query->select (
         array ("docId","doc_num","doc_date","rc.cust_name doc_cust","doc_sum","doc_status",
             "doc_manager" ));
     $query->from ($db->quoteName ('rbo_docs', 'rd'));
-    $query->where ($db->quoteName ('rd.doc_type') . "='счет'");
+    $query->where ($sWhere);
     $query->order ($db->quoteName ('rd.docId') . " DESC");
     $query->leftJoin (
         $db->quoteName ('rbo_cust', 'rc') . ' ON (' . $db->quoteName ('rd.custId') . ' = ' .
              $db->quoteName ('rc.custId') . ')');
     
     if (isset ($_POST ['iDisplayStart']) && $_POST ['iDisplayLength'] != '-1') {
-      $db->setQuery ($query, intval ($_POST ['iDisplayStart']), intval ($_POST ['iDisplayLength']));
+      $db->setQuery ($query, intval ($iDisplayStart), intval ($iDisplayLength));
     } else {
       $db->setQuery ($query);
     }
@@ -204,22 +203,39 @@ class RbOInvoice extends RbObject {
     $data_rows_assoc_list = $db->loadAssocList ();
     $iTotalDisplayRecords = $db->getAffectedRows ();
     
-    $s = '';
-    $iCnt = 0;
-    foreach ( $data_rows_assoc_list as $v ) {
-      if ($s != '') $s .= ',';
-      $s .= '{"doc_num":"' . $v ['doc_num'] . '",';
-      $s .= '"docId":"' . $v ['docId'] . '",';
-      $s .= '"doc_date":"' . JFactory::getDate ($v ['doc_date'])->format ('d M Y (D)') . '",'; // https://php.net/manual/en/function.date.php
-      $s .= '"doc_cust":"' . $v ['doc_cust'] . '",';
-      $s .= '"doc_sum":"' . $v ['doc_sum'] . '",';
-      $s .= '"doc_status":"' . $v ['doc_status'] . '",';
-      $s .= '"doc_manager":"' . $v ['doc_manager'] . '"}';
-      $iCnt ++;
+    foreach ( $data_rows_assoc_list as &$v ) {
+      $v ['doc_date'] = JFactory::getDate ($v ['doc_date'])->format ('d.m.y'); // https://php.net/manual/en/function.date.php
     }
     
-    $this->response = '{"sEcho":' . $sEcho . ',"iTotalRecords":' . $iTotalRecords .
-         ',"iTotalDisplayRecords":' . $iTotalRecords . ',"aaData":[' . $s . ']}';
+    $res = new stdClass ();
+    $res->sEcho = $sEcho;
+    $res->iTotalRecords = $iTotalDisplayRecords;
+    $res->iTotalDisplayRecords = $iTotalDisplayRecords;
+    $res->aaData = $data_rows_assoc_list;
+    $this->response = json_encode ($res);
+  }
+  
+  // =================================================================
+  function getNextDocNumber() {
+    $currentTime = new JDate ();
+    $year = $currentTime->format ('Y', false);
+    
+    try {
+      $db = JFactory::getDBO ();
+      $query = $db->getQuery (true);
+      $query->select ("MAX(doc_num)");
+      $query->from ("rbo_docs");
+      $query->where ("doc_type='" . $this->buffer->doc_type . "'");
+      $query->where ("DATE_FORMAT(doc_date,'%Y')=$year");
+      $db->setQuery ($query);
+      $newNumber = $db->loadResult ();
+      $res = new stdClass ();
+      $res->new_num = $newNumber + 1;
+      $res->new_date = $currentTime->format ('d.m.Y', true);
+      echo json_encode ($res);
+    } catch ( Exception $e ) {
+      JLog::add (get_class ($this) . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
+    }
   }
 }
 

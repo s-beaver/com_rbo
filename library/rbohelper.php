@@ -62,28 +62,5 @@ class RbOHelper {
       JLog::add (get_class ($this) . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
     }
   }
-  
-  // =================================================================
-  static function getNextDocNumber($sDocType) { // счет, накл, акт
-    $currentTime = new JDate ();
-    $year = $currentTime->format ('Y', false);
-    
-    try {
-      $db = JFactory::getDBO ();
-      $query = $db->getQuery (true);
-      $query->select ("MAX(doc_num)");
-      $query->from ("rbo_docs");
-      $query->where ("doc_type='$sDocType'");
-      $query->where ("DATE_FORMAT(doc_date,'%Y')=$year");
-      $db->setQuery ($query);
-      $newNumber = $db->loadResult ();
-      $res = new stdClass ();
-      $res->new_num = $newNumber + 1;
-      $res->new_date = $currentTime->format ('d.m.Y', true);
-      echo json_encode ($res);
-    } catch ( Exception $e ) {
-      JLog::add (get_class ($this) . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
-    }
-  }
 }
 

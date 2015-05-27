@@ -20,7 +20,9 @@ $(function() {
 </script>
 <body>
   <ol id="selectable">
-    <li class="ui-widget-content1"><a href='/index.php?option=com_rbo&view=invoices'>Документы</a></li>
+    <li class="ui-widget-content1"><a href='/index.php?option=com_rbo&view=invoices'>Счета</a></li>
+    <li class="ui-widget-content1"><a href='/index.php?option=com_rbo&view=shipments'>Накладные</a></li>
+    <li class="ui-widget-content1"><a href='/index.php?option=com_rbo&view=acts'>Акты</a></li>
     <li class="ui-widget-content1">Операции</li>
     <li class="ui-widget-content1">Справочник - покупатели</li>
     <li class="ui-widget-content1">Отчеты</li>
