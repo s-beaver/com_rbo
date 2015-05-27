@@ -4,8 +4,8 @@ include_once "models/rbobject.php";
 class RbOCust extends RbObject {
   
   // =================================================================
-  public function __construct($parentKeyValue) {
-    parent::__construct ($parentKeyValue);
+  public function __construct($keyValue) {
+    parent::__construct ($keyValue);
     
     $this->table_name = "rbo_cust";
     $this->flds ["custId"] = array ("type" => "numeric","is_key" => true );

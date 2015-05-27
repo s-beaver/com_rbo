@@ -62,7 +62,7 @@ function readDoc(docId) {
     data : {
       "rbo_docs" : {
         "docId" : docId,
-        "doc_type": sDocType
+        "doc_type" : sDocType
       }
     },
     url : comPath + "ajax.php?task=doc_read",
@@ -73,7 +73,7 @@ function readDoc(docId) {
 }
 
 // ===================================================================================
-function saveDoc(docId, doc_status) {
+function saveDoc(docId) {
   var bValid = true;
   allFields.removeClass("ui-state-error");
   bValid = bValid && checkNotEmpty($("#doc_num"), "Номер", tips);
@@ -128,7 +128,7 @@ function createDoc() {
     type : "POST",
     data : {
       "rbo_docs" : {
-        "doc_type": sDocType
+        "doc_type" : sDocType
       }
     },
     url : comPath + "ajax.php?task=get_doc_num",
@@ -149,7 +149,7 @@ function deleteDoc(docId) {
     data : {
       "rbo_docs" : {
         "docId" : docId,
-        "doc_type": sDocType
+        "doc_type" : sDocType
       }
     },
     url : comPath + "ajax.php?task=doc_delete",
@@ -167,7 +167,13 @@ function showDocForm(i) {
   $("#doc_date").val(i.doc_date);
   $("#doc_sum").val(i.doc_sum);
   $("#doc_status").val(i.doc_status);
-  $("#doc_manager option:contains('" + i.doc_manager + "')").prop("selected", "selected");
+
+  $('#doc_manager option:selected').each(function() {
+    this.selected = false;
+  });
+  if (!IsEmpty(i.doc_manager))
+    $("#doc_manager option:contains('" + i.doc_manager + "')").prop("selected", "selected");
+
   oCust = NullTo(i.doc_cust, {
     cust_data : {}
   });
@@ -201,7 +207,7 @@ function showDocForm(i) {
   };
 
   oBtns["Сохранить"] = function() {
-    saveDoc(i.docId, "");
+    saveDoc(i.docId);
   };
 
   oBtns["Отмена"] = function() {
@@ -209,7 +215,7 @@ function showDocForm(i) {
   };
 
   $("#doc-form").dialog({
-    title : sDocTypeTitle+" №" + $('#doc_num').val(),
+    title : sDocTypeTitle + " №" + $('#doc_num').val(),
     buttons : oBtns
   });
 
@@ -277,13 +283,11 @@ function custSearch() {
       if (p.result.length > 0) {
         for (var i = 0; i < p.result.length; i++) {
           $('#cust_name').append('<option value="' + i + '">' + p.result[i].cust_name + '</option>');
-          if (i == 0) {
-            $("#cust_name option:contains('" + p.result[i].cust_name + "')").prop("selected", "selected");
-          }
         }
         if (p.count > p.result.length) {
           $('#cust_name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
         }
+        $("#cust_name option:first").prop("selected", "selected");
         setCustFlds('selected');
       }
     }
@@ -367,16 +371,16 @@ function showProductForm(x) {// x-номер редактируемой стро
   else
     lines_before_update = p.length;
 
+  $("#prodId").val(p.productId);
+  $("#prod_code").val(p.product_code);
+  $('#prod_name option').remove();
   if (x >= 0) {
-    $("#prodId").val(p.productId);
-    $("#prod_code").val(p.product_code);
-    $('#prod_name option').remove();
     $('#prod_name').append('<option value="">' + p.product_name + '</option>');
-    $("#prod_name option:contains('" + p.product_name + "')").prop("selected", "selected");
-    $("#prod_price").val(p.product_price);
-    $("#prod_cnt").val(p.product_cnt);
-    $("#prod_sum").val(p.product_sum);
   }
+  $("#prod_name option:first").prop("selected", "selected");
+  $("#prod_price").val(p.product_price);
+  $("#prod_cnt").val(p.product_cnt);
+  $("#prod_sum").val(p.product_sum);
 
   $("#newline-form").dialog({
     title : "Позиция - " + p.product_code,
@@ -489,7 +493,7 @@ $(document).ready(function() {
       "sSwfPath" : "/swf/copy_csv_xls_pdf.swf"
     },
     "aaSorting" : [ [ 1, "desc" ] ],
-    "sAjaxSource" : comPath + "ajax.php?task=get_doc_list&doc_type="+sDocType,
+    "sAjaxSource" : comPath + "ajax.php?task=get_doc_list&doc_type=" + sDocType,
     "fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
       oSettings.jqXHR = $.ajax({
         "dataType" : 'json',

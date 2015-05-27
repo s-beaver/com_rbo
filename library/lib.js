@@ -1,9 +1,11 @@
-var monthAr = new Array("", "январь", "февраль", "март", "апрель", "май",
-    "июнь", "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь");
-var monthAr1 = new Array("", "января", "февраля", "марта", "апреля", "мая", "июня",
-    "июля", "августа", "сентября", "октября", "ноября", "декабря");
+var monthAr = new Array("", "январь", "февраль", "март", "апрель", "май", "июнь", "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь");
+var monthAr1 = new Array("", "января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря");
 
 // ===================================================================================
+/*
+ * Функция предназначена для коректной проверки на не заданое или не правильное
+ * значение #hval(variant)#первый параметр vVal - Тестируемое значение
+ */
 function IsNull(vVal) {
   var und = void null;
   switch (vVal) {
@@ -20,11 +22,72 @@ function IsNull(vVal) {
 }
 
 // ===================================================================================
+/*
+ * Функция предназначена для проверки и приведения oTest к умолчательному
+ * значению sVoz, в случаях, когда oTest равен null или NaN
+ * #hval(variant)#первый параметр oTest #hval(variant)#второй параметр sVoz
+ */
 function NullTo(oTest, sVoz) {
   if (IsNull(oTest))
     return sVoz;
   else
     return oTest;
+}
+
+//===================================================================================
+/*
+ * Функция предназначена для проверки пустое ли значение #hval(variant)# vVal -
+ * проверяемое значение #href(lib.ObjLength)# - вычисление количества элементов
+ * объекта JavaScript
+ */
+function IsEmpty(vVal) {
+  if (IsNull(vVal))
+    return true;
+  if (typeof (vVal) == "string")
+    return (vVal == "");
+  if (IsArray(vVal))
+    return (vVal.length == 0);
+  if (IsObject(vVal))
+    return (ObjLength(vVal) <= 0);
+  return false;
+}
+
+//=============================================================================
+/*
+ * Функция предназначена для проверки является ли переданая переменная массивом
+ * JScript
+ */
+function IsArray(obj) {
+  if (IsObject(obj)) {
+    if (obj instanceof Array)
+      return true;
+    else {
+      try {
+        var aAr = new Array();
+        if ((obj.constructor + "") == (aAr.constructor + ""))
+          return true;
+        else {
+          if (obj.length > 0)
+            obj[0] = obj[0];
+          else
+            return (obj[0] == undefined);
+          return true;
+        }
+      } catch (err) {
+        return false;
+      }
+    }
+  }
+  return false;
+}
+
+//=============================================================================
+/*
+ * Функция предназначена для проверки является ли переданое значение объектом
+ * #hval(variant)# oObj - проверяемый объект
+ */
+function IsObject(oObj) {
+  return typeof (oObj) == "object";
 }
 
 // ===================================================================================
@@ -52,8 +115,7 @@ function checkNotEmpty(o, n, tips) {
 function checkLength(o, n, min, max, tips) {
   if (o.val().length > max || o.val().length < min) {
     o.addClass("ui-state-error");
-    updateTips("Длина поля " + n + "  должна быть не менее " + min
-        + "  и не более " + max + " символов", tips);
+    updateTips("Длина поля " + n + "  должна быть не менее " + min + "  и не более " + max + " символов", tips);
     return false;
   } else {
     return true;
@@ -99,7 +161,8 @@ function Ask(sText, okText, cancelText, fnOk, fnCancel, sElemSelector) {
 
 // ===================================================================================
 function convertDate(d) {// в формате 01.12.2015
-  if (IsNull(d)) return "";
+  if (IsNull(d))
+    return "";
   var re = new RegExp("(\\.([0-9]{1,2})\\.)");
   return d.replace(re, function(a, b, c) {
     return " " + monthAr1[Number(c)] + " "
@@ -109,14 +172,10 @@ function convertDate(d) {// в формате 01.12.2015
 // ===================================================================================
 function number_to_string(_number, _no_first_upper, _no_rub) {
   var _arr_numbers = new Array();
-  _arr_numbers[1] = new Array('', 'один', 'два', 'три', 'четыре', 'пять',
-      'шесть', 'семь', 'восемь', 'девять', 'десять', 'одиннадцать',
-      'двенадцать', 'тринадцать', 'четырнадцать', 'пятнадцать', 'шестнадцать',
-      'семнадцать', 'восемнадцать', 'девятнадцать');
-  _arr_numbers[2] = new Array('', '', 'двадцать', 'тридцать', 'сорок',
-      'пятьдесят', 'шестьдесят', 'семьдесят', 'восемьдесят', 'девяносто');
-  _arr_numbers[3] = new Array('', 'сто', 'двести', 'триста', 'четыреста',
-      'пятьсот', 'шестьсот', 'семьсот', 'восемьсот', 'девятьсот');
+  _arr_numbers[1] = new Array('', 'один', 'два', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять', 'десять', 'одиннадцать', 'двенадцать', 'тринадцать',
+      'четырнадцать', 'пятнадцать', 'шестнадцать', 'семнадцать', 'восемнадцать', 'девятнадцать');
+  _arr_numbers[2] = new Array('', '', 'двадцать', 'тридцать', 'сорок', 'пятьдесят', 'шестьдесят', 'семьдесят', 'восемьдесят', 'девяносто');
+  _arr_numbers[3] = new Array('', 'сто', 'двести', 'триста', 'четыреста', 'пятьсот', 'шестьсот', 'семьсот', 'восемьсот', 'девятьсот');
   // ++++++++++++++++++
   function number_parser(_num, _desc) {
     var _string = '';
@@ -131,13 +190,13 @@ function number_to_string(_number, _no_first_upper, _no_rub) {
     else {
       var _first_num = _num.substr(0, 1);
       var _second_num = _num.substr(1, 2);
-      _string += _arr_numbers[2][_first_num] + ' '
-          + _arr_numbers[1][_second_num] + ' ';
+      _string += _arr_numbers[2][_first_num] + ' ' + _arr_numbers[1][_second_num] + ' ';
     }
     switch (_desc) {
     case 0:
       var _last_num = parseFloat(_num.substr(-1));
-      if (_no_rub) break;
+      if (_no_rub)
+        break;
       if (_last_num == 1)
         _string += 'рубль';
       else if (_last_num > 1 && _last_num < 5)
@@ -195,7 +254,7 @@ function number_to_string(_number, _no_first_upper, _no_rub) {
 
   _no_rub = NullTo(_no_rub, false);
   _no_first_upper = NullTo(_no_first_upper, false);
-  
+
   if (!_number || _number == 0)
     return false;
   if (typeof _number !== 'number') {
@@ -225,7 +284,8 @@ function number_to_string(_number, _no_first_upper, _no_rub) {
   }
   if (_number_decimals && !_no_rub)
     _string += decimals_parser(_number_decimals);
-  if (_no_first_upper) return _string;
+  if (_no_first_upper)
+    return _string;
   var _string1 = _string.substr(0, 1).toUpperCase();
   var _string2 = _string.substr(1);
   return _string1 + _string2;

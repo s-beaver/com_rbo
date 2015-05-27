@@ -1,20 +1,20 @@
 <?php
 jimport ('etc.json_lib');
 class RbObject {
-  public $oJson; // нужно выносить из класса
+  //public $oJson; // нужно выносить из класса
   public $is_multiple = false; // читать одну запись или несколько по идентификатору
   public $response = ""; // подготовленный ответ для отправки в ответ на ajax запрос
   public $table_name = ""; // наименование таблицы БД в которой хранится объект, по совместительству - название переменной для передачи данных через input буфер
   public $flds = array (); // ассоциативный массив, где ключ - название поле таблицы БД, а значение - тип поля из списка: numeric, string, datetime
                            // public $flds = array (); // ассоциативный массив системных полей таблицы
   public $buffer; // Значения для загрузки в таблицу. Ассоциативный массив, или массив ассоциативных массивов. Результат загрузки значений из таблицы. Ассоциативный массив, или массив ассоциативных массивов
-  public $parentKeyValue = 0; // если $is_multiple, то отсюда берется значение ключа для связи с родительской таблицей. Название ключа выбирается из flds
+  public $keyValue = 0; // если $is_multiple, то отсюда берется значение ключа для связи с родительской таблицей. Название ключа выбирается из flds
   public $insertid;
   
   // =================================================================
-  public function __construct($parentKeyValue) {
-    $this->parentKeyValue = $parentKeyValue;
-    $this->oJson = new Services_JSON ();
+  public function __construct($keyValue) {
+    $this->keyValue = $keyValue;
+    //$this->oJson = new Services_JSON ();
   }
   
   // =================================================================
@@ -56,13 +56,13 @@ class RbObject {
   // =================================================================
   public function getWhereClause() {
     foreach ( $this->flds as $fldname => $fldvalue ) {
-      if ($fldvalue ["is_key"]) return "$fldname=" . $this->parentKeyValue;
+      if ($fldvalue ["is_key"]) return "$fldname=" . $this->keyValue;
     }
     return; // ПРОБА!!!!!!!!!!!!!!!!!!
     
     if ($this->is_multiple) {
       foreach ( $this->flds as $fldname => $fldvalue ) {
-        if ($fldvalue ["is_key"]) return "$fldname=" . $this->parentKeyValue;
+        if ($fldvalue ["is_key"]) return "$fldname=" . $this->keyValue;
       }
     } else {
       $buffer = ( object ) $this->buffer;
@@ -223,7 +223,7 @@ class RbObject {
     try {
       if ($this->is_multiple) {
         $result = true;
-          $this->insertid = array ();
+        $this->insertid = array ();
         foreach ( $this->buffer as $key => $value ) {
           $query->clear ();
           $ins = $this->getArraysForInsert ($db, $value);
@@ -231,8 +231,8 @@ class RbObject {
           $query->columns ($ins [0]);
           $query->values ($ins [1]);
           $db->setQuery ($query);
-          $this->insertid [] = $db->insertid ();
           $result = $result && $db->execute ();
+          $this->insertid [] = $db->insertid ();
         }
         if (! $result) throw new Exception ('Ошибка при создании записи в БД');
       } else {

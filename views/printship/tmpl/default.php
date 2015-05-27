@@ -36,27 +36,27 @@ table, th, td {
 	border: 0;
 }
 
-.inv_num {
+.doc_num {
 	font-size: 150%;
 	font-weight: bold;
 	margin: 10px;
 }
 
-.inv_recv, .inv_header, .inv_sum_words {
+.doc_recv, .doc_header, .doc_sum_words {
 	font-size: 10pt;
 }
 
-.inv_products {
+.doc_products {
 	width: 100%;
 	padding: 2px;
 }
 
-.inv_products thead * {
+.doc_products thead * {
 	text-align: center;
 	font-weight: bold;
 }
 
-[class~=inv_sign] {
+[class~=doc_sign] {
 	font-size: 10pt;
 	text-align: center;
 }
@@ -88,26 +88,26 @@ table, th, td {
   <table class="table_no_border">
     <tr>
       <td style="width: 10%">Поставщик:</td>
-      <td style="width: 90%" id="inv_firm">ххООО Робик.РУхх</td>
+      <td style="width: 90%" id="doc_firm">ххООО Робик.РУхх</td>
     </tr>
     <tr>
       <td style="width: 10%">Покупатель:</td>
-      <td style="width: 90%" id="inv_cust">ххПокупательхх</td>
+      <td style="width: 90%" id="doc_cust">ххПокупательхх</td>
     </tr>
     <tr>
       <td style="width: 10%">Основание:</td>
-      <td style="width: 90%" id="inv_based_on">ххОснованиехх</td>
+      <td style="width: 90%" id="doc_based_on">ххОснованиехх</td>
     </tr>
   </table>
 
-  <div class="inv_header">
-    <div class="inv_num">
-      Накладная <span id="inv_ship_num"></span> от <span
-        id="inv_ship_date"></span>
+  <div class="doc_header">
+    <div class="doc_num">
+      Накладная <span id="doc_num"></span> от <span
+        id="doc_date"></span>
     </div>
   </div>
 
-  <table class="inv_products">
+  <table class="doc_products">
     <thead>
       <tr>
         <td>№</td>
@@ -118,22 +118,22 @@ table, th, td {
         <td>Сумма, руб</td>
       </tr>
     </thead>
-    <tbody id="inv_products"></tbody>
-    <tfoot id="inv_products">
+    <tbody id="doc_products"></tbody>
+    <tfoot id="doc_products">
       <tr>
         <td colspan=3>Итого</td>
-        <td id="inv_cnt_sum" style='text-align: center'>ххКвоИтогохх</td>
+        <td id="doc_cnt_sum" style='text-align: center'>ххКвоИтогохх</td>
         <td>&nbsp;</td>
-        <td id="inv_sum" style='text-align: right'>ххСуммаИтогохх</td>
+        <td id="doc_sum" style='text-align: right'>ххСуммаИтогохх</td>
       </tr>
     </tfoot>
   </table>
 
-  <div class="inv_sum_words">
-    Сумма прописью: <span id="inv_sum_words"></span>. Без НДС.
+  <div class="doc_sum_words">
+    Сумма прописью: <span id="doc_sum_words"></span>. Без НДС.
   </div>
 
-  <table class="table_no_border inv_sign">
+  <table class="table_no_border doc_sign">
     <tr>
       <td id="stamp_anchor">Отпустил</td>
       <td>
@@ -147,7 +147,7 @@ table, th, td {
   </table>
 
   <!-- img id="img_sign" class="img_sign" src=""/-->
-  <img id="img_stamp" class="img_stamp" src="" />
+  <!-- img id="img_stamp" class="img_stamp" src="" /-->
 
 </body>
 </html>

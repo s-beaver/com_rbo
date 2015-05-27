@@ -6,10 +6,11 @@ include_once "models/rbocust.php";
 include_once "../library/rbohelper.php";
 include_once "configuration.php";
 class RbODocument extends RbObject {
+  public $readBaseDocument = true;
   
   // =================================================================
-  public function __construct() {
-    parent::__construct ();
+  public function __construct($keyValue, $readBaseDocument) {
+    parent::__construct ($keyValue);
     
     $this->table_name = "rbo_docs";
     $this->flds ["docId"] = array ("type" => "numeric","is_key" => true );
@@ -32,21 +33,26 @@ class RbODocument extends RbObject {
     $this->flds ["modified_on"] = array ("type" => "datetime" );
     
     $this->getInputBuffer ();
+    
+    if (! isset ($keyValue)) $this->keyValue = $this->buffer->docId;
+    if (isset ($readBaseDocument)) $this->readBaseDocument = $readBaseDocument;
+    else $this->readBaseDocument = true;
   }
   
   // =================================================================
   public function readObject() {
-    $docId = $this->buffer->docId;
-    $this->parentKeyValue = $docId;
     parent::readObject ();
     $custId = $this->buffer->custId;
     $doc_base = $this->buffer->doc_base;
     
-    /*$doc_base_doc = new RbODocument ($doc_base);
-    $doc_base_doc->readObject ();
-    $this->buffer->doc_base_doc = $doc_base_doc->buffer;*/
+    if ($this->readBaseDocument) {
+      if (!isset($doc_base)) $doc_base = 0;//иначе объект возъмет из буфера, а там ключ самого себя
+      $doc_base_doc = new RbODocument ($doc_base, false);
+      $doc_base_doc->readObject ();
+      $this->buffer->doc_base_doc = $doc_base_doc->buffer;
+    }
     
-    $prod = new RbOProducts ($docId);
+    $prod = new RbOProducts ($this->keyValue);
     $prod->readObject ();
     $this->buffer->doc_products = $prod->buffer;
     
@@ -58,15 +64,14 @@ class RbODocument extends RbObject {
     $cfg = new RboConfig ();
     $this->buffer->doc_firm_details = $cfg->firms [$this->buffer->doc_firm];
     $this->buffer->doc_manager_details = $cfg->managers [$this->buffer->doc_manager];
-    $this->response = $this->oJson->encode ($this->buffer);
+    $this->response = json_encode ($this->buffer, JSON_UNESCAPED_UNICODE);
+    // $this->response = $this->oJson->encode ($this->buffer);
   }
   
   // =================================================================
   public function updateObject() {
     $response = true;
-    $docId = $this->buffer->docId;
     $custId = $this->buffer->custId;
-    $this->parentKeyValue = $docId;
     $doc_products = $this->buffer->doc_products;
     $doc_cust = $this->buffer->doc_cust;
     // проверить если пустой массив, то не сохранять
@@ -90,13 +95,13 @@ class RbODocument extends RbObject {
     }
     
     foreach ( $doc_products as &$p ) {
-      $p ["docId"] = $docId;
+      $p ["docId"] = $this->keyValue;
     }
     parent::updateObject ();
     
     $input = JFactory::getApplication ()->input;
     $input->set ("rbo_docs_products", $doc_products);
-    $prod = new RbOProducts ($docId);
+    $prod = new RbOProducts ($this->keyValue);
     $prod->deleteObject ();
     $prod->createObject ();
     $response = $response && $prod->response;
@@ -147,8 +152,6 @@ class RbODocument extends RbObject {
   
   // =================================================================
   public function deleteObject() {
-    $docId = $this->buffer->docId;
-    $this->parentKeyValue = $docId;
     $db = JFactory::getDBO ();
     $query = $db->getQuery (true);
     
@@ -178,9 +181,9 @@ class RbODocument extends RbObject {
     $sSearch = $input->getString ('sSearch');
     $sWhere = array ();
     $sWhere [] = $db->quoteName ('doc_type') . "='" . $doc_type . "'";
-    if (isset($sSearch) && $sSearch!="") 
-      $sWhere [] = $db->quoteName ('rc.cust_name') . " LIKE '%" . $sSearch . "%'";
-      
+    if (isset ($sSearch) && $sSearch != "") $sWhere [] = $db->quoteName ('rc.cust_name') . " LIKE '%" .
+         $sSearch . "%'";
+    
     $query = $db->getQuery (true);
     
     $query->clear ();

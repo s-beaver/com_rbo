@@ -7,42 +7,49 @@ function readDocument(invId) {
     type : "POST",
     data : {
       "rbo_docs" : {
-        "docId" : invId
+        "docId" : invId,
+        "doc_type": "накл"
       }
     },
-    url : comPath + "ajax.php?task=invoice_read",
-    success : function(inv_data) {
-      fillInvoicePrintForm(inv_data);
+    url : comPath + "ajax.php?task=doc_read",
+    success : function(doc_data) {
+      fillInvoicePrintForm(doc_data);
     }
   });
 }
 
 // ===================================================================================
 function fillInvoicePrintForm(i) {
-  $("#inv_num").html(i.doc_num);
-  $("#inv_date").html(i.doc_date);
-  $("#inv_based_on").html("По счету №" + i.doc_num + " от " + i.doc_date);
-
-  $("#inv_ship_num").html(i.doc_ship_num);
-  $("#inv_ship_date").html(i.doc_ship_date);
+  $("#doc_num").html(i.doc_num);
+  $("#doc_date").html(i.doc_date);
+  $("#doc_based_on").html("по счету №" + i.doc_base_doc.doc_num + " от " + i.doc_base_doc.doc_date);
 
   if (!IsNull(i.doc_firm_details)) {
     var f = i.doc_firm_details;
     var arFirm = [ f.f_name, "ИНН " + f.f_inn, "КПП " + f.f_kpp, f.f_addr,
-        f.f_phone ];
-    $("#inv_firm").html(arFirm.join());
-    $("#f_bank").html(f.f_bank);
-    $("#f_bik").html(f.f_bik);
-    $("#f_rch").html(f.f_rch);
-    $("#f_kch").html(f.f_kch);
-    $("#f_name").html(f.f_fullname);
-    $("#f_inn").html(f.f_inn);
-    $("#f_kpp").html(f.f_kpp);
+        f.f_phone, "банк "+f.f_bank, "БИК "+f.f_bik, "р/сч "+f.f_rch, "к/сч "+f.f_kch];
+    $("[id^='doc_firm']").each(function(x, elem) {
+      $(this).html(arFirm.join());
+    });
+    $("[id^='firm_okpo']").each(function(x, elem) {
+      $(this).html(f.f_okpo);
+    });
   }
 
-  $("#inv_cust").html(i.doc_cust);
+  if (!IsNull(i.doc_cust)) {
+    var c = i.doc_cust;
+    var cd = c.cust_data;
+    var arCust = [ c.cust_fullname, "ИНН " + cd.cust_inn, "КПП " + cd.cust_kpp, cd.cust_addr,
+        c.f_phone, "банк "+cd.cust_bank, "БИК "+cd.cust_bik, "р/сч "+cd.cust_rch, "к/сч "+cd.cust_kch ];
+    $("[id^='doc_cust']").each(function(x, elem) {
+      $(this).html(arCust.join());
+    });
+    $("[id^='cust_okpo']").each(function(x, elem) {
+      $(this).html(cd.cust_okpo);
+    });
+  }
 
-  $("#inv_manager").html(i.doc_manager_details);
+  $("#doc_manager").html(i.doc_manager_details);
 
   var sPr = "";
   var iCntSum=0;
@@ -57,25 +64,25 @@ function fillInvoicePrintForm(i) {
       sPr += "<td style='text-align: center'>" + i.doc_products[x].product_cnt
           + "</td>";
       sPr += "<td style='text-align: right'>" + i.doc_products[x].product_price
-          + "</td>";
+          + ",00</td>";
       sPr += "<td style='text-align: right'>" + i.doc_products[x].product_sum
-          + "</td>";
+          + ",00</td>";
       sPr += "</tr>";
       iCntSum += Number(i.doc_products[x].product_cnt);
     }
   }
-  $("#inv_products").html(sPr);
-  $("#inv_cnt_sum").html(iCntSum);
-  $("#inv_sum").html(i.doc_sum);
-  $("#inv_sum_words").html(number_to_string(i.doc_sum));
+  $("#doc_products").html(sPr);
+  $("#doc_cnt_sum").html(iCntSum);
+  $("#doc_sum").html(i.doc_sum+",00");
+  $("#doc_sum_words").html(number_to_string(i.doc_sum));
 
   var iManOffset = $("#stamp_anchor").offset();
   iManOffset.top -= 10;
   iManOffset.left += 100;
 
-  if (!IsNull(i.doc_firm_details))
+  /*if (!IsNull(i.doc_firm_details))
     $("#img_stamp").attr("src", "components/com_rbo/images/" + f.f_stamp);
-  $("#img_stamp").offset(iManOffset);
+  $("#img_stamp").offset(iManOffset);*/
 
 }
 

@@ -136,15 +136,15 @@
           <tr>
             <td><label for="cust_search">Поиск</label></td>
             <td><input type="text" name="cust_search" id="cust_search" style='width: 150px' /> <a href="javascript:custSearch()"> <img
-                src="components/com_rbo/images/icon-32-search-on.png" /></a><input style="visibility: hidden" id="custId" /></td>
+                src="components/com_rbo/images/icon-32-search-on.png" /></a><input style="visibility: hidden" id="custId" /><input style="visibility: hidden" id="doc_baseId" /></td>
           </tr>
           <tr>
             <td><label for="cust_name">Название</label></td>
             <td><select name="cust_name" id="cust_name" style="width: 500px" onChange="setBaseDocList()"></select></td>
           </tr>
           <tr>
-            <td><label for="base_doc">Основание</label></td>
-            <td><select name="base_doc" id="base_doc" style="width: 400px">
+            <td><label for="cust_base_doc">Основание</label></td>
+            <td><select name="cust_base_doc" id="cust_base_doc" style="width: 400px">
               </select></td>
           </tr>
         </table>

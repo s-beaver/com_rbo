@@ -108,6 +108,7 @@ function saveDoc(docId) {
       "doc_num" : $("#doc_num").val(),
       "doc_date" : $("#doc_date").val(),
       "doc_sum" : $("#doc_sum").val(),
+      "doc_base":$("#doc_baseId").val(),// скрытое поле 
       "doc_status" : $("#doc_status").val(),
       "doc_manager" : $("#doc_manager").val(),
       "custId" : $("#custId").val(),// скрытое поле в форме выбора клиента
@@ -184,12 +185,18 @@ function showDocForm(i) {
   $("#doc_status").val(i.doc_status);
 
   var sDocBase = "";
-  $("#doc_base").val(i.doc_base);
-  if (!IsNull(i.doc_base_doc)) { 
-    sDocBase = "Счет №"+i.doc_base_doc.doc_num+" от "+i.doc_base_doc.doc_date;
+  $("#doc_baseId").val(i.doc_base);
+  if ((i.doc_base>0) && !IsNull(i.doc_base_doc)) {
+    sDocBase = "Счет №" + i.doc_base_doc.doc_num + " от " + i.doc_base_doc.doc_date;
   }
+  $("#doc_base").val(sDocBase);
 
-  $("#doc_manager option:contains('" + i.doc_manager + "')").prop("selected", "selected");
+  $('#doc_manager option:selected').each(function() {
+    this.selected = false;
+  });
+  if (!IsEmpty(i.doc_manager))
+    $("#doc_manager option:contains('" + i.doc_manager + "')").prop("selected", "selected");
+
   oCust = NullTo(i.doc_cust, {
     cust_data : {}
   });
@@ -243,15 +250,20 @@ function chooseBaseDoc() {
   var custId = $("#custId").val();
   var custName = $("#doc_cust").val();
   arSearchedCust = new Array();
-  $('#cust_name option').remove();
-  $('#cust_name').append('<option value="">' + custName + '</option>');
-  $("#cust_name option:contains('" + custName + "')").prop("selected", "selected");
+  if (bCustInput == 'select') {
+    $('#cust_name option').remove();
+    //$('#cust_name').append('<option value="">' + custName + '</option>');
+    //$("#cust_name option:contains('" + custName + "')").prop("selected", "selected");
+    $('#cust_base_doc option').remove();
+  }
+  setCustFlds('saved');
 
   $("#cust-form").dialog({
     title : "Выбор документа-основания",
     buttons : {
       "Сохранить" : function() {
-        var invId = $("#base_doc option:selected").val();
+        var invId = $("#cust_base_doc option:selected").val();
+        //$("#doc_baseId").val(invId);
         $.ajax({
           dataType : 'json',
           type : "POST",
@@ -263,11 +275,14 @@ function chooseBaseDoc() {
           },
           url : comPath + "ajax.php?task=doc_read",
           success : function(doc_data) {
+            doc_data.doc_base = invId;
+            doc_data.doc_base_doc.doc_num = doc_data.doc_num; 
+            doc_data.doc_base_doc.doc_date = doc_data.doc_date; 
+
             doc_data.docId = oDoc.doctId;
             doc_data.doc_num = oDoc.doc_num;
             doc_data.doc_date = oDoc.doc_date;
             doc_data.doc_status = oDoc.doc_status;
-            doc_data.base_doc = invId;
             showDocForm(doc_data);
           }
         });
@@ -276,6 +291,7 @@ function chooseBaseDoc() {
       },
 
       "Отмена" : function() {
+        setCustFlds('saved');
         $("#cust-form").dialog("close");
       }
     },
@@ -297,13 +313,13 @@ function setBaseDocList() {
     },
     url : comPath + "ajax.php?task=get_doc_list&doc_type=счет",//счет - это правильно!
     success : function(s) {
-      $('#base_doc option').remove();
+      $('#cust_base_doc option').remove();
       p = s.aaData;
       if (p.length > 0) {
         for (var i = 0; i < p.length; i++) {
-          $('#base_doc').append('<option value="' + p[i].docId + '">Счет №' + p[i].doc_num + " от " + p[i].doc_date + " (" + p[i].doc_sum + '=)</option>');
+          $('#cust_base_doc').append('<option value="' + p[i].docId + '">Счет №' + p[i].doc_num + " от " + p[i].doc_date + " (" + p[i].doc_sum + '=)</option>');
         }
-        $("#base_doc option:first").prop("selected", "selected");
+        $("#cust_base_doc option:first").prop("selected", "selected");
       }
     }
   });
@@ -330,6 +346,7 @@ function custSearch() {
           $('#cust_name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
         }
         $("#cust_name option:first").prop("selected", "selected");
+        setCustFlds('selected');
         setBaseDocList();
       }
     }
@@ -413,16 +430,16 @@ function showProductForm(x) {// x-номер редактируемой стро
   else
     lines_before_update = p.length;
 
+  $("#prodId").val(p.productId);
+  $("#prod_code").val(p.product_code);
+  $('#prod_name option').remove();
   if (x >= 0) {
-    $("#prodId").val(p.productId);
-    $("#prod_code").val(p.product_code);
-    $('#prod_name option').remove();
     $('#prod_name').append('<option value="">' + p.product_name + '</option>');
-    $("#prod_name option:contains('" + p.product_name + "')").prop("selected", "selected");
-    $("#prod_price").val(p.product_price);
-    $("#prod_cnt").val(p.product_cnt);
-    $("#prod_sum").val(p.product_sum);
   }
+  $("#prod_name option:first").prop("selected", "selected");
+  $("#prod_price").val(p.product_price);
+  $("#prod_cnt").val(p.product_cnt);
+  $("#prod_sum").val(p.product_sum);
 
   $("#newline-form").dialog({
     title : "Позиция - " + p.product_code,
@@ -487,10 +504,8 @@ function productSearch() {
       for (var i = 0; i < p.result.length; i++) {
         $('#prod_name').append(
             '<option value="' + p.result[i].productID + "|" + p.result[i].price + "|" + p.result[i].product_code + '">' + p.result[i].name + '</option>');
-        if (i == 0) {
-          $("#prod_name option:contains('" + p.result[i].name + "')").prop("selected", "selected");
-        }
       }
+      $("#prod_name option:first").prop("selected", "selected");
       setProductPrice();
       if (p.count > p.result.length) {
         $('#prod_name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
@@ -618,7 +633,7 @@ $(document).ready(function() {
 
   $("#cust-form").dialog({
     autoOpen : false,
-    height : 250,
+    height : 300,
     width : 700,
     modal : true,
     resizable : true

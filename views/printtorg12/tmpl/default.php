@@ -28,21 +28,21 @@ sup {
 	top: -6px;
 }
 
-.inv_num {
+.doc_num {
 	font-size: 150%;
 	font-weight: bold;
 	margin: 10px;
 }
 
-.inv_header {
+.doc_header {
 	font-size: 8pt;
 }
 
-.inv_sum_words {
+.doc_sum_words {
 	font-size: 10pt;
 }
 
-.inv_products {
+.doc_products {
 	width: 100%;
 	padding: 2px;
 	border: 1px solid;
@@ -50,7 +50,7 @@ sup {
 	margin-bottom: 5px;
 }
 
-.inv_products * {
+.doc_products * {
 	text-align: center;
 	font-weight: normal;
 	border: 1px solid;
@@ -65,7 +65,7 @@ sup {
 	padding-left: 5px; /* Поля в ячейках */
 }
 
-[class~=inv_sign] {
+[class~=doc_sign] {
 	font-size: 10pt;
 	text-align: center;
 }
@@ -107,7 +107,7 @@ sup {
     <tr>
       <td rowspan="2" style="width: 10%">Грузоотправитель</td>
       <td rowspan="2" style="width: 70%; border-bottom: 1px solid;"
-        id="inv_firm">ххООО Робик.РУхх</td>
+        id="doc_firm">ххООО Робик.РУхх</td>
       <td colspan="2" style="width: 10%; text-align: right;">Форма по
         ОКУД</td>
       <td style="width: 10%; border: 1px solid; text-align: center;">0330212</td>
@@ -125,7 +125,7 @@ sup {
     </tr>
     <tr>
       <td style="width: 10%">Грузополучатель</td>
-      <td id="inv_cust" style="width: 70%; border-bottom: 1px solid">ххПокупательхх</td>
+      <td id="doc_cust" style="width: 70%; border-bottom: 1px solid">ххПокупательхх</td>
       <td colspan="2"
         style="width: 10%; border-bottom: 1px solid; text-align: right;">по
         ОКПО</td>
@@ -133,7 +133,7 @@ sup {
     </tr>
     <tr>
       <td style="width: 10%">Поставщик</td>
-      <td id="inv_firm" style="width: 70%; border-bottom: 1px solid;" id="inv_firm">ххООО
+      <td id="doc_firm" style="width: 70%; border-bottom: 1px solid;" id="doc_firm">ххООО
         Робик.РУхх</td>
       <td colspan="2"
         style="width: 10%; border-bottom: 1px solid; text-align: right;">по
@@ -142,7 +142,7 @@ sup {
     </tr>
     <tr>
       <td style="width: 10%">Плательщик</td>
-      <td id="inv_cust" style="width: 70%; border-bottom: 1px solid">ххПокупательхх</td>
+      <td id="doc_cust" style="width: 70%; border-bottom: 1px solid">ххПокупательхх</td>
       <td colspan="2"
         style="width: 10%; border-bottom: 1px solid; text-align: right;">по
         ОКПО</td>
@@ -151,7 +151,7 @@ sup {
     <tr>
       <td style="width: 10%">Основание:</td>
       <td style="width: 70%; border-bottom: 1px solid;"
-        id="inv_based_on">ххОснованиехх</td>
+        id="doc_based_on">ххОснованиехх</td>
       <td colspan="2"
         style="width: 10%; border-bottom: 1px solid; text-align: right;">номер</td>
       <td style="width: 10%; border: 1px solid; text-align: center;">&nbsp;</td>
@@ -163,7 +163,7 @@ sup {
     <tr>
       <td colspan="2" rowspan="3" style="width: 60%; text-align: right;">
 
-        <table class="inv_header" align="center"
+        <table class="doc_header" align="center"
           style="vertical-align: bottom; border: 0">
           <tr>
             <td rowspan="2" style="vertical-align: bottom; border: 0; font-size: 10pt">ТОВАРНАЯ
@@ -172,8 +172,8 @@ sup {
             <td style="border: 1px solid">Дата составления</td>
           </tr>
           <tr>
-            <td id="inv_ship_num" style="border: 1px solid; text-align:center">xxНомерхх</td>
-            <td id="inv_ship_date" style="border: 1px solid; text-align:center">ххДатахх</td>
+            <td id="doc_num" style="border: 1px solid; text-align:center">xxНомерхх</td>
+            <td id="doc_date" style="border: 1px solid; text-align:center">ххДатахх</td>
           </tr>
         </table>
 
@@ -194,7 +194,7 @@ sup {
     </tr>
   </table>
 
-  <table class="inv_products">
+  <table class="doc_products">
     <thead>
       <tr>
         <td rowspan="2">Номер по порядку</td>
@@ -237,19 +237,19 @@ sup {
         <td>15</td>
       </tr>
     </thead>
-    <tbody id="inv_products"></tbody>
-    <tfoot id="inv_products">
+    <tbody id="doc_products"></tbody>
+    <tfoot id="doc_products">
       <tr>
         <td colspan=7 style="text-align: right; border: 0;">Всего по
           накладной</td>
         <td>Х</td>
         <td>Х</td>
-        <td id="inv_cnt_sum" style='text-align: center'>ххКвоИтогохх</td>
+        <td id="doc_cnt_sum" style='text-align: center'>ххКвоИтогохх</td>
         <td>Х</td>
-        <td id="inv_sum" style='text-align: right'>ххСуммаИтогохх</td>
+        <td id="doc_sum" style='text-align: right'>ххСуммаИтогохх</td>
         <td>Х</td>
         <td>0,00</td>
-        <td id="inv_sum" style='text-align: right'>ххСуммаИтогохх</td>
+        <td id="doc_sum" style='text-align: right'>ххСуммаИтогохх</td>
       </tr>
     </tfoot>
   </table>
@@ -287,7 +287,7 @@ sup {
     <table class="footer">
       <tr>
         <td colspan="4" style="text-align: left">	
-          Всего отпущено на сумму <span id="inv_sum_words" class="underlined"></span><span class="underlined">. Без
+          Всего отпущено на сумму <span id="doc_sum_words" class="underlined"></span><span class="underlined">. Без
           НДС.</span>
         </td>
       </tr>
@@ -345,7 +345,7 @@ sup {
     <table class="footer">
       <tr>
         <td colspan="4" style="text-align: left">
-          По доверенности №<span id="inv_sum_words"></span>. Без НДС.<br>выданной
+          По доверенности №_____________________________выданной
         </td>
       </tr>
       <tr>

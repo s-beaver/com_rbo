@@ -1,36 +1,34 @@
 'use strict';
 var comPath = "/components/com_rbo/";
 // ===================================================================================
-function readDocument(invId) {
+function readDocument(docId) {
   $.ajax({
     dataType : 'json',
     type : "POST",
     data : {
       "rbo_docs" : {
-        "docId" : invId
+        "docId" : docId,
+        "doc_type": "накл"
       }
     },
-    url : comPath + "ajax.php?task=invoice_read",
-    success : function(inv_data) {
-      fillInvoicePrintForm(inv_data);
+    url : comPath + "ajax.php?task=doc_read",
+    success : function(doc_data) {
+      fillInvoicePrintForm(doc_data);
     }
   });
 }
 
 // ===================================================================================
 function fillInvoicePrintForm(i) {
-  $("#inv_num").html(i.doc_num);
-  $("#inv_date").html(i.doc_date);
-  $("#inv_based_on").html("По счету №" + i.doc_num + " от " + i.doc_date);
-
-  $("#inv_ship_num").html(i.doc_ship_num);
-  $("#inv_ship_date").html(i.doc_ship_date);
+  $("#doc_num").html(i.doc_num);
+  $("#doc_date").html(i.doc_date);
+  $("#doc_based_on").html("по счету №" + i.doc_base_doc.doc_num + " от " + i.doc_base_doc.doc_date);
 
   if (!IsNull(i.doc_firm_details)) {
     var f = i.doc_firm_details;
     var arFirm = [ f.f_name, "ИНН " + f.f_inn, "КПП " + f.f_kpp, f.f_addr,
         f.f_phone, "банк "+f.f_bank, "БИК "+f.f_bik, "р/сч "+f.f_rch, "к/сч "+f.f_kch];
-    $("[id^='inv_firm']").each(function(x, elem) {
+    $("[id^='doc_firm']").each(function(x, elem) {
       $(this).html(arFirm.join());
     });
     $("[id^='firm_okpo']").each(function(x, elem) {
@@ -38,14 +36,20 @@ function fillInvoicePrintForm(i) {
     });
   }
 
-  $("[id^='inv_cust']").each(function(x, elem) {
-    $(this).html(i.doc_cust);
-  });
-  $("[id^='cust_okpo']").each(function(x, elem) {
-    $(this).html("&nbsp;");
-  });
-
-  $("#inv_manager").html(i.doc_manager_details);
+  if (!IsNull(i.doc_cust)) {
+    var c = i.doc_cust;
+    var cd = c.cust_data;
+    var arCust = [ c.cust_fullname, "ИНН " + cd.cust_inn, "КПП " + cd.cust_kpp, cd.cust_addr,
+        c.f_phone, "банк "+cd.cust_bank, "БИК "+cd.cust_bik, "р/сч "+cd.cust_rch, "к/сч "+cd.cust_kch ];
+    $("[id^='doc_cust']").each(function(x, elem) {
+      $(this).html(arCust.join());
+    });
+    $("[id^='cust_okpo']").each(function(x, elem) {
+      $(this).html(cd.cust_okpo);
+    });
+  }
+  
+  $("#doc_manager").html(i.doc_manager_details);
 
   var sPr = "";
   var iCntSum = 0;
@@ -78,15 +82,15 @@ function fillInvoicePrintForm(i) {
       iCntSum += Number(i.doc_products[x].product_cnt);
     }
   }
-  $("#inv_products").html(sPr);
-  $("#inv_cnt_sum").html(iCntSum);
-  $("[id^='inv_sum']").each(function(x, elem) {
+  $("#doc_products").html(sPr);
+  $("#doc_cnt_sum").html(iCntSum);
+  $("[id^='doc_sum']").each(function(x, elem) {
     $(this).html(i.doc_sum + ",00");
   });
-  $("#inv_sum_words").html(number_to_string(i.doc_sum));
+  $("#doc_sum_words").html(number_to_string(i.doc_sum));
 
   $("[id^='doc_date_footer']").each(function(x, elem) {
-    $(this).html(convertDate(i.doc_ship_date));
+    $(this).html(convertDate(i.doc_date));
   });
   
   $("#doc_cnt_words").html(number_to_string(i.doc_products.length, true, true));
