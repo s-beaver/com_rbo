@@ -9,15 +9,9 @@
 <script src="libraries/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script>
 <script src="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
 <script src="libraries/DataTables-1.10.6/media/js/jquery.dataTables.min.js"></script>
-</head>
-<script>
-$(function() {
-    $( "#selectable1" ).selectable();
-    $( "#cust-tabs1" ).tabs();
-    
-  });
+<link rel="stylesheet" href="components/com_rbo/css/rbo.css" />
 
-</script>
+</head>
 <body>
   <ol id="selectable">
     <li class="ui-widget-content1"><a href='/index.php?option=com_rbo&view=invoices'>Счета</a></li>

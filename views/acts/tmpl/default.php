@@ -10,7 +10,7 @@
 <script src="libraries/DataTables-1.10.6/media/js/jquery.dataTables.min.js"></script>
 
 <script src="components/com_rbo/library/lib.js"></script>
-<script src="components/com_rbo/models/invoices.js"></script>
+<script src="components/com_rbo/models/acts.js"></script>
 <link rel="stylesheet" href="components/com_rbo/css/rbo.css" />
 
 <style>
@@ -23,7 +23,7 @@
       <a href="javascript:createDoc()"> <img src="components/com_rbo/images/icon-32-new-on.png" /></a>
     </div>
     <div>
-      <h2>Счета</h2>
+      <h2>Акты</h2>
     </div>
   </div>
 
@@ -64,9 +64,11 @@
           <tr>
             <td><a href="javascript:showProductForm()"> <img src="components/com_rbo/images/icon-32-new-on.png" /></a>
               <div style="float: right">
+                <label for="doc_base">Основание</label>
+                <input disabled type="text" name="doc_base" id="doc_base" style='width: 150px' />
+                <button id="baseedit">..</button>
                 <label for="doc_cust">Покупатель</label>
-                <input disabled type="text" name="doc_cust" id="doc_cust" style='width: 450px' />
-                <button id="cedit">..</button>
+                <input disabled type="text" name="doc_cust" id="doc_cust" style='width: 200px' />
                 <label for="doc_firm">Фирма</label>
                 <select id="doc_firm" name="doc_firm" style="width: 70px">
                   <option value="ип">ИП</option>
@@ -108,63 +110,31 @@
     </form>
   </div>
 
-  <div id="cust-form" title="Позиция">
+  <div id="cust-form" title="Выбор документа-основания">
     <form id="cust-form-form" method="post" action="">
       <fieldset style='padding: 0'>
         <table>
           <tr>
             <td><label for="cust_search">Поиск</label></td>
             <td><input type="text" name="cust_search" id="cust_search" style='width: 150px' /> <a href="javascript:custSearch()"> <img
-                src="components/com_rbo/images/icon-32-search-on.png" /></a><input style="visibility: hidden" id="custId" /></td>
+                src="components/com_rbo/images/icon-32-search-on.png" /></a><input style="visibility: hidden" id="custId" /><input style="visibility: hidden"
+              id="doc_baseId" /></td>
           </tr>
           <tr>
             <td><label for="cust_name">Название</label></td>
-            <td><select name="cust_name" id="cust_name" style="width: 500px" onChange="setCustFlds('selected')"></select></td>
-          </tr>
-        </table>
-        <table>
-          <tr>
-            <td><label for="cust_fullname">
-                Название<br>полностью
-              </label></td>
-            <td><input type="text" name="cust_fullname" id="cust_fullname" style='width: 500px' /></td>
+            <td><select name="cust_name" id="cust_name" style="width: 500px" onChange="setBaseDocList()"></select></td>
           </tr>
           <tr>
-            <td><label for="cust_addr">Адрес</label></td>
-            <td><input type="text" name="cust_addr" id="cust_addr" style='width: 500px' /></td>
-          </tr>
-          <tr>
-            <td><label for="cust_nonds">Без НДС</label></td>
-            <td><input type="checkbox" name="cust_nonds" id="cust_nonds"></td>
-          </tr>
-        </table>
-        <table>
-          <tr>
-            <td colspan="2"><label for="cust_inn">&nbsp;ИНН</label><input type="text" name="cust_inn" id="cust_inn" style='width: 150px' /> <label for="cust_kpp">&nbsp;КПП</label><input
-              type="text" name="cust_kpp" id="cust_kpp" style='width: 150px' /></td>
-          </tr>
-          <tr>
-            <td colspan="2"><label for="cust_okpo">ОКПО</label><input type="text" name="cust_okpo" id="cust_okpo" style='width: 150px' /> <label for="cust_ogrn">&nbsp;ОГРН</label>
-              <input type="text" name="cust_ogrn" id="cust_ogrn" style='width: 150px' /></td>
-          </tr>
-          <tr>
-            <td><label for="cust_bank">Банк</label></td>
-            <td><input type="text" name="cust_bank" id="cust_bank" style='width: 500px' /></td>
-          </tr>
-          <tr>
-            <td><label for="cust_bik">БИК</label></td>
-            <td><input type="text" name="cust_bik" id="cust_bik" style='width: 150px' /></td>
-          </tr>
-          <tr>
-            <td colspan="2"><label for="cust_rch">р/сч</label><input type="text" name="cust_rch" id="cust_rch" style='width: 250px' /> <label for="cust_kch">к/сч</label><input
-              type="text" name="cust_kch" id="cust_kch" style='width: 250px' /></td>
+            <td><label for="cust_base_doc">Основание</label></td>
+            <td><select name="cust_base_doc" id="cust_base_doc" style="width: 400px">
+              </select></td>
           </tr>
         </table>
       </fieldset>
     </form>
   </div>
 
-  <div id="dialog-confirm" title="Удалить счёт?">Счёт будет удален. Продолжить?</div>
+  <div id="dialog-confirm" title="Удалить накладную?">Документ будет удален. Продолжить?</div>
 
   <table id="TableDoc" class="display compact"></table>
 

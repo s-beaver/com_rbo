@@ -11,40 +11,21 @@
 
 <script src="components/com_rbo/library/lib.js"></script>
 <script src="components/com_rbo/models/shipments.js"></script>
+<link rel="stylesheet" href="components/com_rbo/css/rbo.css" />
 
 <style>
-#doc-form * label input {
-	display: block;
-}
-
-#doc-form * label select {
-	display: block;
-}
-
-#doc-form * input.text {
-	margin-bottom: 0px;
-	padding: .2em;
-}
-
-#doc-form * select {
-	margin-bottom: 0px;
-	padding: .2em;
-}
-
-#doc-form * textarea {
-	margin-bottom: 0px;
-	padding: .2em;
-}
-
-.validateTips {
-	border: 1px solid transparent;
-	padding: 0.3em;
-}
 </style>
 
 </head>
 <body>
-  <a href="javascript:createDoc()"> <img src="components/com_rbo/images/icon-32-new-on.png" /></a>
+  <div>
+    <div style="float: left">
+      <a href="javascript:createDoc()"> <img src="components/com_rbo/images/icon-32-new-on.png" /></a>
+    </div>
+    <div>
+      <h2>Накладные</h2>
+    </div>
+  </div>
 
   <div id="doc-form" title="Документ">
     <!--  p class="validateTips" style="visibility: hidden">Заполните обязательные поля</p-->

@@ -170,7 +170,7 @@ class RbODocument extends RbObject {
   }
   
   // =================================================================
-  public function getDocList() { // надо уметь фильтровать по разным полям. тогда подойдет и для выбора документа-основания
+  public function getDocList() { 
     $db = JFactory::getDBO ();
     
     $input = JFactory::getApplication ()->input;
