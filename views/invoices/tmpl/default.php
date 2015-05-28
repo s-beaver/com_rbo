@@ -128,8 +128,14 @@
             <td><input type="text" name="cust_addr" id="cust_addr" style='width: 500px' /></td>
           </tr>
           <tr>
-            <td><label for="cust_nonds">Без НДС</label></td>
-            <td><input type="checkbox" name="cust_nonds" id="cust_nonds"></td>
+            <td colspan="2"><label for="cust_nonds">Без НДС</label><input type="checkbox" name="cust_nonds" id="cust_nonds">
+            
+<label for="cust_phone">&nbsp;Тел.</label>
+<input type="text" name="cust_phone" id="cust_phone" style='width: 200px' /> 
+<label for="cust_email">&nbsp;@</label>
+<input type="text" name="cust_email" id="cust_email" style='width: 200px' />            
+            
+            </td>
           </tr>
         </table>
         <table>

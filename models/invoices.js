@@ -333,6 +333,8 @@ function setCustFlds(cmd) {
   $("#doc_cust").val(f.cust_name);
   //$("#cust_name").val(f.cust_name);
   $("#cust_fullname").val(f.cust_fullname);
+  $("#cust_email").val(f.cust_email);
+  $("#cust_phone").val(f.cust_phone);
   $("#cust_inn").val(fd.cust_inn);
   $("#cust_kpp").val(fd.cust_kpp);
   $("#cust_okpo").val(fd.cust_okpo);
@@ -350,6 +352,8 @@ function saveCustFlds() {
   oCust.custId = $("#custId").val();
   oCust.cust_name = $("#doc_cust").val();
   oCust.cust_fullname = $("#cust_fullname").val();
+  oCust.cust_email = $("#cust_email").val();
+  oCust.cust_phone = $("#cust_phone").val();
   oCust.cust_data.cust_inn = $("#cust_inn").val();
   oCust.cust_data.cust_kpp = $("#cust_kpp").val();
   oCust.cust_data.cust_okpo = $("#cust_okpo").val();
