@@ -10,6 +10,7 @@
 <script src="libraries/DataTables-1.10.6/media/js/jquery.dataTables.min.js"></script>
 
 <script src="components/com_rbo/library/lib.js"></script>
+<script src="components/com_rbo/models/rbohelper.js"></script>
 <script src="components/com_rbo/models/shipments.js"></script>
 <link rel="stylesheet" href="components/com_rbo/css/rbo.css" />
 
@@ -18,20 +19,13 @@
 
 </head>
 <body>
-  <div>
-    <div style="float: left">
-      <a href="javascript:createDoc()"> <img src="components/com_rbo/images/icon-32-new-on.png" /></a>
-    </div>
-    <div>
-      <h2>Накладные</h2>
-    </div>
-  </div>
+  <?php include 'components/com_rbo/views/header.doclist.php';?>
 
   <div id="doc-form" title="Документ">
     <!--  p class="validateTips" style="visibility: hidden">Заполните обязательные поля</p-->
     <form id="doc-form-form" method="post" action="">
       <fieldset style='padding: 0'>
-        <table>
+        <table style='width: 100%'>
           <tr>
             <td>
               <div style="float: left">

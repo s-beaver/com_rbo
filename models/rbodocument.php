@@ -188,7 +188,7 @@ class RbODocument extends RbObject {
     
     $query->clear ();
     $query->select (
-        array ("docId","doc_num","doc_date","rc.cust_name doc_cust","doc_sum","doc_status",
+        array ("docId","doc_num","doc_date","rc.cust_name doc_cust","doc_sum","doc_status","doc_firm",
             "doc_manager" ));
     $query->from ($db->quoteName ('rbo_docs', 'rd'));
     $query->where ($sWhere);
