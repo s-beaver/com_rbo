@@ -68,7 +68,7 @@ switch ($cmd) {
   
   case "product_search" :
     {
-      RbOHelper::getProductListBySubstr ();
+      RbOProducts::getProductListBySubstr ();
       break;
     }
   
