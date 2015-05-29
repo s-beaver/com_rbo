@@ -1,5 +1,5 @@
 <?php
-class RboConfig {
+class RbOConfig {
   public $firms = array (
       "ип" => array ("f_name" => "ИП Ефремов Сергей Александрович",
           "f_fullname" => "Индивидуальный предприниматель Ефремов Сергей Александрович",

@@ -61,7 +61,7 @@ class RbODocument extends RbObject {
     $cust->buffer->cust_data = json_decode ($cust->buffer->cust_data);
     $this->buffer->doc_cust = $cust->buffer;
     
-    $cfg = new RboConfig ();
+    $cfg = new RbOConfig ();
     $this->buffer->doc_firm_details = $cfg->firms [$this->buffer->doc_firm];
     $this->buffer->doc_manager_details = $cfg->managers [$this->buffer->doc_manager];
     $this->response = json_encode ($this->buffer, JSON_UNESCAPED_UNICODE);
