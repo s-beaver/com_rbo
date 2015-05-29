@@ -1,7 +1,6 @@
 <?php
-jimport ('etc.json_lib');
+//jimport ('etc.json_lib');
 class RbObject {
-  //public $oJson; // нужно выносить из класса
   public $is_multiple = false; // читать одну запись или несколько по идентификатору
   public $response = ""; // подготовленный ответ для отправки в ответ на ajax запрос
   public $table_name = ""; // наименование таблицы БД в которой хранится объект, по совместительству - название переменной для передачи данных через input буфер
@@ -14,7 +13,6 @@ class RbObject {
   // =================================================================
   public function __construct($keyValue) {
     $this->keyValue = $keyValue;
-    //$this->oJson = new Services_JSON ();
   }
   
   // =================================================================

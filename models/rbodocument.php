@@ -1,5 +1,5 @@
 <?php
-jimport ('etc.json_lib');
+//jimport ('etc.json_lib');
 include_once "models/rbobject.php";
 include_once "models/rboproducts.php";
 include_once "models/rbocust.php";
@@ -65,7 +65,6 @@ class RbODocument extends RbObject {
     $this->buffer->doc_firm_details = $cfg->firms [$this->buffer->doc_firm];
     $this->buffer->doc_manager_details = $cfg->managers [$this->buffer->doc_manager];
     $this->response = json_encode ($this->buffer, JSON_UNESCAPED_UNICODE);
-    // $this->response = $this->oJson->encode ($this->buffer);
   }
   
   // =================================================================
