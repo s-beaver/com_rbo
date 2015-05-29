@@ -1,5 +1,5 @@
 <?php
-//jimport ('etc.json_lib');
+// jimport ('etc.json_lib');
 include_once "models/rbobject.php";
 include_once "models/rboproducts.php";
 include_once "models/rbocust.php";
@@ -46,7 +46,7 @@ class RbODocument extends RbObject {
     $doc_base = $this->buffer->doc_base;
     
     if ($this->readBaseDocument) {
-      if (!isset($doc_base)) $doc_base = 0;//иначе объект возъмет из буфера, а там ключ самого себя
+      if (! isset ($doc_base)) $doc_base = 0; // иначе объект возъмет из буфера, а там ключ самого себя
       $doc_base_doc = new RbODocument ($doc_base, false);
       $doc_base_doc->readObject ();
       $this->buffer->doc_base_doc = $doc_base_doc->buffer;
@@ -61,7 +61,7 @@ class RbODocument extends RbObject {
     $cust->buffer->cust_data = json_decode ($cust->buffer->cust_data);
     $this->buffer->doc_cust = $cust->buffer;
     
-    //$cfg = new RbOConfig ();
+    // $cfg = new RbOConfig ();
     $this->buffer->doc_firm_details = RbOConfig::$firms [$this->buffer->doc_firm];
     $this->buffer->doc_manager_details = RbOConfig::$managers [$this->buffer->doc_manager];
     $this->response = json_encode ($this->buffer, JSON_UNESCAPED_UNICODE);
@@ -106,6 +106,10 @@ class RbODocument extends RbObject {
     $response = $response && $prod->response;
     
     $this->response = $this->response && $response;
+    /*if ($this->response) {
+      RbOHelper::sendEMail ("документ изменен", 
+          "Изменен документ. Детали: " . RbODocument::docBuffer2Str ($this->buffer));
+    }*/
   }
   
   // =================================================================
@@ -169,7 +173,7 @@ class RbODocument extends RbObject {
   }
   
   // =================================================================
-  public function getDocList() { 
+  public function getDocList() {
     $db = JFactory::getDBO ();
     
     $input = JFactory::getApplication ()->input;
@@ -187,8 +191,8 @@ class RbODocument extends RbObject {
     
     $query->clear ();
     $query->select (
-        array ("docId","doc_num","doc_date","rc.cust_name doc_cust","doc_sum","doc_status","doc_firm",
-            "doc_manager" ));
+        array ("docId","doc_num","doc_date","rc.cust_name doc_cust","doc_sum","doc_status",
+            "doc_firm","doc_manager" ));
     $query->from ($db->quoteName ('rbo_docs', 'rd'));
     $query->where ($sWhere);
     $query->order ($db->quoteName ('rd.docId') . " DESC");
@@ -238,6 +242,23 @@ class RbODocument extends RbObject {
     } catch ( Exception $e ) {
       JLog::add (get_class ($this) . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
     }
+  }
+  
+  // =================================================================
+  function docBuffer2Str($buffer) {
+    $s = "";
+    $s .= "N " . $buffer->doc_num;
+    $s .= " от " . $buffer->doc_date;
+    $s .= " " . $buffer->doc_type;
+    $s .= " " . $buffer->doc_status;
+    $s .= " Сумма:" . $buffer->doc_sum;
+    $s .= " " . $buffer->doc_manager;
+    $s .= " " . $buffer->doc_firm;
+    $s .= " " . $buffer->doc_rem;
+    
+    $s .= " Покупатель:" . $buffer->doc_cust->cust_name;
+    
+    return $s;
   }
 }
 

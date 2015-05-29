@@ -20,4 +20,7 @@ class RbOConfig {
        );
   public static $managers = array ("Аня" => "Меньшенина Анна","Володя" => "Николашвили Владимир",
       "Алексей" => "Вяткин Алексей","Николай" => "Грозных Николай" );
+  
+  public static $documentNotifyEMails = array("s_efremov@mail.ru");
+  
 }
