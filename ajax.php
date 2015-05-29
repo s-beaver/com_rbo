@@ -12,7 +12,7 @@ if (! defined ('_JDEFINES')) {
 }
 
 require_once JPATH_BASE . '/includes/framework.php';
-include_once "library/rbohelper.php";
+include_once "models/rbohelper.php";
 include_once "models/rbodocument.php";
 include_once "models/rbocust.php";
 JLog::addLogger (array ('text_file' => 'com_rbo.php' ), JLog::ALL, array ('com_rbo' ));

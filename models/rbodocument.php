@@ -3,7 +3,7 @@
 include_once "models/rbobject.php";
 include_once "models/rboproducts.php";
 include_once "models/rbocust.php";
-include_once "../library/rbohelper.php";
+include_once "rbohelper.php";
 include_once "configuration.php";
 class RbODocument extends RbObject {
   public $readBaseDocument = true;
