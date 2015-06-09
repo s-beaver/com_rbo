@@ -40,8 +40,7 @@
                 <label for="doc_status">Статус</label>
                 <select id="doc_status" name="doc_status" style="width: 120px">
                   <option value=""></option>
-                  <option value="выставлен">выставлен</option>
-                  <option value="оплачен">оплачен</option>
+                  <option value="подписан">подписан</option>
                   <option value="удален">удален</option>
                 </select>
                 <label for="doc_manager">Менеджер</label>

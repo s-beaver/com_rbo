@@ -40,8 +40,7 @@
                 <label for="doc_status">Статус</label>
                 <select id="doc_status" name="doc_status" style="width: 120px">
                   <option value=""></option>
-                  <option value="выставлен">выставлен</option>
-                  <option value="оплачен">оплачен</option>
+                  <option value="подписан">подписан</option>
                   <option value="удален">удален</option>
                 </select>
                 <label for="doc_manager">Менеджер</label>
@@ -111,7 +110,8 @@
           <tr>
             <td><label for="cust_search">Поиск</label></td>
             <td><input type="text" name="cust_search" id="cust_search" style='width: 150px' /> <a href="javascript:custSearch()"> <img
-                src="components/com_rbo/images/icon-32-search-on.png" /></a><input style="visibility: hidden" id="custId" /><input style="visibility: hidden" id="doc_baseId" /></td>
+                src="components/com_rbo/images/icon-32-search-on.png" /></a><input style="visibility: hidden" id="custId" /><input style="visibility: hidden"
+              id="doc_baseId" /></td>
           </tr>
           <tr>
             <td><label for="cust_name">Название</label></td>
