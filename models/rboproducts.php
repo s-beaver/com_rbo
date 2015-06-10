@@ -40,7 +40,7 @@ class RbOProducts extends RbObject {
      */
     
     $query->clear ();
-    $query->select ("productID, name, price, product_code");
+    $query->select ("productID, name, price, product_code, list_price");
     $query->from ("SS_products");
     $query->where ("name LIKE '%" . $searchSubstr . "%'");
     

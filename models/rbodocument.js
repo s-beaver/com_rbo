@@ -476,7 +476,7 @@ rboDoc.prototype.productSearch = function() {
       $('#prod_name option').remove();
       for (var i = 0; i < p.result.length; i++) {
         $('#prod_name').append(
-            '<option value="' + p.result[i].productID + "|" + p.result[i].price + "|" + p.result[i].product_code + '">' + p.result[i].name + '</option>');
+            '<option value="' + p.result[i].productID + "|" + p.result[i].price + "|" + p.result[i].product_code + "|"+p.result[i].list_price+'">' + p.result[i].name + '</option>');
       }
       $("#prod_name option:first").prop("selected", "selected");
       self.setProductPrice();
@@ -497,13 +497,17 @@ rboDoc.prototype.setProductPrice = function() {
   $("#prod_price").val(arProd[1]);
   $("#prod_code").val(arProd[2]);
   $("#prod_cnt").val(1);
+  $("#prod_price1").html("Цена Опт.1= "+arProd[3]+"р.");
   this.calcSum();
 }
 
 // ===================================================================================
+
+//===================================================================================
 rboDoc.prototype.calcSum = function() {
   $("#prod_sum").val($("#prod_price").val() * $("#prod_cnt").val());
 }
+
 
 //===================================================================================
 function rboShipment(o) {
