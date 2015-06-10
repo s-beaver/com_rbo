@@ -11,6 +11,7 @@
 
 <script src="components/com_rbo/library/lib.js"></script>
 <script src="components/com_rbo/models/rbohelper.js"></script>
+<script src="components/com_rbo/models/rbodocument.js"></script>
 <script src="components/com_rbo/models/invoices.js"></script>
 <link rel="stylesheet" href="components/com_rbo/css/rbo.css" />
 
@@ -56,7 +57,7 @@
             </td>
           </tr>
           <tr>
-            <td><a href="javascript:showProductForm()"> <img src="components/com_rbo/images/icon-32-new-on.png" /></a>
+            <td><a href="javascript:doc.showProductForm()"> <img src="components/com_rbo/images/icon-32-new-on.png" /></a>
               <div style="float: right">
                 <label for="doc_cust">Покупатель</label>
                 <input disabled type="text" name="doc_cust" id="doc_cust" style='width: 450px' />
@@ -83,18 +84,18 @@
       <fieldset style='padding: 0'>
         <table>
           <tr>
-            <td><label for="prod_search">Поиск</label> <input type="text" name="prod_search" id="prod_search" style='width: 150px' /> <a href="javascript:productSearch()">
+            <td><label for="prod_search">Поиск</label> <input type="text" name="prod_search" id="prod_search" style='width: 150px' /> <a href="javascript:doc.productSearch()">
                 <img src="components/com_rbo/images/icon-32-search-on.png" />
             </a></td>
           </tr>
           <tr>
-            <td><label for="prod_name">Название</label> <select name="prod_name" id="prod_name" style="width: 500px" onChange="setProductPrice()">
+            <td><label for="prod_name">Название</label> <select name="prod_name" id="prod_name" style="width: 500px" onChange="doc.setProductPrice()">
               </select></td>
           </tr>
           <tr>
             <td><label for="prod_price">Цена</label> <input type="text" name="prod_price" id="prod_price" class="ui-widget-content ui-corner-all"
-              style="text-align: center; width: 50px" onChange="calcSum()" /> <label for="prod_cnt">р.&nbsp;Х&nbsp;</label> <input type="text" name="prod_cnt" id="prod_cnt"
-              style="text-align: center; width: 30px" onChange="calcSum()" /> <label for="prod_sum">ед.&nbsp;=&nbsp;</label> <input disabled type="text" name="prod_sum"
+              style="text-align: center; width: 50px" onChange="doc.calcSum()" /> <label for="prod_cnt">р.&nbsp;Х&nbsp;</label> <input type="text" name="prod_cnt" id="prod_cnt"
+              style="text-align: center; width: 30px" onChange="doc.calcSum()" /> <label for="prod_sum">ед.&nbsp;=&nbsp;</label> <input disabled type="text" name="prod_sum"
               id="prod_sum" style="text-align: center; width: 50px" /> р. <input style="visibility: hidden" id="prodId" /> <input style="visibility: hidden" id="prod_code" /></td>
           </tr>
         </table>
@@ -108,12 +109,12 @@
         <table>
           <tr>
             <td><label for="cust_search">Поиск</label></td>
-            <td><input type="text" name="cust_search" id="cust_search" style='width: 150px' /> <a href="javascript:custSearch()"> <img
+            <td><input type="text" name="cust_search" id="cust_search" style='width: 150px' /> <a href="javascript:doc.custSearch()"> <img
                 src="components/com_rbo/images/icon-32-search-on.png" /></a><input style="visibility: hidden" id="custId" /></td>
           </tr>
           <tr>
             <td><label for="cust_name">Название</label></td>
-            <td><select name="cust_name" id="cust_name" style="width: 500px" onChange="setCustFlds('selected')"></select></td>
+            <td><select name="cust_name" id="cust_name" style="width: 500px" onChange="doc.setCustFlds('selected')"></select></td>
           </tr>
         </table>
         <table>

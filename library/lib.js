@@ -90,7 +90,17 @@ function IsObject(oObj) {
   return typeof (oObj) == "object";
 }
 
-// ===================================================================================
+//===================================================================================
+function extendObject(Child, Parent) {
+  var F = function() {
+  }
+  F.prototype = Parent.prototype;
+  Child.prototype = new F();
+  Child.prototype.constructor = Child;
+  Child.superclass = Parent.prototype;
+}
+
+//===================================================================================
 function updateTips(t, tips) {
   tips.text(t).addClass("ui-state-highlight");
   tips.show();

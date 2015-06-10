@@ -25,7 +25,7 @@ function initTableDocList(comPath, sDocType) {
       "sTitle" : "Номер",
       "sClass" : "center",
       "mData" : function(source, type, val) {
-        return "<a href='javascript:readDoc(" + source.docId + ")'>" + source.doc_num + " /" + source.doc_date + "</a>";
+        return "<a href='javascript:doc.readDoc(" + source.docId + ")'>" + source.doc_num + " /" + source.doc_date + "</a>";
       }
     }, {
       "sTitle" : "Покупатель",
@@ -107,7 +107,7 @@ function initTableProducts(comPath, sDocType) {
       "sClass" : "center",
       //"sWidth" : "50",
       "mData" : function(source, type, val) {
-        return "<a id='edit_product' href='javascript:showProductForm(" + source.lineNo + ")'>" + "<img src='" + comPath + "images/icon-32-edit-on.png'/></a>";
+        return "<a id='edit_product' href='javascript:doc.showProductForm(" + source.lineNo + ")'>" + "<img src='" + comPath + "images/icon-32-edit-on.png'/></a>";
       }
     } ],
     "oLanguage" : {
