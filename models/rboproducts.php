@@ -17,7 +17,8 @@ class RbOProducts extends RbObject {
     $this->flds ["product_price"] = array ("type" => "numeric" );
     $this->flds ["product_sum"] = array ("type" => "numeric","read_only" => true,
         "formula" => "product_cnt*product_price" );
-    $this->flds ["product_uom"] = array ("type" => "string","read_only" => true,"formula" => "'шт.'" );
+    $this->flds ["product_uom"] = array ("type" => "string","read_only" => true,
+        "formula" => "'шт.'" );
     
     $this->getInputBuffer ();
   }
@@ -31,18 +32,14 @@ class RbOProducts extends RbObject {
     $db = JFactory::getDBO ();
     $query = $db->getQuery (true);
     
-    /*
-     * $query->select ("count(*)");
-     * $query->from ("SS_products");
-     * $query->where ("name LIKE '%" . $searchSubstr . "%'");
-     * $db->setQuery ($query);
-     * $count = $db->loadResult ();
-     */
+    $searchAr = split (" ", $searchSubstr);
     
     $query->clear ();
     $query->select ("productID, name, price, product_code, list_price");
     $query->from ("SS_products");
-    $query->where ("name LIKE '%" . $searchSubstr . "%'");
+    foreach ( $searchAr as $v ) {
+      $query->where ("LOWER(name) LIKE '%" . strtolower($v) . "%'");
+    }
     
     try {
       $db->setQuery ($query, 0, 30);

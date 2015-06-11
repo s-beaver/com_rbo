@@ -84,8 +84,8 @@
       <fieldset style='padding: 0'>
         <table>
           <tr>
-            <td><label for="prod_search">Поиск</label> <input type="text" name="prod_search" id="prod_search" style='width: 150px' /> <a href="javascript:doc.productSearch()">
-                <img src="components/com_rbo/images/icon-32-search-on.png" />
+            <td><label for="prod_search">Поиск</label> <input type="text" name="prod_search" id="prod_search" style='width: 350px' /> <a
+              href="javascript:doc.productSearch()"> <img src="components/com_rbo/images/icon-32-search-on.png" />
             </a></td>
           </tr>
           <tr>
@@ -94,11 +94,11 @@
           </tr>
           <tr>
             <td><label for="prod_price">Цена</label> <input type="text" name="prod_price" id="prod_price" class="ui-widget-content ui-corner-all"
-              style="text-align: center; width: 50px" onChange="doc.calcSum()" /> <label for="prod_cnt">р.&nbsp;Х&nbsp;</label> <input type="text" name="prod_cnt" id="prod_cnt"
-              style="text-align: center; width: 30px" onChange="doc.calcSum()" /> <label for="prod_sum">ед.&nbsp;=&nbsp;</label> <input disabled type="text" name="prod_sum"
-              id="prod_sum" style="text-align: center; width: 50px" /> р. <input style="visibility: hidden" id="prodId" /> <input style="visibility: hidden" id="prod_code" />
-              <div id="prod_price1">Цена Опт.1</div>
-            </td>
+              style="text-align: center; width: 50px" onChange="doc.calcSum()" /> <label for="prod_cnt">р.&nbsp;Х&nbsp;</label> <input type="text" name="prod_cnt"
+              id="prod_cnt" style="text-align: center; width: 30px" onChange="doc.calcSum()" /> <label for="prod_sum">ед.&nbsp;=&nbsp;</label> <input disabled type="text"
+              name="prod_sum" id="prod_sum" style="text-align: center; width: 50px" /> р. <input style="visibility: hidden" id="prodId" /> <input style="visibility: hidden"
+              id="prod_code" />
+              <div id="prod_price1">Цена Опт.1</div></td>
           </tr>
         </table>
       </fieldset>
@@ -111,7 +111,7 @@
         <table>
           <tr>
             <td><label for="cust_search">Поиск</label></td>
-            <td><input type="text" name="cust_search" id="cust_search" style='width: 150px' /> <a href="javascript:doc.custSearch()"> <img
+            <td><input type="text" name="cust_search" id="cust_search" style='width: 350px' /> <a href="javascript:doc.custSearch()"> <img
                 src="components/com_rbo/images/icon-32-search-on.png" /></a><input style="visibility: hidden" id="custId" /></td>
           </tr>
           <tr>
@@ -131,14 +131,9 @@
             <td><input type="text" name="cust_addr" id="cust_addr" style='width: 500px' /></td>
           </tr>
           <tr>
-            <td colspan="2"><label for="cust_nonds">Без НДС</label><input type="checkbox" name="cust_nonds" id="cust_nonds">
-            
-<label for="cust_phone">&nbsp;Тел.</label>
-<input type="text" name="cust_phone" id="cust_phone" style='width: 200px' /> 
-<label for="cust_email">&nbsp;@</label>
-<input type="text" name="cust_email" id="cust_email" style='width: 200px' />            
-            
-            </td>
+            <td colspan="2"><label for="cust_nonds">Без НДС</label><input type="checkbox" name="cust_nonds" id="cust_nonds"> <label for="cust_phone">&nbsp;Тел.</label> <input
+              type="text" name="cust_phone" id="cust_phone" style='width: 200px' /> <label for="cust_email">&nbsp;@</label> <input type="text" name="cust_email"
+              id="cust_email" style='width: 200px' /></td>
           </tr>
         </table>
         <table>
