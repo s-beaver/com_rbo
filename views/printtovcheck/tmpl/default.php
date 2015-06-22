@@ -84,55 +84,11 @@ table, th, td {
   echo $input->getCmd ('docid');
   ?>
   </div>
-  <table class="table_no_border">
-    <tr>
-      <td>
-        <img src="components/com_rbo/images/logo.jpg"
-          style="width: 54mm;" />
-      </td>
-      <td>Внимание! Оплата данного счета означает согласие с условиями
-        поставки товара. Уведомление об оплате обязательно, в противном
-        случае не гарантируется наличие товара на складе. Товар
-        отпускается по факту прихода денег на р/с Поставщика,
-        самовывозом, при наличии доверенности и паспорта</td>
-    </tr>
-  </table>
-  <br>
-
-  <div class="doc_recv">
-    <table style="width: 100%">
-      <tr>
-        <td colspan=2 rowspan=2 id="f_bank">ххБАНКхх</td>
-        <td>БИК</td>
-        <td rowspan=2>
-          <span id="f_bik">ххБИКхх</span><br> <span id="f_kch">ххСч.№хх</span>
-        </td>
-      </tr>
-      <tr>
-        <td>Сч.№</td>
-      </tr>
-      <tr>
-        <td>
-          ИНН <span id="f_inn">ххИННхх</span>
-        </td>
-        <td>
-          КПП <span id="f_kpp">ххКППхх</span>
-        </td>
-        <td rowspan=2>Сч.№</td>
-        <td rowspan=2 id="f_rch">ххСч.№хх</td>
-      </tr>
-      <tr>
-        <td colspan=2 id="f_name">ххПолучательхх</td>
-      </tr>
-    </table>
-  </div>
 
   <div class="doc_header">
     <div class="doc_num">
-      Счет № <span id="doc_num"></span> от <span id="doc_date"></span>
+      Товарный чек № <span id="doc_num"></span> от <span id="doc_date"></span>
     </div>
-    <div>Счет действителен в течение 3 банковских дней с даты его
-      выставления</div>
     <hr noshade>
     <table class="table_no_border">
       <tr>
@@ -177,12 +133,11 @@ table, th, td {
   <br>
 
   <table class="table_no_border doc_sign" id="doc_sign_block">
-    <tr>
+      <tr>
       <td>Менеджер</td>
       <td>
         <div class="underlined">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
       </td>
-      <td id="doc_manager" class="underlined">ххМенеджерхх</td>
     </tr>
   </table>
 

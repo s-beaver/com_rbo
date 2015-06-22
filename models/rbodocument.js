@@ -6,7 +6,7 @@ function rboDoc(o) {
   this.sDocTypeTitle = o.sDocTypeTitle;
   this.sDocTypeListTitle = o.sDocTypeListTitle;
   this.allFields = o.allFields;
-  this.printViewName = o.printViewName;
+  this.printList = o.printList;
 
   this.oTable = initTableDocList(comPath, this.sDocType);
   this.oTableProducts = initTableProducts(comPath, this.sDocType);
@@ -222,12 +222,15 @@ rboDoc.prototype.showDocForm = function(i) {
         self.deleteDoc(i.docId);
       }, null, "#dialog-confirm");
     }
-
   }
 
-  oBtns["Печатать"] = function() {
-    window.open('index.php?option=com_rbo&view='+self.printViewName+'&format=raw&docid=' + i.docId, '_blank');
-  };
+  if (!IsNull(self.printList) && self.printList.length > 0) {
+    for (var x = 0; x < self.printList.length; x++) {
+      oBtns[self.printList[x].title] = function() {
+        self.showPrintView(event.target.outerText,i.docId);
+      };
+    }
+  }
 
   oBtns["Сохранить"] = function() {
     self.saveDoc(i.docId);
@@ -245,7 +248,23 @@ rboDoc.prototype.showDocForm = function(i) {
   $("#doc-form").dialog("open");
 }
 
-// ===================================================================================
+//===================================================================================
+rboDoc.prototype.showPrintView = function(title,docId) {
+  var self = this;
+  var viewname = "";
+  if (!IsNull(self.printList) && self.printList.length > 0) {
+    for (var x = 0; x < self.printList.length; x++) {
+      if (self.printList[x].title == title) {
+        viewname = self.printList[x].viewname;
+        break;
+      }
+    }
+  }
+  if (viewname != "")
+    window.open('index.php?option=com_rbo&view=' + viewname + '&format=raw&docid=' + docId, '_blank');
+}
+
+//===================================================================================
 rboDoc.prototype.showCustForm = function() {
   var self = this;
   var custId = $("#custId").val();
@@ -476,7 +495,8 @@ rboDoc.prototype.productSearch = function() {
       $('#prod_name option').remove();
       for (var i = 0; i < p.result.length; i++) {
         $('#prod_name').append(
-            '<option value="' + p.result[i].productID + "|" + p.result[i].price + "|" + p.result[i].product_code + "|"+p.result[i].list_price+'">' + p.result[i].name + '</option>');
+            '<option value="' + p.result[i].productID + "|" + p.result[i].price + "|" + p.result[i].product_code + "|" + p.result[i].list_price + '">' + p.result[i].name
+                + '</option>');
       }
       $("#prod_name option:first").prop("selected", "selected");
       self.setProductPrice();
@@ -497,7 +517,7 @@ rboDoc.prototype.setProductPrice = function() {
   $("#prod_price").val(arProd[1]);
   $("#prod_code").val(arProd[2]);
   $("#prod_cnt").val(1);
-  $("#prod_price1").html("Цена Опт.1= "+arProd[3]+"р.");
+  $("#prod_price1").html("Цена Опт.1= " + arProd[3] + "р.");
   this.calcSum();
 }
 
@@ -507,7 +527,6 @@ rboDoc.prototype.setProductPrice = function() {
 rboDoc.prototype.calcSum = function() {
   $("#prod_sum").val($("#prod_price").val() * $("#prod_cnt").val());
 }
-
 
 //===================================================================================
 function rboShipment(o) {

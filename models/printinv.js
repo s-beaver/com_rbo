@@ -76,9 +76,9 @@ function fillInvoicePrintForm(i) {
   $("#doc_sum").html(i.doc_sum);
   $("#doc_sum_words").html(number_to_string(i.doc_sum));
 
-  var iManOffset = $("#doc_manager").offset();
+  var iManOffset = $("#doc_sign_block").offset();
   iManOffset.top -= 50;
-  iManOffset.left -= 50;
+  iManOffset.left = 250;
 
   if (!IsNull(i.doc_firm_details))
     $("#img_stamp").attr("src", "components/com_rbo/images/" + f.f_stamp);

@@ -9,7 +9,7 @@ $(document).ready(function() {
     sDocTypeTitle : 'Счет',
     allFields : $("#doc_num").add($("#doc_date")).add($("#doc_manager")).add($("#doc_firm")).add($("#cedit")),
     tips : $(".validateTips"),
-    printViewName : 'printinv'
+    printList : [{title:"Печатать счет", viewname:"printinv"}]
   });
 
   $("#cedit").click(function(event) {
