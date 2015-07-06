@@ -662,6 +662,7 @@ rboShipment.prototype.setBaseDocList = function() {
     success : function(s) {
       $('#cust_base_doc option').remove();
       p = s.aaData;
+      $('#cust_base_doc').append('<option value="0">Розница</option>');
       if (p.length > 0) {
         for (var i = 0; i < p.length; i++) {
           $('#cust_base_doc').append('<option value="' + p[i].docId + '">Счет №' + p[i].doc_num + " от " + p[i].doc_date + " (" + p[i].doc_sum + '=)</option>');

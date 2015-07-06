@@ -2,15 +2,13 @@
 
 <html>
 <head>
-<link rel="stylesheet"
-  href="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.css" />
+<link rel="stylesheet" href="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.css" />
 
-<script
-  src="libraries/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script>
+<script src="libraries/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script>
 <script src="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
 
-<script src="components/com_rbo/library/lib.js"></script>
-<script src="components/com_rbo/models/printtorg12.js"></script>
+<script src="<?php echo JRBO_PATH?>/library/lib.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/printtorg12.js"></script>
 
 <style>
 body {
@@ -94,9 +92,8 @@ sup {
   ?>
   </div>
 
-  <div style="text-align: right; font-size:6pt">
-    Унифицированная форма Торг-12<br>Утверждена постановлением
-    Госкомстата России от 25.12.98 № 132
+  <div style="text-align: right; font-size: 6pt">
+    Унифицированная форма Торг-12<br>Утверждена постановлением Госкомстата России от 25.12.98 № 132
   </div>
 
   <table style="width: 100%; vertical-align: top">
@@ -106,54 +103,40 @@ sup {
     </tr>
     <tr>
       <td rowspan="2" style="width: 10%">Грузоотправитель</td>
-      <td rowspan="2" style="width: 70%; border-bottom: 1px solid;"
-        id="doc_firm">ххООО Робик.РУхх</td>
-      <td colspan="2" style="width: 10%; text-align: right;">Форма по
-        ОКУД</td>
+      <td rowspan="2" style="width: 70%; border-bottom: 1px solid;" id="doc_firm">ххООО Робик.РУхх</td>
+      <td colspan="2" style="width: 10%; text-align: right;">Форма по ОКУД</td>
       <td style="width: 10%; border: 1px solid; text-align: center;">0330212</td>
     </tr>
     <tr>
-      <td colspan="2"
-        style="width: 10%; border-bottom: 1px solid; text-align: right;">по
-        ОКПО</td>
+      <td colspan="2" style="width: 10%; border-bottom: 1px solid; text-align: right;">по ОКПО</td>
       <td id="firm_okpo" style="width: 10%; border: 1px solid;">&nbsp;</td>
     </tr>
     <tr>
-      <td colspan="4" style="width: 10%; text-align: right;">Виды
-        деятельности по ОКДП</td>
+      <td colspan="4" style="width: 10%; text-align: right;">Виды деятельности по ОКДП</td>
       <td style="width: 10%; border: 1px solid;">&nbsp;</td>
     </tr>
     <tr>
       <td style="width: 10%">Грузополучатель</td>
       <td id="doc_cust" style="width: 70%; border-bottom: 1px solid">ххПокупательхх</td>
-      <td colspan="2"
-        style="width: 10%; border-bottom: 1px solid; text-align: right;">по
-        ОКПО</td>
+      <td colspan="2" style="width: 10%; border-bottom: 1px solid; text-align: right;">по ОКПО</td>
       <td id="cust_okpo" style="width: 10%; border: 1px solid;">&nbsp;</td>
     </tr>
     <tr>
       <td style="width: 10%">Поставщик</td>
-      <td id="doc_firm" style="width: 70%; border-bottom: 1px solid;" id="doc_firm">ххООО
-        Робик.РУхх</td>
-      <td colspan="2"
-        style="width: 10%; border-bottom: 1px solid; text-align: right;">по
-        ОКПО</td>
+      <td id="doc_firm" style="width: 70%; border-bottom: 1px solid;" id="doc_firm">ххООО Робик.РУхх</td>
+      <td colspan="2" style="width: 10%; border-bottom: 1px solid; text-align: right;">по ОКПО</td>
       <td id="firm_okpo" style="width: 10%; border: 1px solid; text-align: center;">хх55774024хх</td>
     </tr>
     <tr>
       <td style="width: 10%">Плательщик</td>
       <td id="doc_cust" style="width: 70%; border-bottom: 1px solid">ххПокупательхх</td>
-      <td colspan="2"
-        style="width: 10%; border-bottom: 1px solid; text-align: right;">по
-        ОКПО</td>
+      <td colspan="2" style="width: 10%; border-bottom: 1px solid; text-align: right;">по ОКПО</td>
       <td id="cust_okpo" style="width: 10%; border: 1px solid; text-align: center;">хх55774024хх</td>
     </tr>
     <tr>
       <td style="width: 10%">Основание:</td>
-      <td style="width: 70%; border-bottom: 1px solid;"
-        id="doc_based_on">ххОснованиехх</td>
-      <td colspan="2"
-        style="width: 10%; border-bottom: 1px solid; text-align: right;">номер</td>
+      <td style="width: 70%; border-bottom: 1px solid;" id="doc_based_on">ххОснованиехх</td>
+      <td colspan="2" style="width: 10%; border-bottom: 1px solid; text-align: right;">номер</td>
       <td style="width: 10%; border: 1px solid; text-align: center;">&nbsp;</td>
     </tr>
     <tr>
@@ -163,17 +146,15 @@ sup {
     <tr>
       <td colspan="2" rowspan="3" style="width: 60%; text-align: right;">
 
-        <table class="doc_header" align="center"
-          style="vertical-align: bottom; border: 0">
+        <table class="doc_header" align="center" style="vertical-align: bottom; border: 0">
           <tr>
-            <td rowspan="2" style="vertical-align: bottom; border: 0; font-size: 10pt">ТОВАРНАЯ
-              НАКЛАДНАЯ</td>
+            <td rowspan="2" style="vertical-align: bottom; border: 0; font-size: 10pt">ТОВАРНАЯ НАКЛАДНАЯ</td>
             <td style="border: 1px solid">Номер документа</td>
             <td style="border: 1px solid">Дата составления</td>
           </tr>
           <tr>
-            <td id="doc_num" style="border: 1px solid; text-align:center">xxНомерхх</td>
-            <td id="doc_date" style="border: 1px solid; text-align:center">ххДатахх</td>
+            <td id="doc_num" style="border: 1px solid; text-align: center">xxНомерхх</td>
+            <td id="doc_date" style="border: 1px solid; text-align: center">ххДатахх</td>
           </tr>
         </table>
 
@@ -188,8 +169,7 @@ sup {
       <td style="width: 10%; border: 1px solid;">&nbsp;</td>
     </tr>
     <tr>
-      <td colspan="2" style="width: 10%; text-align: right;">Вид
-        операции</td>
+      <td colspan="2" style="width: 10%; text-align: right;">Вид операции</td>
       <td style="width: 10%; border: 1px solid;">&nbsp;</td>
     </tr>
   </table>
@@ -240,8 +220,7 @@ sup {
     <tbody id="doc_products"></tbody>
     <tfoot id="doc_products">
       <tr>
-        <td colspan=7 style="text-align: right; border: 0;">Всего по
-          накладной</td>
+        <td colspan=7 style="text-align: right; border: 0;">Всего по накладной</td>
         <td>Х</td>
         <td>Х</td>
         <td id="doc_cnt_sum" style='text-align: center'>ххКвоИтогохх</td>
@@ -255,11 +234,8 @@ sup {
   </table>
 
   <div>
-    Товарная накладная имеет приложение на <span
-      style="border-bottom: 2px solid;">&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-    листах и содержит <span id="doc_cnt_words"
-      style="border-bottom: 2px solid;"></span> порядковых номеров
-    записей
+    Товарная накладная имеет приложение на <span style="border-bottom: 2px solid;">&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> листах и
+    содержит <span id="doc_cnt_words" style="border-bottom: 2px solid;"></span> порядковых номеров записей
   </div>
 
   <table style="width: 95%; border: 0">
@@ -282,60 +258,38 @@ sup {
 
   <div>Приложение (паспорта, сертификаты, и т. п.) на листах</div>
 
-  <div
-    style="float: left; width: 49%; border-right: 1px solid; margin-right: 5px; padding-right: 5px">
+  <div style="float: left; width: 49%; border-right: 1px solid; margin-right: 5px; padding-right: 5px">
     <table class="footer">
       <tr>
-        <td colspan="4" style="text-align: left">	
-          Всего отпущено на сумму <span id="doc_sum_words" class="underlined"></span><span class="underlined">. Без
-          НДС.</span>
+        <td colspan="4" style="text-align: left">Всего отпущено на сумму <span id="doc_sum_words" class="underlined"></span><span class="underlined">. Без НДС.</span>
         </td>
       </tr>
       <tr>
         <td style="text-align: left; width: 25%">Отпуск разрешил</td>
-        <td style="width: 25%; border-bottom: 1px solid;">Руководитель
-          организации</td>
+        <td style="width: 25%; border-bottom: 1px solid;">Руководитель организации</td>
         <td style="width: 25%; border-bottom: 1px solid;">&nbsp;</td>
         <td style="width: 25%; border-bottom: 1px solid;">&nbsp;</td>
       </tr>
 
       <tr>
-        <td colspan="2" style="text-align: left;">Главный (старший)
-          бухгалтер</td>
-        <td
-          style="width: 25%; text-align: center; border-bottom: 1px solid;">
-          <sup>подпись</sup>
-        </td>
-        <td
-          style="width: 25%; text-align: center; border-bottom: 1px solid;">
-          <sup>расшифровка</sup>
-        </td>
+        <td colspan="2" style="text-align: left;">Главный (старший) бухгалтер</td>
+        <td style="width: 25%; text-align: center; border-bottom: 1px solid;"><sup>подпись</sup></td>
+        <td style="width: 25%; text-align: center; border-bottom: 1px solid;"><sup>расшифровка</sup></td>
       </tr>
       <tr>
         <td style="text-align: left;">Отпуск груза произвел</td>
         <td style="width: 25%; border-bottom: 1px solid;">&nbsp;</td>
-        <td
-          style="width: 25%; text-align: center; border-bottom: 1px solid;">
-          <sup>подпись</sup>
-        </td>
-        <td
-          style="width: 25%; text-align: center; border-bottom: 1px solid;">
-          <sup>расшифровка</sup>
-        </td>
+        <td style="width: 25%; text-align: center; border-bottom: 1px solid;"><sup>подпись</sup></td>
+        <td style="width: 25%; text-align: center; border-bottom: 1px solid;"><sup>расшифровка</sup></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <td style="text-align: center">
-          <sup>подпись</sup>
-        </td>
-        <td style="text-align: center">
-          <sup>расшифровка</sup>
-        </td>
+        <td style="text-align: center"><sup>подпись</sup></td>
+        <td style="text-align: center"><sup>расшифровка</sup></td>
       </tr>
       <tr>
-        <td colspan="4" style="text-align: center">
-          М.П. <span id="doc_date_footer">ххДатахх</span>
+        <td colspan="4" style="text-align: center">М.П. <span id="doc_date_footer">ххДатахх</span>
         </td>
       </tr>
     </table>
@@ -344,9 +298,7 @@ sup {
   <div style="float: left; width: 49%">
     <table class="footer">
       <tr>
-        <td colspan="4" style="text-align: left">
-          По доверенности №_____________________________выданной
-        </td>
+        <td colspan="4" style="text-align: left">По доверенности №_____________________________выданной</td>
       </tr>
       <tr>
         <td colspan="4">&nbsp;</td>
@@ -354,35 +306,24 @@ sup {
       <tr>
         <td style="text-align: left;">Груз принял</td>
         <td style="width: 22%; border-bottom: 1px solid;">&nbsp;</td>
-        <td
-          style="width: 22%; text-align: center; border-bottom: 1px solid;">&nbsp;</td>
-        <td
-          style="width: 22%; text-align: center; border-bottom: 1px solid;">&nbsp;</td>
+        <td style="width: 22%; text-align: center; border-bottom: 1px solid;">&nbsp;</td>
+        <td style="width: 22%; text-align: center; border-bottom: 1px solid;">&nbsp;</td>
       </tr>
       <tr>
         <td style="text-align: left;">Груз получил грузополучатель</td>
         <td style="border-bottom: 1px solid;">&nbsp;</td>
-        <td style="text-align: center; border-bottom: 1px solid;">
-          <sup>подпись</sup>
-        </td>
-        <td style="text-align: center; border-bottom: 1px solid;">
-          <sup>расшифровка</sup>
-        </td>
+        <td style="text-align: center; border-bottom: 1px solid;"><sup>подпись</sup></td>
+        <td style="text-align: center; border-bottom: 1px solid;"><sup>расшифровка</sup></td>
       </tr>
       <tr>
         <td style="text-align: left;">&nbsp;</td>
         <td>&nbsp;</td>
 
-        <td style="text-align: center">
-          <sup>подпись</sup>
-        </td>
-        <td style="text-align: center">
-          <sup>расшифровка</sup>
-        </td>
+        <td style="text-align: center"><sup>подпись</sup></td>
+        <td style="text-align: center"><sup>расшифровка</sup></td>
       </tr>
       <tr>
-        <td colspan="4" style="text-align: center">
-          М.П. <span id="doc_date_footer">ххДатахх</span>
+        <td colspan="4" style="text-align: center">М.П. <span id="doc_date_footer">ххДатахх</span>
         </td>
       </tr>
     </table>

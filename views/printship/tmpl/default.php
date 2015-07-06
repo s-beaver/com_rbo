@@ -2,15 +2,13 @@
 
 <html>
 <head>
-<link rel="stylesheet"
-  href="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.css" />
+<link rel="stylesheet" href="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.css" />
 
-<script
-  src="libraries/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script>
+<script src="libraries/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script>
 <script src="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
 
-<script src="components/com_rbo/library/lib.js"></script>
-<script src="components/com_rbo/models/printship.js"></script>
+<script src="<?php echo JRBO_PATH?>/library/lib.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/printship.js"></script>
 
 <style>
 body {
@@ -102,8 +100,7 @@ table, th, td {
 
   <div class="doc_header">
     <div class="doc_num">
-      Накладная <span id="doc_num"></span> от <span
-        id="doc_date"></span>
+      Накладная <span id="doc_num"></span> от <span id="doc_date"></span>
     </div>
   </div>
 

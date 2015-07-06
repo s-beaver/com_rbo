@@ -2,15 +2,13 @@
 
 <html>
 <head>
-<link rel="stylesheet"
-  href="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.css" />
+<link rel="stylesheet" href="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.css" />
 
-<script
-  src="libraries/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script>
+<script src="libraries/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script>
 <script src="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
 
-<script src="components/com_rbo/library/lib.js"></script>
-<script src="components/com_rbo/models/printinv.js"></script>
+<script src="<?php echo JRBO_PATH?>/library/lib.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/printinv.js"></script>
 
 <style>
 body {
@@ -86,15 +84,9 @@ table, th, td {
   </div>
   <table class="table_no_border">
     <tr>
-      <td>
-        <img src="components/com_rbo/images/logo.jpg"
-          style="width: 54mm;" />
-      </td>
-      <td>Внимание! Оплата данного счета означает согласие с условиями
-        поставки товара. Уведомление об оплате обязательно, в противном
-        случае не гарантируется наличие товара на складе. Товар
-        отпускается по факту прихода денег на р/с Поставщика,
-        самовывозом, при наличии доверенности и паспорта</td>
+      <td><img src="<?php echo JRBO_PATH?>/images/logo.jpg" style="width: 54mm;" /></td>
+      <td>Внимание! Оплата данного счета означает согласие с условиями поставки товара. Уведомление об оплате обязательно, в противном случае не гарантируется наличие
+        товара на складе. Товар отпускается по факту прихода денег на р/с Поставщика, самовывозом, при наличии доверенности и паспорта</td>
     </tr>
   </table>
   <br>
@@ -104,19 +96,15 @@ table, th, td {
       <tr>
         <td colspan=2 rowspan=2 id="f_bank">ххБАНКхх</td>
         <td>БИК</td>
-        <td rowspan=2>
-          <span id="f_bik">ххБИКхх</span><br> <span id="f_kch">ххСч.№хх</span>
-        </td>
+        <td rowspan=2><span id="f_bik">ххБИКхх</span><br> <span id="f_kch">ххСч.№хх</span></td>
       </tr>
       <tr>
         <td>Сч.№</td>
       </tr>
       <tr>
-        <td>
-          ИНН <span id="f_inn">ххИННхх</span>
+        <td>ИНН <span id="f_inn">ххИННхх</span>
         </td>
-        <td>
-          КПП <span id="f_kpp">ххКППхх</span>
+        <td>КПП <span id="f_kpp">ххКППхх</span>
         </td>
         <td rowspan=2>Сч.№</td>
         <td rowspan=2 id="f_rch">ххСч.№хх</td>
@@ -131,8 +119,7 @@ table, th, td {
     <div class="doc_num">
       Счет № <span id="doc_num"></span> от <span id="doc_date"></span>
     </div>
-    <div>Счет действителен в течение 3 банковских дней с даты его
-      выставления</div>
+    <div>Счет действителен в течение 3 банковских дней с даты его выставления</div>
     <hr noshade>
     <table class="table_no_border">
       <tr>
@@ -167,7 +154,7 @@ table, th, td {
       </tr>
     </tfoot>
   </table>
-  
+
   <div class="doc_sum_words">
     Сумма прописью: <span id="doc_sum_words"></span>. Без НДС.
   </div>

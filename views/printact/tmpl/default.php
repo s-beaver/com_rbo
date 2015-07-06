@@ -7,8 +7,8 @@
 <script src="libraries/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script>
 <script src="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
 
-<script src="components/com_rbo/library/lib.js"></script>
-<script src="components/com_rbo/models/printact.js"></script>
+<script src="<?php echo JRBO_PATH?>/library/lib.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/printact.js"></script>
 
 <style>
 body {

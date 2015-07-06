@@ -2,15 +2,13 @@
 
 <html>
 <head>
-<link rel="stylesheet"
-  href="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.css" />
+<link rel="stylesheet" href="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.css" />
 
-<script
-  src="libraries/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script>
+<script src="libraries/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script>
 <script src="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
 
-<script src="components/com_rbo/library/lib.js"></script>
-<script src="components/com_rbo/models/printinv.js"></script>
+<script src="<?php echo JRBO_PATH?>/library/lib.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/printinv.js"></script>
 
 <style>
 body {
@@ -123,7 +121,7 @@ table, th, td {
       </tr>
     </tfoot>
   </table>
-  
+
   <div class="doc_sum_words">
     Сумма прописью: <span id="doc_sum_words"></span>. Без НДС.
   </div>
@@ -133,7 +131,7 @@ table, th, td {
   <br>
 
   <table class="table_no_border doc_sign" id="doc_sign_block">
-      <tr>
+    <tr>
       <td>Менеджер</td>
       <td>
         <div class="underlined">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>

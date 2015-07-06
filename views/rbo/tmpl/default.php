@@ -9,7 +9,7 @@
 <script src="libraries/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script>
 <script src="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
 <script src="libraries/DataTables-1.10.6/media/js/jquery.dataTables.min.js"></script>
-<link rel="stylesheet" href="components/com_rbo/css/rbo.css" />
+<link rel="stylesheet" href="<?php echo JRBO_PATH?>/css/rbo.css" />
 
 </head>
 <body>

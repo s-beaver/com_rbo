@@ -1,20 +1,19 @@
 <?php
-defined('_JEXEC') or die;
+defined ('_JEXEC') or die ();
 
-jimport('joomla.application.component.view');
+jimport ('joomla.application.component.view');
+define ('RBO_PATH', realpath (dirname (__FILE__) . '/../..'));
+include_once RBO_PATH . "/configuration.php";
+define ('JRBO_PATH', str_replace (RbOConfig::$pathRemoveForJsScrips, '', RBO_PATH));
 
-class RbOViewActs extends JViewLegacy
-{
-	public function display($tpl = null) 
-	{
-		if (count($errors = $this->get('Errors')))
-		{
-			foreach ($errors as $error)
-			{
-				JLog::add($error, JLog::ERROR, 'com_rbo');
-			}
-		}
-
-		parent::display($tpl);
-	}
+class RbOViewActs extends JViewLegacy {
+  public function display($tpl = null) {
+    if (count ($errors = $this->get ('Errors'))) {
+      foreach ( $errors as $error ) {
+        JLog::add ($error, JLog::ERROR, 'com_rbo');
+      }
+    }
+    
+    parent::display ($tpl);
+  }
 }
