@@ -594,22 +594,22 @@ rboShipment.prototype.createDoc = function() {
 //===================================================================================
 rboShipment.prototype.chooseBaseDoc = function() {
   var self = this;
-  var custId = $("#custId").val();
-  var custName = $("#doc_cust").val();
+  //var custId = $("#custId").val();
+  //var custName = $("#doc_cust").val();
   self.arSearchedCust = new Array();
   if (self.bCustInput == 'select') {
-    $('#cust_name option').remove();
-    //$('#cust_name').append('<option value="">' + custName + '</option>');
-    //$("#cust_name option:contains('" + custName + "')").prop("selected", "selected");
-    $('#cust_base_doc option').remove();
+    $('#base-doc-cust-name option').remove();
+    //$('#base-doc-cust-name').append('<option value="">' + custName + '</option>');
+    //$("#base-doc-cust-name option:contains('" + custName + "')").prop("selected", "selected");
+    $('#base-doc-doc option').remove();
   }
   self.setCustFlds('saved');
 
-  $("#cust-form").dialog({
+  $("#base-doc-form").dialog({
     title : "Выбор документа-основания",
     buttons : {
       "Сохранить" : function() {
-        var invId = $("#cust_base_doc option:selected").val();
+        var invId = $("#base-doc-doc option:selected").val();
         //$("#doc_baseId").val(invId);
         $.ajax({
           dataType : 'json',
@@ -634,18 +634,18 @@ rboShipment.prototype.chooseBaseDoc = function() {
           }
         });
 
-        $("#cust-form").dialog("close");
+        $("#base-doc-form").dialog("close");
       },
 
       "Отмена" : function() {
         self.setCustFlds('saved');
-        $("#cust-form").dialog("close");
+        $("#base-doc-form").dialog("close");
       }
     },
     resizable : true
   });
 
-  $("#cust-form").dialog("open");
+  $("#base-doc-form").dialog("open");
 
   return false;
 }
@@ -656,44 +656,45 @@ rboShipment.prototype.setBaseDocList = function() {
     dataType : 'json',
     type : "POST",
     data : {
-      "sSearch" : $("#cust_name option:selected").html()
+      "sSearch" : $("#base-doc-cust-name option:selected").html()
     },
     url : comPath + "ajax.php?task=get_doc_list&doc_type=счет",//счет - это правильно!
     success : function(s) {
-      $('#cust_base_doc option').remove();
+      $('#base-doc-doc option').remove();
+      $('#base-doc-doc').append('<option value="0">Без счета</option>');
       p = s.aaData;
       if (p.length > 0) {
         for (var i = 0; i < p.length; i++) {
-          $('#cust_base_doc').append('<option value="' + p[i].docId + '">Счет №' + p[i].doc_num + " от " + p[i].doc_date + " (" + p[i].doc_sum + '=)</option>');
+          $('#base-doc-doc').append('<option value="' + p[i].docId + '">Счет №' + p[i].doc_num + " от " + p[i].doc_date + " (" + p[i].doc_sum + '=)</option>');
         }
-        $("#cust_base_doc option:first").prop("selected", "selected");
+        $("#base-doc-doc option:first").prop("selected", "selected");
       }
     }
   });
 }
 
 // ===================================================================================
-rboShipment.prototype.custSearch = function() {
+rboShipment.prototype.baseDocSearch = function() {//custSearch
   var self = this;
   $.ajax({
     dataType : 'json',
     type : "POST",
     data : {
-      "search" : $("#cust_search").val()
+      "search" : $("#base-doc-search").val()
     },
     url : comPath + "ajax.php?task=cust_search",
     success : function(p) {
       self.arSearchedCust = p.result;
       self.convertInput2Select();
-      $('#cust_name option').remove();
+      $('#base-doc-cust-name option').remove();
       if (p.result.length > 0) {
         for (var i = 0; i < p.result.length; i++) {
-          $('#cust_name').append('<option value="' + i + '">' + p.result[i].cust_name + '</option>');
+          $('#base-doc-cust-name').append('<option value="' + i + '">' + p.result[i].cust_name + '</option>');
         }
         if (p.count > p.result.length) {
-          $('#cust_name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
+          $('#base-doc-cust-name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
         }
-        $("#cust_name option:first").prop("selected", "selected");
+        $("#base-doc-cust-name option:first").prop("selected", "selected");
         self.setCustFlds('selected');
         self.setBaseDocList();
       }

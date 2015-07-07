@@ -17,6 +17,11 @@ $(document).ready(function() {
     return false;
   });
 
+  $("#cedit").click(function(event) {
+    doc.showCustForm();
+    return false;
+  });
+
   $("#doc-form").dialog({
     autoOpen : false,
     height : 550,
@@ -34,6 +39,14 @@ $(document).ready(function() {
   });
 
   $("#cust-form").dialog({
+    autoOpen : false,
+    height : 550,
+    width : 700,
+    modal : true,
+    resizable : true
+  });
+
+  $("#base-doc-form").dialog({
     autoOpen : false,
     height : 300,
     width : 700,

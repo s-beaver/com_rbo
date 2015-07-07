@@ -14,7 +14,7 @@
 
 </head>
 <body>
-  <?php include RBO_PATH.'/views/header.doclist.php';?>
+  <?php include RBO_PATH.'/views/header.doclist.php'?>
 
   <div id="doc-form" title="Документ">
     <!--  p class="validateTips" style="visibility: hidden">Заполните обязательные поля</p-->
@@ -57,7 +57,7 @@
                 <button id="baseedit">..</button>
                 <label for="doc_cust">Покупатель</label>
                 <input disabled type="text" name="doc_cust" id="doc_cust" style='width: 200px' />
-                <label for="doc_firm">Фирма</label>
+                <button id="cedit">..</button><label for="doc_firm">Фирма</label>
                 <select id="doc_firm" name="doc_firm" style="width: 70px">
                   <option value="ип">ИП</option>
                   <option value="ооо">ООО</option>
@@ -74,55 +74,13 @@
     </form>
   </div>
 
-  <div id="newline-form" title="Позиция">
-    <form id="newline-form-form" method="post" action="">
-      <fieldset style='padding: 0'>
-        <table>
-          <tr>
-            <td><label for="prod_search">Поиск</label> <input type="text" name="prod_search" id="prod_search" style='width: 150px' /> <a href="javascript:doc.productSearch()">
-                <img src="<?php echo JRBO_PATH?>/images/icon-32-search-on.png" />
-            </a></td>
-          </tr>
-          <tr>
-            <td><label for="prod_name">Название</label> <select name="prod_name" id="prod_name" style="width: 500px" onChange="doc.setProductPrice()">
-              </select></td>
-          </tr>
-          <tr>
-            <td><label for="prod_price">Цена</label> <input type="text" name="prod_price" id="prod_price" class="ui-widget-content ui-corner-all"
-              style="text-align: center; width: 50px" onChange="doc.calcSum()" /> <label for="prod_cnt">р.&nbsp;Х&nbsp;</label> <input type="text" name="prod_cnt" id="prod_cnt"
-              style="text-align: center; width: 30px" onChange="doc.calcSum()" /> <label for="prod_sum">ед.&nbsp;=&nbsp;</label> <input disabled type="text" name="prod_sum"
-              id="prod_sum" style="text-align: center; width: 50px" /> р. <input style="visibility: hidden" id="prodId" /> <input style="visibility: hidden" id="prod_code" /></td>
-          </tr>
-        </table>
-      </fieldset>
-    </form>
-  </div>
+  <?php include RBO_PATH.'/views/form.newline.php'?>
 
-  <div id="cust-form" title="Выбор документа-основания">
-    <form id="cust-form-form" method="post" action="">
-      <fieldset style='padding: 0'>
-        <table>
-          <tr>
-            <td><label for="cust_search">Поиск</label></td>
-            <td><input type="text" name="cust_search" id="cust_search" style='width: 150px' /> <a href="javascript:doc.custSearch()"> <img
-                src="<?php echo JRBO_PATH?>/images/icon-32-search-on.png" /></a><input style="visibility: hidden" id="custId" /><input style="visibility: hidden"
-              id="doc_baseId" /></td>
-          </tr>
-          <tr>
-            <td><label for="cust_name">Название</label></td>
-            <td><select name="cust_name" id="cust_name" style="width: 500px" onChange="doc.setBaseDocList()"></select></td>
-          </tr>
-          <tr>
-            <td><label for="cust_base_doc">Основание</label></td>
-            <td><select name="cust_base_doc" id="cust_base_doc" style="width: 400px">
-              </select></td>
-          </tr>
-        </table>
-      </fieldset>
-    </form>
-  </div>
+  <?php include RBO_PATH.'/views/form.customer.php'?>
 
-  <div id="dialog-confirm" title="Удалить накладную?">Документ будет удален. Продолжить?</div>
+  <?php include RBO_PATH.'/views/form.base-doc.php'?>
+
+  <?php include RBO_PATH.'/views/form.del-doc.php'?>
 
   <table id="TableDoc" class="display compact"></table>
 

@@ -1,5 +1,6 @@
 <?php
-//jimport ('etc.json_lib');
+// jimport ('etc.json_lib');
+include_once 'configuration.php';
 class RbObject {
   public $is_multiple = false; // читать одну запись или несколько по идентификатору
   public $response = ""; // подготовленный ответ для отправки в ответ на ajax запрос
@@ -13,6 +14,11 @@ class RbObject {
   // =================================================================
   public function __construct($keyValue) {
     $this->keyValue = $keyValue;
+  }
+  
+  // =================================================================
+  public function setTableName($table_name) {
+    $this->table_name = RbOConfig::$prefixForDBTables . $table_name . RbOConfig::$suffixForDBTables;
   }
   
   // =================================================================

@@ -12,7 +12,7 @@ class RbODocument extends RbObject {
   public function __construct($keyValue, $readBaseDocument) {
     parent::__construct ($keyValue);
     
-    $this->table_name = "rbo_docs";
+    $this->setTableName("rbo_docs");
     $this->flds ["docId"] = array ("type" => "numeric","is_key" => true );
     $this->flds ["doc_num"] = array ("type" => "string" );
     $this->flds ["doc_date"] = array ("type" => "date" );

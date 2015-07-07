@@ -8,7 +8,7 @@ class RbOProducts extends RbObject {
     parent::__construct ($keyValue);
     
     $this->is_multiple = true;
-    $this->table_name = "rbo_docs_products";
+    $this->setTableName("rbo_docs_products");
     $this->flds ["docId"] = array ("type" => "numeric","is_key" => true );
     $this->flds ["productId"] = array ("type" => "numeric" );
     $this->flds ["product_code"] = array ("type" => "string" );

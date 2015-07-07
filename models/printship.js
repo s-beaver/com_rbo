@@ -22,7 +22,12 @@ function readDocument(invId) {
 function fillInvoicePrintForm(i) {
   $("#doc_num").html(i.doc_num);
   $("#doc_date").html(i.doc_date);
-  $("#doc_based_on").html("по счету №" + i.doc_base_doc.doc_num + " от " + i.doc_base_doc.doc_date);
+  
+  if ((i.doc_base > 0) && !IsNull(i.doc_base_doc)) {
+    $("#doc_based_on").html("по счету №" + i.doc_base_doc.doc_num + " от " + i.doc_base_doc.doc_date);
+  } else {
+    $("#doc_based_on").html("");
+  }
 
   if (!IsNull(i.doc_firm_details)) {
     var f = i.doc_firm_details;

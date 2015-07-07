@@ -7,7 +7,7 @@ class RbOpers extends RbObject {
     parent::__construct ($keyValue);
     
     $this->is_multiple = true;
-    $this->table_name = "ss_opers";
+    $this->setTableName("ss_opers");
     
     $this->flds ["sKey"] = array ("type" => "numeric","is_key" => true );
     $this->flds ["sOperType"] = array ("type" => "string" );

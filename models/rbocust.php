@@ -7,7 +7,7 @@ class RbOCust extends RbObject {
   public function __construct($keyValue) {
     parent::__construct ($keyValue);
     
-    $this->table_name = "rbo_cust";
+    $this->setTableName("rbo_cust");
     $this->flds ["custId"] = array ("type" => "numeric","is_key" => true );
     $this->flds ["cust_name"] = array ("type" => "string" );
     $this->flds ["cust_fullname"] = array ("type" => "string" );
