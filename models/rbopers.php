@@ -7,7 +7,7 @@ class RbOpers extends RbObject {
     parent::__construct ($keyValue);
     
     $this->is_multiple = true;
-    $this->setTableName("ss_opers");
+    $this->setTableName ("SS_opers");//case sensitive?
     
     $this->flds ["sKey"] = array ("type" => "numeric","is_key" => true );
     $this->flds ["sOperType"] = array ("type" => "string" );
@@ -48,22 +48,20 @@ class RbOpers extends RbObject {
     $doc_type = $input->getString ('doc_type');
     $sSearch = $input->getString ('sSearch');
     $sWhere = array ();
-    $sWhere [] = $db->quoteName ('doc_type') . "='" . $doc_type . "'";
+    /*$sWhere [] = $db->quoteName ('doc_type') . "='" . $doc_type . "'";
     if (isset ($sSearch) && $sSearch != "") $sWhere [] = $db->quoteName ('rc.cust_name') . " LIKE '%" .
-         $sSearch . "%'";
+         $sSearch . "%'";*/
     
     $query = $db->getQuery (true);
     
     $query->clear ();
-    $query->select (
-        array ("docId","doc_num","doc_date","rc.cust_name doc_cust","doc_sum","doc_status",
-            "doc_firm","doc_manager" ));
-    $query->from ($db->quoteName ('rbo_docs', 'rd'));
-    $query->where ($sWhere);
-    $query->order ($db->quoteName ('rd.docId') . " DESC");
-    $query->leftJoin (
+    $query->select ($this->getFieldsForSelectClause());
+    $query->from ($db->quoteName ($this->table_name,'so'));
+    //$query->where ($sWhere);
+    $query->order ($db->quoteName ('so.sDate') . " DESC");
+    /*$query->leftJoin (
         $db->quoteName ('rbo_cust', 'rc') . ' ON (' . $db->quoteName ('rd.custId') . ' = ' .
-             $db->quoteName ('rc.custId') . ')');
+             $db->quoteName ('rc.custId') . ')');*/
     
     if (isset ($_POST ['iDisplayStart']) && $_POST ['iDisplayLength'] != '-1') {
       $db->setQuery ($query, intval ($iDisplayStart), intval ($iDisplayLength));
@@ -85,7 +83,7 @@ class RbOpers extends RbObject {
     $res->aaData = $data_rows_assoc_list;
     $this->response = json_encode ($res);
   }
-  }
+}
 
 
 

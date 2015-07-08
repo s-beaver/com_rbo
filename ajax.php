@@ -15,12 +15,13 @@ require_once JPATH_BASE . '/includes/framework.php';
 include_once "models/rbohelper.php";
 include_once "models/rbodocument.php";
 include_once "models/rbocust.php";
+include_once "models/rbopers.php";
 JLog::addLogger (array ('text_file' => 'com_rbo.php' ), JLog::ALL, array ('com_rbo' ));
 
 $app = JFactory::getApplication ('site');
 $app->initialise ();
 
-RbOHelper::checkAccess();
+RbOHelper::checkAccess ();
 
 $input = $app->input;
 $cmd = $input->getCmd ('task');
@@ -29,12 +30,12 @@ switch ($cmd) {
   case "get_doc_list" :
     {
       $docList = new RbODocument ();
-      $docList->getDocList();
+      $docList->getDocList ();
       echo $docList->getResponse ();
       break;
     }
   
-    case "doc_read" :
+  case "doc_read" :
     {
       $doc = new RbODocument ();
       $doc->readObject ();
@@ -74,7 +75,7 @@ switch ($cmd) {
   
   case "cust_search" :
     {
-      $cust = new RbOCust();
+      $cust = new RbOCust ();
       $cust->getCustListBySubstr ();
       break;
     }
@@ -83,6 +84,14 @@ switch ($cmd) {
     {
       $doc = new RbODocument ();
       $doc->getNextDocNumber ();
+      break;
+    }
+  
+  case "get_oper_list" :
+    {
+      $operList = new RbOpers ();
+      $operList->getOperList ();
+      echo $operList->getResponse ();
       break;
     }
   
