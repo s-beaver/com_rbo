@@ -6,6 +6,7 @@
 <script src="<?php echo JRBO_PATH?>/library/lib.js"></script>
 <script src="<?php echo JRBO_PATH?>/models/rbohelper.js"></script>
 <script src="<?php echo JRBO_PATH?>/models/rbodocument.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/rbocust.js"></script>
 <script src="<?php echo JRBO_PATH?>/models/acts.js"></script>
 <link rel="stylesheet" href="<?php echo JRBO_PATH?>/css/rbo.css" />
 

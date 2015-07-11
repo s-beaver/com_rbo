@@ -1,10 +1,205 @@
 var comPath = "/components/com_rbo/";
-var doc;
+var oper;
+
+//===================================================================================
+function rbOper(o) {
+  initHeaderDocList(this.sDocTypeListTitle);
+
+  this.oCust = {
+    cust_data : {}
+  }; //объект, содержащий поля покупателя, пришедший из запроса к БД
+  this.arSearchedCust = new Array(); // массив объектов содержащих поля покупателя
+  this.bCustInput = 'select';
+
+}
+
+//===================================================================================
+rbOper.prototype.setRW = function(sStatus) {
+    return false;
+}
+
+//===================================================================================
+rbOper.prototype.readOper = function(sKey) {
+  var self = this;
+  $.ajax({
+    dataType : 'json',
+    type : "POST",
+    data : {
+      "SS_opers" : {
+        "sKey" : sKey
+      }
+    },
+    url : comPath + "ajax.php?task=oper_read",
+    success : function(oper_data) {
+      self.showOperForm(oper_data);
+    }
+  });
+}
+
+//===================================================================================
+rbOper.prototype.saveOper = function(sKey) {
+  var self = this;
+  var bValid = true;
+}
+
+//===================================================================================
+rbOper.prototype.createOper = function() {
+  var self = this;
+  /*$.ajax({
+    dataType : 'json',
+    type : "POST",
+    data : {
+      "SS_opers" : {
+        "doc_type" : self.sDocType
+      }
+    },
+    url : comPath + "ajax.php?task=get_doc_num",
+    success : function(p) {
+      var i = {};
+      i.doc_num = p.new_num;
+      i.doc_date = p.new_date;
+      self.showDocForm(i);
+    }
+  });*/
+}
+
+// ===================================================================================
+rbOper.prototype.deleteOper = function(sKey) {
+  var self = this;
+  $.ajax({
+    dataType : 'json',
+    type : "POST",
+    data : {
+      "SS_opers" : {
+        "sKey" : sKey
+      }
+    },
+    url : comPath + "ajax.php?task=oper_delete",
+    success : function(oper_data) {
+      self.oTable.fnDraw();
+    }
+  });
+
+  $("#doc-form").dialog("close");
+}
+
+// ===================================================================================
+rbOper.prototype.showOperForm = function(i) {
+  var self = this;
+  $("#sDate").val(i.sDate);
+  $("#sSum").val(i.sSum);
+  $("#sRem").html(i.sRem);
+  /*Как быть если автор или операция не попадают в список select
+   * Продумать общую наличную кассу и общий склад при разных банках
+   * Надо ли иметь отдельную сумму для оплаты или нет?*/
+
+  $('#sOperType option:selected').each(function() {
+    this.selected = false;
+  });
+  if (!IsEmpty(i.sOperType))
+    $("#sOperType option:contains('" + i.sOperType + "')").prop("selected", "selected");
+  
+  $('#sOperMan option:selected').each(function() {
+    this.selected = false;
+  });
+  if (!IsEmpty(i.sOperMan))
+    $("#sOperMan option:contains('" + i.sOperMan + "')").prop("selected", "selected");
+  
+  /*var sDocBase = "";
+  $("#doc_baseId").val(i.doc_base);
+  if ((i.doc_base > 0) && !IsNull(i.doc_base_doc)) {
+    sDocBase = "Счет №" + i.doc_base_doc.doc_num + " от " + i.doc_base_doc.doc_date;
+  }
+  $("#doc_base").val(sDocBase);*/
+
+  /*this.oCust = NullTo(i.doc_cust, {
+    cust_data : {}
+  });
+  this.oCust.cust_data = NullTo(this.oCust.cust_data, {});
+  this.setCustFlds('saved');
+  if (!IsNull(i.doc_firm))
+    $("#doc_firm option:contains('" + i.doc_firm.toUpperCase() + "')").prop("selected", "selected");
+  $("#doc_rem").val(i.doc_rem);*/
+
+  var readOnly = this.setRW(i.doc_status);
+
+  var oBtns = {};
+  if (!readOnly) {
+    oBtns["Удалить"] = function() {
+      Ask("Операция будет удалена. Продолжить?", "Удалить операцию", "Отмена", function() {
+        self.deleteOper(i.sKey);
+      }, null, "#dialog-confirm");
+    }
+  }
+
+  oBtns["Сохранить"] = function() {
+    self.saveOper(i.sKey);
+  };
+
+  oBtns["Отмена"] = function() {
+    $("#oper-form").dialog("close");
+  };
+
+  $("#oper-form").dialog({
+    title : i.sOperType + " #" + i.sKey,
+    buttons : oBtns
+  });
+
+  $("#oper-form").dialog("open");
+}
+
+//===================================================================================
+rbOper.prototype.productSearch = function() {
+  var self = this;
+  $.ajax({
+    dataType : 'json',
+    type : "POST",
+    data : {
+      "search" : $("#prod_search").val()
+    },
+    url : comPath + "ajax.php?task=product_search",
+    success : function(p) {
+      $('#prod_name option').remove();
+      for (var i = 0; i < p.result.length; i++) {
+        $('#prod_name').append(
+            '<option value="' + p.result[i].productID + "|" + p.result[i].price + "|" + p.result[i].product_code + "|" + p.result[i].list_price + '">' + p.result[i].name
+                + '</option>');
+      }
+      $("#prod_name option:first").prop("selected", "selected");
+      self.setProductPrice();
+      if (p.count > p.result.length) {
+        $('#prod_name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
+      }
+
+    }
+  });
+}
+
+// ===================================================================================
+rbOper.prototype.setProductPrice = function() {
+  var oVal = $("#prod_name option:selected").val();
+  $("#newline-form").dialog("option", "title", "Позиция - " + oVal);
+  var arProd = oVal.split("|");
+  $("#prodId").val(arProd[0]);
+  $("#prod_price").val(arProd[1]);
+  $("#prod_code").val(arProd[2]);
+  $("#prod_cnt").val(1);
+  $("#prod_price1").html(arProd[3] + "р.");
+  this.calcSum();
+}
+
+//===================================================================================
+rbOper.prototype.calcSum = function() {
+  $("#sSum").val($("#prod_price").val() * $("#prod_cnt").val());
+}
 
 // ===================================================================================
 $(document).ready(function() {
-
-  var oTable = $('#TableOper').dataTable({
+  
+  oper = new rbOper({
+  });
+  
+  oper.oTable = $('#TableOper').dataTable({
     "bJQueryUI" : true,
     "bProcessing" : true,
     "bServerSide" : true,
@@ -23,7 +218,9 @@ $(document).ready(function() {
     "aoColumns" : [ {
       "sTitle" : "Ключ",
       "sClass" : "center",
-      "mData" : "sKey"
+      "mData" : function(source, type, val) {
+        return "<a href='javascript:oper.readOper(" + source.sKey + ")'>#" + source.sKey + "</a>";
+      }
     }, {
       "sTitle" : "Дата",
       "mData" : "sDate"
@@ -65,14 +262,14 @@ $(document).ready(function() {
   });
 
   $("#cedit").click(function(event) {
-    doc.showCustForm();
+    oper.showCustForm();
     return false;
   });
 
   $("#oper-form").dialog({
     autoOpen : false,
-    height : 550,
-    width : 900,
+    height : 450,
+    width : 800,
     modal : true,
     resizable : true
   });
@@ -89,7 +286,7 @@ $(document).ready(function() {
     autoOpen : false
   });
 
-  $("#doc_date").datepicker({
+  $("#sDate").datepicker({
     showButtonPanel : true,
     dateFormat : "dd.mm.yy"
   });

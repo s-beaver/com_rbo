@@ -12,7 +12,7 @@
               </select></td>
           </tr>
           <tr>
-            <td><label for="prod_price">Цена</label> <input type="text" name="prod_price" id="prod_price" class="ui-widget-content ui-corner-all"
+            <td><label for="prod_price">Цена</label> <input type="text" name="prod_price" id="prod_price"
               style="text-align: center; width: 50px" onChange="doc.calcSum()" /> <label for="prod_cnt">р.&nbsp;Х&nbsp;</label> <input type="text" name="prod_cnt"
               id="prod_cnt" style="text-align: center; width: 30px" onChange="doc.calcSum()" /> <label for="prod_sum">ед.&nbsp;=&nbsp;</label> <input disabled type="text"
               name="prod_sum" id="prod_sum" style="text-align: center; width: 50px" /> р. <input style="visibility: hidden" id="prodId" /> <input style="visibility: hidden"

@@ -95,6 +95,14 @@ switch ($cmd) {
       break;
     }
   
+  case "oper_read" :
+    {
+      $oper = new RbOpers ();
+      $oper->readObject ();
+      echo $oper->getResponse ();
+      break;
+    }
+  
   default :
     {
       echo "";

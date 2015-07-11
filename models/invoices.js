@@ -12,8 +12,13 @@ $(document).ready(function() {
     printList : [{title:"Печатать", viewname:"printinv"}]
   });
 
+  $("#cust_name").click(function(event) {
+    doc.oCust.setCustFlds('selected');
+    return false;
+  });
+  
   $("#cedit").click(function(event) {
-    doc.showCustForm();
+    doc.oCust.showCustForm();
     return false;
   });
 
@@ -36,7 +41,7 @@ $(document).ready(function() {
   $("#cust-form").dialog({
     autoOpen : false,
     height : 550,
-    width : 700,
+    width : 750,
     modal : true,
     resizable : true
   });

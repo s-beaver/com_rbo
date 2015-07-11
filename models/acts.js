@@ -13,12 +13,24 @@ $(document).ready(function() {
   });
 
   $("#baseedit").click(function(event) {
-    doc.chooseBaseDoc();
+    doc.oCust.chooseBaseDoc();
     return false;
   });
 
+  $("#base-doc-cust-name").click(function(event) {
+    doc.oCust.setBaseDocList();
+    return false;
+  });
+  
+  $("#base-doc-search-btn").attr("href","javascript:doc.oCust.baseDocSearch()");
+
+  $("#cust_name").click(function(event) {
+    doc.oCust.setCustFlds('selected');
+    return false;
+  });
+  
   $("#cedit").click(function(event) {
-    doc.showCustForm();
+    doc.oCust.showCustForm();
     return false;
   });
 
