@@ -146,7 +146,7 @@ sup {
     <tr>
       <td colspan="2" rowspan="3" style="width: 60%; text-align: right;">
 
-        <table class="doc_header" align="center" style="vertical-align: bottom; border: 0">
+        <table class="doc_header" style="vertical-align: bottom; margin-left: auto; margin-right: auto; width: 50%; border: 0">
           <tr>
             <td rowspan="2" style="vertical-align: bottom; border: 0; font-size: 10pt">ТОВАРНАЯ НАКЛАДНАЯ</td>
             <td style="border: 1px solid">Номер документа</td>

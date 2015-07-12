@@ -5,7 +5,7 @@
           <tr>
             <td><label for="cust_search">Поиск</label></td>
             <td><input type="text" name="cust_search" id="cust_search" style='width: 350px' /> 
-              <a href="javascript:doc.custSearch()"> 
+              <a href="" id="cust_search_btn"> 
                 <img src="<?php echo JRBO_PATH?>/images/icon-32-search-on.png" />
               </a>
               <input style="visibility: hidden" id="custId" />

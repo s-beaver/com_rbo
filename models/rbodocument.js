@@ -28,7 +28,7 @@ rboDoc.prototype.attachDocModule = function() {
     modal : true,
     resizable : true
   });
-  
+
   this.oTable = $('#TableDoc').dataTable({
     "bJQueryUI" : true,
     "bProcessing" : true,
@@ -145,6 +145,19 @@ rboDoc.prototype.attachDocModule = function() {
   this.apiTableProducts = this.oTableProducts.api();
 
   $("#header_doclist_choose_list a h2").html(this.sDocTypeListTitle);
+
+  //обработчик нажатия кнопки добавления документа
+  $("#doc_add_btn").click(function(event) {
+    self.createDoc();
+    return false;
+  });
+
+  //обработчик нажатия кнопки добавления товара в документ
+  $("#prod_add_btn").click(function(event) {
+    self.showProductForm();
+    return false;
+  });
+
 }
 
 // ===================================================================================

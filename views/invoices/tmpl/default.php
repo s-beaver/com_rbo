@@ -52,7 +52,7 @@
             </td>
           </tr>
           <tr>
-            <td><a href="javascript:doc.showProductForm()"> <img src="<?php echo JRBO_PATH?>/images/icon-32-new-on.png" /></a>
+            <td><a href="" id="prod_add_btn"> <img src="<?php echo JRBO_PATH?>/images/icon-32-new-on.png" /></a>
               <div style="float: right">
                 <label for="doc_cust">Покупатель</label>
                 <input disabled type="text" name="doc_cust" id="doc_cust" style='width: 450px' />

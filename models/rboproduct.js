@@ -50,7 +50,7 @@ rboProduct.prototype.showProductForm = function(o) {
   $("#prodId").val(o.pData.productId);
   $("#prod_code").val(o.pData.product_code);
   $('#prod_name option').remove();
-  if (!IsNull(o.pData)) {//if (x >= 0) {
+  if (!IsNull(o.pData) && IsArray(o.pData) && (o.pData.length>0)) {//if (x >= 0) {
     $('#prod_name').append('<option value="">' + o.pData.product_name + '</option>');
   }
   $("#prod_name option:first").prop("selected", "selected");

@@ -5,6 +5,7 @@
 <?php include RBO_PATH.'/views/header.head.links.php'?>
 <script src="<?php echo JRBO_PATH?>/library/lib.js"></script>
 <script src="<?php echo JRBO_PATH?>/models/rbodocument.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/rboproduct.js"></script>
 <script src="<?php echo JRBO_PATH?>/models/rbocust.js"></script>
 <script src="<?php echo JRBO_PATH?>/models/acts.js"></script>
 <link rel="stylesheet" href="<?php echo JRBO_PATH?>/css/rbo.css" />
@@ -50,7 +51,7 @@
             </td>
           </tr>
           <tr>
-            <td><a href="javascript:doc.showProductForm()"> <img src="<?php echo JRBO_PATH?>/images/icon-32-new-on.png" /></a>
+            <td><a href="" id="prod_add_btn"> <img src="<?php echo JRBO_PATH?>/images/icon-32-new-on.png" /></a>
               <div style="float: right">
                 <label for="doc_base">Основание</label>
                 <input disabled type="text" name="doc_base" id="doc_base" style='width: 150px' />

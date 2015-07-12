@@ -25,18 +25,51 @@ rboCust.prototype.attachCustomerModule = function() {
     resizable : true
   });
 
-  //навешиваем обработчик нажатия кнопки выбора контрагента
+  //подключаем форму выбора документа-основания
+  $("#base-doc-form").dialog({
+    autoOpen : false,
+    height : 300,
+    width : 700,
+    modal : true,
+    resizable : true
+  });
+
+  //нажатие кнопки выбора контрагента
   $("#cedit").click(function(event) {
     self.showCustForm();
     return false;
   });
 
-  //навешиваем обработчик при смене текущего контрагента в списке найденных в поиске
+  //нажатие кнопки поиска контрагентов по подстроке
+  $("#cust_search_btn").click(function(event) {
+    self.custSearch();
+    return false;
+  });    
+
+  //смена текущего контрагента в списке найденных в поиске
   $("#cust_name").change(function(event) {
     self.setCustFlds('selected');
     return false;
   });
+  
+  //вызов формы выбора документа-основания
+  $("#baseedit").click(function(event) {
+    self.chooseBaseDoc(doc);
+    return false;
+  });  
 
+  //нажатие кнопки поиска документов оснований по подстроке контрагента
+  $("#base-doc-search-btn").click(function(event) {
+    self.baseDocSearch();
+    return false;
+  });  
+  
+  //смена текущего контрагента в списке найденных в поиске
+  $("#base-doc-cust-name").change(function(event) {
+    self.setBaseDocList();
+    return false;
+  });
+  
 }
 
 //===================================================================================
