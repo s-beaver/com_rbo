@@ -4,14 +4,38 @@
  */
 
 //===================================================================================
-function rboCust(o,parent) {
+function rboCust(o) {
   this.flds = NullTo(o, {
     cust_data : {}
   });//объект, содержащий поля покупателя, пришедший из запроса к БД
   this.flds.cust_data = NullTo(this.flds.cust_data, {});
   this.arSearchedCust = new Array(); // массив объектов содержащих поля покупателя
   this.bCustInput = 'select';
-  this.parent = parent;
+}
+
+//===================================================================================
+rboCust.prototype.attachCustomerModule = function() {
+  var self = this;
+  //подключаем форму выбора контрагента
+  $("#cust-form").dialog({
+    autoOpen : false,
+    height : 550,
+    width : 750,
+    modal : true,
+    resizable : true
+  });
+
+  //навешиваем обработчик нажатия кнопки выбора контрагента
+  $("#cedit").click(function(event) {
+    self.showCustForm();
+    return false;
+  });
+
+  //навешиваем обработчик при смене текущего контрагента в списке найденных в поиске
+  $("#cust_name").change(function(event) {
+    self.setCustFlds('selected');
+    return false;
+  });
 
 }
 
@@ -82,7 +106,7 @@ rboCust.prototype.custSearch = function() {
  * считает это порядовым номером в массиве arSearchedCust. Если параметр равен
  * 'clear', то очищает поля
  */
-rboCust.prototype.setCustFlds = function(cmd) {
+rboCust.prototype.setCustFlds = function(cmd, o) {
   var self = this;
   cmd = NullTo(cmd, 'saved');
   var f = {};
@@ -98,6 +122,14 @@ rboCust.prototype.setCustFlds = function(cmd) {
       $('#cust_name').val();
   }
   if (cmd == 'saved') {
+    if (!IsNull(o) && IsObject(o)) {
+      this.flds = NullTo(o, {
+        cust_data : {}
+      });
+      this.flds.cust_data = NullTo(this.flds.cust_data, {});
+      this.arSearchedCust = new Array(); //????
+    }
+
     f = self.flds;
     fd = NullTo(f.cust_data, {});
   }
@@ -193,7 +225,7 @@ rboCust.prototype.showCustForm = function() {
 }
 
 //===================================================================================
-rboCust.prototype.chooseBaseDoc = function() {
+rboCust.prototype.chooseBaseDoc = function(parent) {
   var self = this;
   self.arSearchedCust = new Array();
   if (self.bCustInput == 'select') {
@@ -222,11 +254,11 @@ rboCust.prototype.chooseBaseDoc = function() {
             doc_data.doc_base_doc.doc_num = doc_data.doc_num;
             doc_data.doc_base_doc.doc_date = doc_data.doc_date;
 
-            doc_data.docId = self.parent.oDoc.doctId;
-            doc_data.doc_num = self.parent.oDoc.doc_num;
-            doc_data.doc_date = self.parent.oDoc.doc_date;
-            doc_data.doc_status = self.parent.oDoc.doc_status;
-            self.parent.showDocForm(doc_data);
+            doc_data.docId = parent.oDoc.doctId;
+            doc_data.doc_num = parent.oDoc.doc_num;
+            doc_data.doc_date = parent.oDoc.doc_date;
+            doc_data.doc_status = parent.oDoc.doc_status;
+            parent.showDocForm(doc_data);
           }
         });
 
@@ -243,7 +275,7 @@ rboCust.prototype.chooseBaseDoc = function() {
 
   $("#base-doc-form").dialog("open");
   return false;
-  
+
 }
 
 // ===================================================================================

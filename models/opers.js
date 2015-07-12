@@ -178,7 +178,7 @@ rbOper.prototype.productSearch = function() {
 // ===================================================================================
 rbOper.prototype.setProductPrice = function() {
   var oVal = $("#prod_name option:selected").val();
-  $("#newline-form").dialog("option", "title", "Позиция - " + oVal);
+  $("#product-form").dialog("option", "title", "Позиция - " + oVal);
   var arProd = oVal.split("|");
   $("#prodId").val(arProd[0]);
   $("#prod_price").val(arProd[1]);

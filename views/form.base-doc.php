@@ -14,7 +14,7 @@
           </tr>
           <tr>
             <td><label for="base-doc-cust-name">Название</label></td><!--cust_name-->
-            <td><select name="base-doc-cust-name" id="base-doc-cust-name" style="width: 500px" onChange="doc.setBaseDocList()"></select></td>
+            <td><select name="base-doc-cust-name" id="base-doc-cust-name" style="width: 500px"></select></td>
           </tr>
           <tr>
             <td><label for="base-doc-doc">Основание</label></td><!--cust_base_doc-->

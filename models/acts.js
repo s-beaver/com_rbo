@@ -13,7 +13,7 @@ $(document).ready(function() {
   });
 
   $("#baseedit").click(function(event) {
-    doc.oCust.chooseBaseDoc();
+    doc.oCust.chooseBaseDoc(doc);
     return false;
   });
 
@@ -42,7 +42,7 @@ $(document).ready(function() {
     resizable : true
   });
 
-  $("#newline-form").dialog({
+  $("#product-form").dialog({
     autoOpen : false,
     height : 300,
     width : 650,

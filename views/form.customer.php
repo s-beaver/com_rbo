@@ -13,7 +13,7 @@
           </tr>
           <tr>
             <td><label for="cust_name">Название</label></td>
-            <td><select name="cust_name" id="cust_name" style="width: 500px" onChange="doc.setCustFlds('selected')"></select></td>
+            <td><select name="cust_name" id="cust_name" style="width: 500px"></select></td>
           </tr>
         </table>
         <table>

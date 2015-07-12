@@ -4,8 +4,8 @@
 <head>
 <?php include RBO_PATH.'/views/header.head.links.php'?>
 <script src="<?php echo JRBO_PATH?>/library/lib.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/rbohelper.js"></script>
 <script src="<?php echo JRBO_PATH?>/models/rbodocument.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/rboproduct.js"></script>
 <script src="<?php echo JRBO_PATH?>/models/rbocust.js"></script>
 <script src="<?php echo JRBO_PATH?>/models/invoices.js"></script>
 <link rel="stylesheet" href="<?php echo JRBO_PATH?>/css/rbo.css" />
@@ -74,7 +74,7 @@
     </form>
   </div>
 
-  <?php include RBO_PATH.'/views/form.newline.php'?>
+  <?php include RBO_PATH.'/views/form.product.php'?>
 
   <?php include RBO_PATH.'/views/form.customer.php'?>
 

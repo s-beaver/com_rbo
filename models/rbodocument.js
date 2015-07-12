@@ -8,16 +8,143 @@ function rboDoc(o) {
   this.allFields = o.allFields;
   this.printList = o.printList;
 
-  this.oTable = initTableDocList(comPath, this.sDocType);
-  this.oTableProducts = initTableProducts(comPath, this.sDocType);
-  this.apiTableProducts = this.oTableProducts.api();
-  initHeaderDocList(this.sDocTypeListTitle);
+  this.oProduct = new rboProduct();
+  this.oCust = new rboCust();
 
-  this.oCust = new rboCust(null,this); //объект, содержащий поля покупателя
   this.tips = {};
   this.editing_lineNo = 0;
   this.lines_before_update = 0;
 
+}
+
+//===================================================================================
+rboDoc.prototype.attachDocModule = function() {
+  var self = this;
+  //подключаем форму для редакции документов
+  $("#doc-form").dialog({
+    autoOpen : false,
+    height : 550,
+    width : 900,
+    modal : true,
+    resizable : true
+  });
+  
+  this.oTable = $('#TableDoc').dataTable({
+    "bJQueryUI" : true,
+    "bProcessing" : true,
+    "bServerSide" : true,
+    // "dom": 'HFT<"toolbar"><t>lfrtip',
+    "tableTools" : {
+      "sSwfPath" : "/swf/copy_csv_xls_pdf.swf"
+    },
+    "aaSorting" : [ [ 1, "desc" ] ],
+    "sAjaxSource" : comPath + "ajax.php?task=get_doc_list&doc_type=" + self.sDocType,
+    "fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
+      oSettings.jqXHR = $.ajax({
+        "dataType" : 'json',
+        "type" : "POST",
+        "data" : aoData,
+        "url" : sSource,
+        "success" : function(json) {
+          fnCallback(json);
+        }
+      });
+    },
+    "aoColumns" : [ {
+      "sTitle" : "Номер",
+      "sClass" : "center",
+      "mData" : function(source, type, val) {
+        return "<a href='javascript:doc.readDoc(" + source.docId + ")'>" + source.doc_num + " /" + source.doc_date + "</a>";
+      }
+    }, {
+      "sTitle" : "Покупатель",
+      "mData" : "doc_cust"
+    }, {
+      "sTitle" : "Сумма",
+      "sClass" : "center",
+      "mData" : "doc_sum"
+    }, {
+      "sTitle" : "Фирма",
+      "sClass" : "center",
+      "mData" : "doc_firm"
+    }, {
+      "sTitle" : "Статус",
+      "sClass" : "center",
+      "mData" : "doc_status"
+    }, {
+      "sTitle" : "Менеджер",
+      "mData" : "doc_manager"
+    } ],
+    "oLanguage" : {
+      "sProcessing" : "Подождите...",
+      "sLengthMenu" : "Показать _MENU_ строк",
+      "sZeroRecords" : "Записи отсутствуют.",
+      "sInfo" : "Документы с _START_ по _END_ (всего: _TOTAL_)",
+      "sInfoEmpty" : "Документов нет",
+      "sInfoFiltered" : "(отфильтровано из _MAX_ записей)",
+      "sInfoPostFix" : "",
+      "sSearch" : "Поиск:",
+      "sUrl" : "",
+      "oPaginate" : {
+        "sFirst" : "В начало",
+        "sPrevious" : "Предыдущие",
+        "sNext" : "Следующие",
+        "sLast" : "В конец"
+      }
+    }
+  });
+
+  this.oTableProducts = $('#TableProducts').dataTable({
+    "bPaginate" : false,
+    "searching" : false,
+    "ordering" : false,
+    "aoColumns" : [ {
+      "sTitle" : "Код",
+      "mData" : "product_code"
+    }, {
+      "sTitle" : "Наименование",
+      "mData" : "product_name"
+    }, {
+      "sTitle" : "Цена",
+      "sClass" : "center",
+      "mData" : "product_price"
+    }, {
+      "sTitle" : "К-во",
+      "sClass" : "center",
+      "mData" : "product_cnt"
+    }, {
+      "sTitle" : "Сумма",
+      "sClass" : "center",
+      "mData" : "product_sum"
+    }, {
+      "sTitle" : "Ред.",
+      "sClass" : "center",
+      "mData" : function(source, type, val) {
+        return "<a id='edit_product' href='javascript:doc.showProductForm(" + source.lineNo + ")'>" + "<img src='" + comPath + "images/icon-32-edit-on.png'/></a>";
+      }
+    } ],
+    "oLanguage" : {
+      "sProcessing" : "Подождите...",
+      "sLengthMenu" : "Показать _MENU_ строк",
+      "sZeroRecords" : "Записи отсутствуют.",
+      "sInfo" : "Строки с _START_ по _END_ (всего: _TOTAL_)",
+      "sInfoEmpty" : "Строк нет",
+      "sInfoFiltered" : "(отфильтровано из _MAX_ записей)",
+      "sInfoPostFix" : "",
+      "sSearch" : "Поиск:",
+      "sUrl" : "",
+      "oPaginate" : {
+        "sFirst" : "В начало",
+        "sPrevious" : "Предыдущие",
+        "sNext" : "Следующие",
+        "sLast" : "В конец"
+      }
+    }
+  });
+
+  this.apiTableProducts = this.oTableProducts.api();
+
+  $("#header_doclist_choose_list a h2").html(this.sDocTypeListTitle);
 }
 
 // ===================================================================================
@@ -167,9 +294,8 @@ rboDoc.prototype.showDocForm = function(i) {
   if (!IsEmpty(i.doc_manager))
     $("#doc_manager option:contains('" + i.doc_manager + "')").prop("selected", "selected");
 
-  self.oCust = new rboCust(i.doc_cust,this);
-  self.oCust.setCustFlds('saved');
-  
+  self.oCust.setCustFlds('saved', i.doc_cust);
+
   if (!IsNull(i.doc_firm))
     $("#doc_firm option:contains('" + i.doc_firm.toUpperCase() + "')").prop("selected", "selected");
   $("#doc_rem").val(i.doc_rem);
@@ -194,7 +320,7 @@ rboDoc.prototype.showDocForm = function(i) {
   if (!IsNull(self.printList) && self.printList.length > 0) {
     for (var x = 0; x < self.printList.length; x++) {
       oBtns[self.printList[x].title] = function(event) {
-        self.showPrintView($(event.target).text(),i.docId);
+        self.showPrintView($(event.target).text(), i.docId);
       };
     }
   }
@@ -216,7 +342,7 @@ rboDoc.prototype.showDocForm = function(i) {
 }
 
 //===================================================================================
-rboDoc.prototype.showPrintView = function(title,docId) {
+rboDoc.prototype.showPrintView = function(title, docId) {
   var self = this;
   var viewname = "";
   if (!IsNull(self.printList) && self.printList.length > 0) {
@@ -247,111 +373,31 @@ rboDoc.prototype.showProductForm = function(x) {// x-номер редактир
   else
     self.lines_before_update = p.length;
 
-  $("#prodId").val(p.productId);
-  $("#prod_code").val(p.product_code);
-  $('#prod_name option').remove();
-  if (x >= 0) {
-    $('#prod_name').append('<option value="">' + p.product_name + '</option>');
-  }
-  $("#prod_name option:first").prop("selected", "selected");
-  $("#prod_price").val(p.product_price);
-  $("#prod_cnt").val(p.product_cnt);
-  $("#prod_sum").val(p.product_sum);
-
-  $("#newline-form").dialog({
-    title : "Позиция - " + p.product_code,
-    buttons : {
-      "Удалить" : function() {
-        Ask("Удалить строку из документа?", "Удалить", "Отмена", function() {
-          if (self.editing_lineNo >= 0) {
-            self.oTableProducts.fnDeleteRow(self.editing_lineNo);
-          }
-          $("#newline-form").dialog("close");
-        }, null, "#dialog-confirm");
-      },
-
-      "Сохранить" : function() {
-        var p = {};
-        p.productId = $("#prodId").val();
-        p.product_code = $("#prod_code").val();
-        p.product_name = $('#prod_name option:selected').text();
-        p.product_price = $("#prod_price").val();
-        p.product_cnt = $("#prod_cnt").val();
-        p.product_sum = $("#prod_sum").val();
-        if (self.editing_lineNo >= 0) {
-          p.lineNo = self.editing_lineNo;
-          self.oTableProducts.fnUpdate(p, x);
-        } else {
-          p.lineNo = self.lines_before_update;
-          self.oTableProducts.fnAddData(p);
-        }
-
-        var pAll = self.oTableProducts.fnGetData();
-        var iSum = 0;
-        for (var x = 0; x < pAll.length; x++) {
-          iSum += Number(pAll[x].product_sum);
-        }
-        $('#doc_sum').val(iSum);
-
-        $("#newline-form").dialog("close");
-      },
-
-      "Отмена" : function() {
-        $("#newline-form").dialog("close");
+  self.oProduct.showProductForm({
+    pData : p,
+    fnDelete : function() {
+      if (self.editing_lineNo >= 0) {
+        self.oTableProducts.fnDeleteRow(self.editing_lineNo);
       }
     },
-    resizable : true
-  });
 
-  $("#newline-form").dialog("open");
-
-}
-
-// ===================================================================================
-rboDoc.prototype.productSearch = function() {
-  var self = this;
-  $.ajax({
-    dataType : 'json',
-    type : "POST",
-    data : {
-      "search" : $("#prod_search").val()
-    },
-    url : comPath + "ajax.php?task=product_search",
-    success : function(p) {
-      $('#prod_name option').remove();
-      for (var i = 0; i < p.result.length; i++) {
-        $('#prod_name').append(
-            '<option value="' + p.result[i].productID + "|" + p.result[i].price + "|" + p.result[i].product_code + "|" + p.result[i].list_price + '">' + p.result[i].name
-                + '</option>');
+    fnSave : function() {
+      if (self.editing_lineNo >= 0) {
+        p.lineNo = self.editing_lineNo;
+        self.oTableProducts.fnUpdate(p, x);
+      } else {
+        p.lineNo = self.lines_before_update;
+        self.oTableProducts.fnAddData(p);
       }
-      $("#prod_name option:first").prop("selected", "selected");
-      self.setProductPrice();
-      if (p.count > p.result.length) {
-        $('#prod_name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
+      var pAll = self.oTableProducts.fnGetData();
+      var iSum = 0;
+      for (var x = 0; x < pAll.length; x++) {
+        iSum += Number(pAll[x].product_sum);
       }
-
+      $('#doc_sum').val(iSum);
     }
   });
-}
 
-// ===================================================================================
-rboDoc.prototype.setProductPrice = function() {
-  var oVal = $("#prod_name option:selected").val();
-  $("#newline-form").dialog("option", "title", "Позиция - " + oVal);
-  var arProd = oVal.split("|");
-  $("#prodId").val(arProd[0]);
-  $("#prod_price").val(arProd[1]);
-  $("#prod_code").val(arProd[2]);
-  $("#prod_cnt").val(1);
-  $("#prod_price1").html("Цена Опт.1= " + arProd[3] + "р.");
-  this.calcSum();
-}
-
-// ===================================================================================
-
-//===================================================================================
-rboDoc.prototype.calcSum = function() {
-  $("#prod_sum").val($("#prod_price").val() * $("#prod_cnt").val());
 }
 
 //===================================================================================
@@ -416,5 +462,3 @@ rboShipment.prototype.createDoc = function() {
     }
   });
 }
-
-

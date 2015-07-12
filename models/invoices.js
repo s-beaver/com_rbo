@@ -9,43 +9,16 @@ $(document).ready(function() {
     sDocTypeTitle : 'Счет',
     allFields : $("#doc_num").add($("#doc_date")).add($("#doc_manager")).add($("#doc_firm")).add($("#cedit")),
     tips : $(".validateTips"),
-    printList : [{title:"Печатать", viewname:"printinv"}]
+    printList : [ {
+      title : "Печатать",
+      viewname : "printinv"
+    } ]
   });
+  doc.attachDocModule();
+  doc.oProduct.attachProductModule();
+  doc.oCust.attachCustomerModule();
 
-  $("#cust_name").click(function(event) {
-    doc.oCust.setCustFlds('selected');
-    return false;
-  });
-  
-  $("#cedit").click(function(event) {
-    doc.oCust.showCustForm();
-    return false;
-  });
-
-  $("#doc-form").dialog({
-    autoOpen : false,
-    height : 550,
-    width : 900,
-    modal : true,
-    resizable : true
-  });
-
-  $("#newline-form").dialog({
-    autoOpen : false,
-    height : 300,
-    width : 650,
-    modal : true,
-    resizable : true
-  });
-
-  $("#cust-form").dialog({
-    autoOpen : false,
-    height : 550,
-    width : 750,
-    modal : true,
-    resizable : true
-  });
-
+  //подключаем диалог вопроса - подтверждения
   $("#dialog-confirm").dialog({
     autoOpen : false
   });

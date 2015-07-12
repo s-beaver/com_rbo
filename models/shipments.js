@@ -42,7 +42,7 @@ $(document).ready(function() {
     resizable : true
   });
 
-  $("#newline-form").dialog({
+  $("#product-form").dialog({
     autoOpen : false,
     height : 300,
     width : 650,
