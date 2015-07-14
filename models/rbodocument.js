@@ -394,13 +394,13 @@ rboDoc.prototype.showProductForm = function(x) {// x-номер редактир
       }
     },
 
-    fnSave : function() {
+    fnSave : function(pObj) {
       if (self.editing_lineNo >= 0) {
-        p.lineNo = self.editing_lineNo;
+        pObj.lineNo = self.editing_lineNo;
         self.oTableProducts.fnUpdate(p, x);
       } else {
-        p.lineNo = self.lines_before_update;
-        self.oTableProducts.fnAddData(p);
+        pObj.lineNo = self.lines_before_update;
+        self.oTableProducts.fnAddData(pObj);
       }
       var pAll = self.oTableProducts.fnGetData();
       var iSum = 0;

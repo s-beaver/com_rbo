@@ -70,13 +70,13 @@ rboProduct.prototype.showProductForm = function(o) {
 
       "Сохранить" : function() {
         var p = {};
-        o.pData.productId = $("#prodId").val();
-        o.pData.product_code = $("#prod_code").val();
-        o.pData.product_name = $('#prod_name option:selected').text();
-        o.pData.product_price = $("#prod_price").val();
-        o.pData.product_cnt = $("#prod_cnt").val();
-        o.pData.product_sum = $("#prod_sum").val();
-        o.fnSave();
+        p.productId = $("#prodId").val();
+        p.product_code = $("#prod_code").val();
+        p.product_name = $('#prod_name option:selected').text();
+        p.product_price = $("#prod_price").val();
+        p.product_cnt = $("#prod_cnt").val();
+        p.product_sum = $("#prod_sum").val();
+        o.fnSave(p);
         $("#product-form").dialog("close");
       },
 
