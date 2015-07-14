@@ -59,7 +59,7 @@ rboProduct.prototype.showProductForm = function(o) {
   $("#prod_sum").val(o.pData.product_sum);
 
   $("#product-form").dialog({
-    title : "Позиция - " + o.pData.product_code,
+    title : "Позиция - " + NullTo(o.pData.product_code,""),
     buttons : {
       "Удалить" : function() {
         Ask("Удалить строку из документа?", "Удалить", "Отмена", function() {

@@ -3,14 +3,109 @@ var oper;
 
 //===================================================================================
 function rbOper(o) {
-  initHeaderDocList(this.sDocTypeListTitle);
 
-  this.oCust = {
-    cust_data : {}
-  }; //объект, содержащий поля покупателя, пришедший из запроса к БД
+  this.oProduct = new rboProduct();
+  this.oCust = new rboCust();
+
   this.arSearchedCust = new Array(); // массив объектов содержащих поля покупателя
   this.bCustInput = 'select';
 
+}
+
+//===================================================================================
+rbOper.prototype.attachOperModule = function() {
+  var self = this;
+  
+  self.oTable = $('#TableOper').dataTable({
+    "bJQueryUI" : true,
+    "bProcessing" : true,
+    "bServerSide" : true,
+    "sAjaxSource" : comPath + "ajax.php?task=get_oper_list",
+    "fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
+      oSettings.jqXHR = $.ajax({
+        "dataType" : 'json',
+        "type" : "POST",
+        "data" : aoData,
+        "url" : sSource,
+        "success" : function(json) {
+          fnCallback(json);
+        }
+      });
+    },
+    "aoColumns" : [ {
+      "sTitle" : "Ключ",
+      "sClass" : "center",
+      "mData" : function(source, type, val) {
+        return "<a href='javascript:oper.readOper(" + source.sKey + ")'>#" + source.sKey + "</a>";
+      }
+    }, {
+      "sTitle" : "Дата",
+      "mData" : "sDate"
+    }, {
+      "sTitle" : "Операция",
+      "mData" : "sOperType"
+    }, {
+      "sTitle" : "Покупатель",
+      "mData" : "sContragent"
+    }, {
+      "sTitle" : "Сумма",
+      "sClass" : "center",
+      "mData" : "sSum"
+    }, {
+      "sTitle" : "Фирма",
+      "sClass" : "center",
+      "mData" : "sCashPlace1"
+    }, {
+      "sTitle" : "Менеджер",
+      "mData" : "sOperMan"
+    } ],
+    "oLanguage" : {
+      "sProcessing" : "Подождите...",
+      "sLengthMenu" : "Показать _MENU_ строк",
+      "sZeroRecords" : "Записи отсутствуют.",
+      "sInfo" : "Операции с _START_ по _END_ (всего: _TOTAL_)",
+      "sInfoEmpty" : "Операций нет",
+      "sInfoFiltered" : "(отфильтровано из _MAX_ записей)",
+      "sInfoPostFix" : "",
+      "sSearch" : "Поиск:",
+      "sUrl" : "",
+      "oPaginate" : {
+        "sFirst" : "В начало",
+        "sPrevious" : "Предыдущие",
+        "sNext" : "Следующие",
+        "sLast" : "В конец"
+      }
+    }
+  });
+
+  //обработчик нажатия кнопки добавления документа
+  $("#oper_add_btn").click(function(event) {
+    self.createOper();
+    return false;
+  });
+
+  $("#prod_search_btn").click(function(event) {
+    self.productSearch();
+    return false;
+  });
+  
+  //навешиваем обработчик при выборе товара из списка найденных
+  $("#prod_name").change(function(event) {
+    self.setProductPrice();
+    return false;
+  });
+
+  //навешиваем обработчик при изменении цены на товар 
+  $("#prod_price").change(function(event) {
+    self.calcSum();
+    return false;
+  });
+
+  //навешиваем обработчик при изменении количества товара
+  $("#prod_cnt").change(function(event) {
+    self.calcSum();
+    return false;
+  });
 }
 
 //===================================================================================
@@ -198,89 +293,9 @@ $(document).ready(function() {
   
   oper = new rbOper({
   });
-  
-  oper.oTable = $('#TableOper').dataTable({
-    "bJQueryUI" : true,
-    "bProcessing" : true,
-    "bServerSide" : true,
-    "sAjaxSource" : comPath + "ajax.php?task=get_oper_list",
-    "fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
-      oSettings.jqXHR = $.ajax({
-        "dataType" : 'json',
-        "type" : "POST",
-        "data" : aoData,
-        "url" : sSource,
-        "success" : function(json) {
-          fnCallback(json);
-        }
-      });
-    },
-    "aoColumns" : [ {
-      "sTitle" : "Ключ",
-      "sClass" : "center",
-      "mData" : function(source, type, val) {
-        return "<a href='javascript:oper.readOper(" + source.sKey + ")'>#" + source.sKey + "</a>";
-      }
-    }, {
-      "sTitle" : "Дата",
-      "mData" : "sDate"
-    }, {
-      "sTitle" : "Операция",
-      "mData" : "sOperType"
-    }, {
-      "sTitle" : "Покупатель",
-      "mData" : "sContragent"
-    }, {
-      "sTitle" : "Сумма",
-      "sClass" : "center",
-      "mData" : "sSum"
-    }, {
-      "sTitle" : "Фирма",
-      "sClass" : "center",
-      "mData" : "sCashPlace1"
-    }, {
-      "sTitle" : "Менеджер",
-      "mData" : "sOperMan"
-    } ],
-    "oLanguage" : {
-      "sProcessing" : "Подождите...",
-      "sLengthMenu" : "Показать _MENU_ строк",
-      "sZeroRecords" : "Записи отсутствуют.",
-      "sInfo" : "Операции с _START_ по _END_ (всего: _TOTAL_)",
-      "sInfoEmpty" : "Операций нет",
-      "sInfoFiltered" : "(отфильтровано из _MAX_ записей)",
-      "sInfoPostFix" : "",
-      "sSearch" : "Поиск:",
-      "sUrl" : "",
-      "oPaginate" : {
-        "sFirst" : "В начало",
-        "sPrevious" : "Предыдущие",
-        "sNext" : "Следующие",
-        "sLast" : "В конец"
-      }
-    }
-  });
-
-  $("#cedit").click(function(event) {
-    oper.showCustForm();
-    return false;
-  });
-
-  $("#oper-form").dialog({
-    autoOpen : false,
-    height : 450,
-    width : 800,
-    modal : true,
-    resizable : true
-  });
-
-  $("#cust-form").dialog({
-    autoOpen : false,
-    height : 550,
-    width : 700,
-    modal : true,
-    resizable : true
-  });
+  oper.attachOperModule();
+  oper.oProduct.attachProductModule();
+  oper.oCust.attachCustomerModule();
 
   $("#dialog-confirm").dialog({
     autoOpen : false

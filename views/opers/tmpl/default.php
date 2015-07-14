@@ -4,6 +4,7 @@
 <head>
 <?php include RBO_PATH.'/views/header.head.links.php'?>
 <script src="<?php echo JRBO_PATH?>/library/lib.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/rboproduct.js"></script>
 <script src="<?php echo JRBO_PATH?>/models/rbocust.js"></script>
 <script src="<?php echo JRBO_PATH?>/models/opers.js"></script>
 <link rel="stylesheet" href="<?php echo JRBO_PATH?>/css/rbo.css" />
@@ -15,7 +16,7 @@
 <body>
   <div>
     <div style="float: left" id="header_doclist_adddoc">
-      <a href="javascript:doc.createOper()"> <img src="<?php echo JRBO_PATH?>/images/icon-32-new-on.png" /></a>
+      <a href="" id="oper_add_btn"> <img src="<?php echo JRBO_PATH?>/images/icon-32-new-on.png" /></a>
     </div>
     <div id="header_doclist_choose_list">
       <a href='zakrytye-materialy/rbo'><h2>Операции</h2></a>
@@ -76,17 +77,17 @@
               <table>
                 <tr>
                   <td><label for="prod_search">Поиск</label> <input type="text" name="prod_search" id="prod_search" style='width: 350px' /> <a
-                    href="javascript:oper.productSearch()"> <img src="<?php echo JRBO_PATH?>/images/icon-32-search-on.png" />
+                    href="" id="prod_search_btn"> <img src="<?php echo JRBO_PATH?>/images/icon-32-search-on.png" />
                   </a></td>
                 </tr>
                 <tr>
-                  <td><label for="prod_name">Название</label> <select name="prod_name" id="prod_name" style="width: 500px" onChange="oper.setProductPrice()">
+                  <td><label for="prod_name">Название</label> <select name="prod_name" id="prod_name" style="width: 500px">
                     </select>&nbsp;(Цена Опт.1&nbsp;<label id="prod_price1"></label>)</td>
                 </tr>
                 <tr>
                   <td><label for="prod_price">Цена</label> <input type="text" name="prod_price" id="prod_price" 
-                    style="text-align: center; width: 50px" onChange="oper.calcSum()" /> <label for="prod_cnt">р.&nbsp;Х&nbsp;</label> <input type="text" name="prod_cnt"
-                    id="prod_cnt" style="text-align: center; width: 30px" onChange="oper.calcSum()" /> <label for="sSum">ед.&nbsp;=&nbsp;</label> <input type="text"
+                    style="text-align: center; width: 50px" /> <label for="prod_cnt">р.&nbsp;Х&nbsp;</label> <input type="text" name="prod_cnt"
+                    id="prod_cnt" style="text-align: center; width: 30px" /> <label for="sSum">ед.&nbsp;=&nbsp;</label> <input type="text"
                     name="sSum" id="sSum" style="text-align: center; width: 50px" />&nbsp;р.<input style="visibility: hidden"
                     id="prodId" /> <input style="visibility: hidden" id="prod_code" /></td>
                 </tr>

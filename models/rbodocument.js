@@ -7,11 +7,11 @@ function rboDoc(o) {
   this.sDocTypeListTitle = o.sDocTypeListTitle;
   this.allFields = o.allFields;
   this.printList = o.printList;
+  this.tips = o.tips;
 
   this.oProduct = new rboProduct();
   this.oCust = new rboCust();
 
-  this.tips = {};
   this.editing_lineNo = 0;
   this.lines_before_update = 0;
 
