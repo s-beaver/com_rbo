@@ -4,13 +4,14 @@
  */
 
 //===================================================================================
-function rboCust(o) {
-  this.flds = NullTo(o, {
+function rboCust(parentDoc) {
+  this.flds = {
     cust_data : {}
-  });//объект, содержащий поля покупателя, пришедший из запроса к БД
+  };
   this.flds.cust_data = NullTo(this.flds.cust_data, {});
   this.arSearchedCust = new Array(); // массив объектов содержащих поля покупателя
   this.bCustInput = 'select';
+  this.parentDoc = parentDoc;
 }
 
 //===================================================================================
@@ -36,7 +37,7 @@ rboCust.prototype.attachCustomerModule = function() {
 
   //нажатие кнопки выбора контрагента
   $("#cedit").click(function(event) {
-    self.showCustForm();
+    self.chooseCustomer();
     return false;
   });
 
@@ -44,32 +45,32 @@ rboCust.prototype.attachCustomerModule = function() {
   $("#cust_search_btn").click(function(event) {
     self.custSearch();
     return false;
-  });    
+  });
 
   //смена текущего контрагента в списке найденных в поиске
   $("#cust_name").change(function(event) {
     self.setCustFlds('selected');
     return false;
   });
-  
+
   //вызов формы выбора документа-основания
   $("#baseedit").click(function(event) {
     self.chooseBaseDoc(doc);
     return false;
-  });  
+  });
 
   //нажатие кнопки поиска документов оснований по подстроке контрагента
   $("#base-doc-search-btn").click(function(event) {
     self.baseDocSearch();
     return false;
-  });  
-  
+  });
+
   //смена текущего контрагента в списке найденных в поиске
   $("#base-doc-cust-name").change(function(event) {
     self.setBaseDocList();
     return false;
   });
-  
+
 }
 
 //===================================================================================
@@ -78,7 +79,7 @@ rboCust.prototype.convertSelect2Input = function() {
   if (this.bCustInput == 'select') {
     tag = $('#cust_name').parent().html();
     tag = tag.replace("<select", "<input type=\"text\"");
-    tag = tag.replace("onChange", "onChange1");
+    tag = tag.replace("onChange", "onChange1");//а ведь этого сейчас нет. событие првязывается через jquery
     tag = tag.replace(">", "/>");
     tag = tag.replace("</select>", "");
     $('#cust_name').parent().html(tag);
@@ -97,38 +98,6 @@ rboCust.prototype.convertInput2Select = function() {
     $('#cust_name').parent().html(tag);
     this.bCustInput = 'select';
   }
-}
-
-// ===================================================================================
-/*
- * Поиск покупателя по подстроке в элементе cust_search. Список найденных
- * вариантов записывается в тэг select cust_name
- */
-rboCust.prototype.custSearch = function() {
-  var self = this;
-  $.ajax({
-    dataType : 'json',
-    type : "POST",
-    data : {
-      "search" : $("#cust_search").val()
-    },
-    url : comPath + "ajax.php?task=cust_search",
-    success : function(p) {
-      self.arSearchedCust = p.result;
-      self.convertInput2Select();
-      $('#cust_name option').remove();
-      if (p.result.length > 0) {
-        for (var i = 0; i < p.result.length; i++) {
-          $('#cust_name').append('<option value="' + i + '">' + p.result[i].cust_name + '</option>');
-        }
-        if (p.count > p.result.length) {
-          $('#cust_name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
-        }
-        $("#cust_name option:first").prop("selected", "selected");
-        self.setCustFlds('selected');
-      }
-    }
-  });
 }
 
 // ===================================================================================
@@ -173,7 +142,7 @@ rboCust.prototype.setCustFlds = function(cmd, o) {
       fd = f.cust_data;
     }
   }
-  $("#cust-form").dialog("option", "title", f.custId + "|" + f.cust_name);
+  $("#cust-form").dialog("option", "title", NullTo(f.custId, "") + "|" + NullTo(f.cust_name, "Заполните поля"));
   $("#custId").val(f.custId);
   $("#doc_cust").val(f.cust_name);
   //$("#cust_name").val(f.cust_name);
@@ -212,17 +181,18 @@ rboCust.prototype.saveCustFlds = function() {
 }
 
 //===================================================================================
-rboCust.prototype.showCustForm = function() {
+rboCust.prototype.chooseCustomer = function() {
   var self = this;
   var custId = $("#custId").val();
   var custName = $("#doc_cust").val();
+  self.convertInput2Select();
   self.arSearchedCust = new Array();
-  if (self.bCustInput == 'select') {
-    $('#cust_name option').remove();
-    $('#cust_name').append('<option value="">' + custName + '</option>');
-    $("#cust_name option:contains('" + custName + "')").prop("selected", "selected");
-  }
-  self.setCustFlds('saved');
+
+  $('#cust_name option').remove();
+  $('#cust_name').append('<option value="">' + custName + '</option>');
+  $("#cust_name option:first").prop("selected", "selected");
+
+  self.setCustFlds('saved');//установим поля в форме из текущего выбранного контрагента (объект)
 
   $("#cust-form").dialog({
     title : "Выбор покупателя",
@@ -238,9 +208,16 @@ rboCust.prototype.showCustForm = function() {
       },
 
       "Сохранить" : function() {
+        var saveCust = self.flds.cust_name;
         if (self.bCustInput == 'input')
           $("#doc_cust").val($("#cust_name").val());
         self.saveCustFlds();
+
+        if (saveCust != $("#doc_cust").val()) {//Если мы выбрали контрагента и он отличается от контрагента в документе-основании, то надо очистить документ-основание
+          $("#doc_baseId").val("0");
+          $("#doc_base").val("");
+        }
+
         $("#cust-form").dialog("close");
       },
 
@@ -258,13 +235,43 @@ rboCust.prototype.showCustForm = function() {
 }
 
 //===================================================================================
-rboCust.prototype.chooseBaseDoc = function(parent) {
+/*
+ * Поиск покупателя по подстроке в элементе cust_search. Список найденных
+ * вариантов записывается в тэг select cust_name
+ */
+rboCust.prototype.custSearch = function() {
+  var self = this;
+  $.ajax({
+    dataType : 'json',
+    type : "POST",
+    data : {
+      "search" : $("#cust_search").val()
+    },
+    url : comPath + "ajax.php?task=cust_search",
+    success : function(p) {
+      self.arSearchedCust = p.result;
+      self.convertInput2Select();
+      $('#cust_name option').remove();
+      if (p.result.length > 0) {
+        for (var i = 0; i < p.result.length; i++) {
+          $('#cust_name').append('<option value="' + i + '">' + p.result[i].cust_name + '</option>');
+        }
+        if (p.count > p.result.length) {
+          $('#cust_name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
+        }
+        $("#cust_name option:first").prop("selected", "selected");
+        self.setCustFlds('selected');
+      }
+    }
+  });
+}
+
+//===================================================================================
+rboCust.prototype.chooseBaseDoc = function() {
   var self = this;
   self.arSearchedCust = new Array();
-  if (self.bCustInput == 'select') {
-    $('#base-doc-cust-name option').remove();
-    $('#base-doc-doc option').remove();
-  }
+  $('#base-doc-cust-name option').remove();
+  $('#base-doc-doc option').remove();
   self.setCustFlds('saved');
 
   $("#base-doc-form").dialog({
@@ -287,11 +294,11 @@ rboCust.prototype.chooseBaseDoc = function(parent) {
             doc_data.doc_base_doc.doc_num = doc_data.doc_num;
             doc_data.doc_base_doc.doc_date = doc_data.doc_date;
 
-            doc_data.docId = parent.oDoc.doctId;
-            doc_data.doc_num = parent.oDoc.doc_num;
-            doc_data.doc_date = parent.oDoc.doc_date;
-            doc_data.doc_status = parent.oDoc.doc_status;
-            parent.showDocForm(doc_data);
+            doc_data.docId = self.parentDoc.doctId;//self.parentDoc.oDoc.doctId;
+            doc_data.doc_num = $("#doc_num").val();//self.parentDoc.oDoc.doc_num;
+            doc_data.doc_date = $("#doc_date").val();//self.parentDoc.oDoc.doc_date;
+            doc_data.doc_status = $("#doc_status").val();//self.parentDoc.oDoc.doc_status;
+            self.parentDoc.showDocForm(doc_data);
           }
         });
 
@@ -311,6 +318,34 @@ rboCust.prototype.chooseBaseDoc = function(parent) {
 
 }
 
+//===================================================================================
+rboCust.prototype.baseDocSearch = function() {
+  var self = this;
+  $.ajax({
+    dataType : 'json',
+    type : "POST",
+    data : {
+      "search" : $("#base-doc-search").val()
+    },
+    url : comPath + "ajax.php?task=cust_search",
+    success : function(p) {
+      self.arSearchedCust = p.result;
+      $('#base-doc-cust-name option').remove();
+      if (p.result.length > 0) {
+        for (var i = 0; i < p.result.length; i++) {
+          $('#base-doc-cust-name').append('<option value="' + i + '">' + p.result[i].cust_name + '</option>');
+        }
+        if (p.count > p.result.length) {
+          $('#base-doc-cust-name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
+        }
+        $("#base-doc-cust-name option:first").prop("selected", "selected");
+        self.setCustFlds('selected');
+        self.setBaseDocList();
+      }
+    }
+  });
+}
+
 // ===================================================================================
 rboCust.prototype.setBaseDocList = function() {
   $.ajax({
@@ -328,35 +363,6 @@ rboCust.prototype.setBaseDocList = function() {
           $('#base-doc-doc').append('<option value="' + p[i].docId + '">Счет №' + p[i].doc_num + " от " + p[i].doc_date + " (" + p[i].doc_sum + '=)</option>');
         }
         $("#base-doc-doc option:first").prop("selected", "selected");
-      }
-    }
-  });
-}
-
-// ===================================================================================
-rboCust.prototype.baseDocSearch = function() {
-  var self = this;
-  $.ajax({
-    dataType : 'json',
-    type : "POST",
-    data : {
-      "search" : $("#base-doc-search").val()
-    },
-    url : comPath + "ajax.php?task=cust_search",
-    success : function(p) {
-      self.arSearchedCust = p.result;
-      self.convertInput2Select();
-      $('#base-doc-cust-name option').remove();
-      if (p.result.length > 0) {
-        for (var i = 0; i < p.result.length; i++) {
-          $('#base-doc-cust-name').append('<option value="' + i + '">' + p.result[i].cust_name + '</option>');
-        }
-        if (p.count > p.result.length) {
-          $('#base-doc-cust-name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
-        }
-        $("#base-doc-cust-name option:first").prop("selected", "selected");
-        self.setCustFlds('selected');
-        self.setBaseDocList();
       }
     }
   });

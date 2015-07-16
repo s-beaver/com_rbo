@@ -1,16 +1,25 @@
-var comPath = "/components/com_rbo/";
+/**
+ * Абстрактный объект JavaScript для работы с документами. Предназначен для
+ * наследования
+ * 
+ * Необходимо: - убрать comPath - например передовать из php при создании
+ * объекта - четче привязать методы к полям объекта, может быть убрать передачу
+ * ключа документа через параметр ф-ции (брать из объекта)
+ */
 
+var comPath = "/components/com_rbo/";
 //===================================================================================
 function rboDoc(o) {
+  this.docId = 0;
   this.sDocType = o.sDocType;
   this.sDocTypeTitle = o.sDocTypeTitle;
   this.sDocTypeListTitle = o.sDocTypeListTitle;
-  this.allFields = o.allFields;
-  this.printList = o.printList;
+  this.allFields = o.allFields;//перечень элементов jquery, предназначенных для ввода данных и проверяемых на обязательность заполнения
   this.tips = o.tips;
+  this.printList = o.printList;//перечень печатных форм документа
 
-  this.oProduct = new rboProduct();
-  this.oCust = new rboCust();
+  this.oProduct = new rboProduct();//объект для выбора/редакции товарами
+  this.oCust = new rboCust(this);//объект для выбора/редакции контрагента
 
   this.editing_lineNo = 0;
   this.lines_before_update = 0;
@@ -219,7 +228,7 @@ rboDoc.prototype.saveDoc = function(docId) {
       "doc_num" : $("#doc_num").val(),
       "doc_date" : $("#doc_date").val(),
       "doc_sum" : $("#doc_sum").val(),
-      "doc_base" : $("#doc_baseId").val(),// скрытое поле  testit 
+      "doc_base" : $("#doc_baseId").val(),// скрытое поле в форме выбора документа - основания
       "doc_status" : $("#doc_status").val(),
       "doc_manager" : $("#doc_manager").val(),
       "custId" : $("#custId").val(),// скрытое поле в форме выбора клиента
@@ -289,11 +298,16 @@ rboDoc.prototype.deleteDoc = function(docId) {
 // ===================================================================================
 rboDoc.prototype.showDocForm = function(i) {
   var self = this;
+
+  self.docId = i.docId;
+
+  //установим базовые реквизиты документа
   $("#doc_num").val(i.doc_num);
   $("#doc_date").val(i.doc_date);
   $("#doc_sum").val(i.doc_sum);
   $("#doc_status").val(i.doc_status);
 
+  //установим поля документа-основания
   var sDocBase = "";
   $("#doc_baseId").val(i.doc_base);
   if ((i.doc_base > 0) && !IsNull(i.doc_base_doc)) {
@@ -301,24 +315,30 @@ rboDoc.prototype.showDocForm = function(i) {
   }
   $("#doc_base").val(sDocBase);
 
+  //укажем менеджера
   $('#doc_manager option:selected').each(function() {
     this.selected = false;
   });
   if (!IsEmpty(i.doc_manager))
     $("#doc_manager option:contains('" + i.doc_manager + "')").prop("selected", "selected");
 
+  //установим поля контрагента
   self.oCust.setCustFlds('saved', i.doc_cust);
 
+  //установим фирму
   if (!IsNull(i.doc_firm))
     $("#doc_firm option:contains('" + i.doc_firm.toUpperCase() + "')").prop("selected", "selected");
   $("#doc_rem").val(i.doc_rem);
 
+  //заполним список товаров/услуг
   self.oTableProducts.fnClearTable();
   if (!IsNull(i.doc_products) && i.doc_products.length > 0) {
     for (var x = 0; x < i.doc_products.length; x++)
       i.doc_products[x].lineNo = x;
     self.oTableProducts.fnAddData(i.doc_products);
   }
+
+  //установим документ в правильное состояние RW
   var readOnly = this.setRW(i.doc_status);
 
   var oBtns = {};
@@ -391,6 +411,12 @@ rboDoc.prototype.showProductForm = function(x) {// x-номер редактир
     fnDelete : function() {
       if (self.editing_lineNo >= 0) {
         self.oTableProducts.fnDeleteRow(self.editing_lineNo);
+        var pAll = self.oTableProducts.fnGetData();
+        var iSum = 0;
+        for (var x = 0; x < pAll.length; x++) {
+          iSum += Number(pAll[x].product_sum);
+        }
+        $('#doc_sum').val(iSum);
       }
     },
 
@@ -416,12 +442,10 @@ rboDoc.prototype.showProductForm = function(x) {// x-номер редактир
 //===================================================================================
 function rboShipment(o) {
   rboShipment.superclass.constructor.apply(this, arguments);
-  this.oDoc = {
-    doctId : 0,
-    doc_num : 0,
-    doc_date : 0,
-    doc_status : ""
-  }
+  //для временного хранения части реквизитов документа - убрать
+  /*
+   * this.oDoc = { doctId : 0, doc_num : 0, doc_date : 0, doc_status : "" }
+   */
 
 }
 //===================================================================================
@@ -442,10 +466,11 @@ rboShipment.prototype.readDoc = function(docId) {
     },
     url : comPath + "ajax.php?task=doc_read",
     success : function(doc_data) {
-      self.oDoc.doctId = doc_data.docId;
-      self.oDoc.doc_num = doc_data.doc_num;
-      self.oDoc.doc_date = doc_data.doc_date;
-      self.oDoc.doc_status = doc_data.doc_status;
+      /*
+       * self.oDoc.doctId = doc_data.docId; self.oDoc.doc_num =
+       * doc_data.doc_num; self.oDoc.doc_date = doc_data.doc_date;
+       * self.oDoc.doc_status = doc_data.doc_status;
+       */
       self.showDocForm(doc_data);
     }
   });
@@ -464,10 +489,10 @@ rboShipment.prototype.createDoc = function() {
     },
     url : comPath + "ajax.php?task=get_doc_num",
     success : function(p) {
-      self.oDoc.doctId = 0;
-      self.oDoc.doc_num = p.new_num;
-      self.oDoc.doc_date = p.new_date;
-      self.oDoc.doc_status = "";
+      /*
+       * self.oDoc.doctId = 0; self.oDoc.doc_num = p.new_num; self.oDoc.doc_date =
+       * p.new_date; self.oDoc.doc_status = "";
+       */
       var i = {};
       i.doc_num = p.new_num;
       i.doc_date = p.new_date;

@@ -13,7 +13,7 @@
             </td>
           </tr>
           <tr>
-            <td><label for="base-doc-cust-name">Название</label></td><!--cust_name-->
+            <td><label for="base-doc-cust-name">Название</label></td>
             <td><select name="base-doc-cust-name" id="base-doc-cust-name" style="width: 500px"></select></td>
           </tr>
           <tr>
