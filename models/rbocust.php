@@ -1,5 +1,4 @@
 <?php
-//jimport ('etc.json_lib');
 include_once "models/rbobject.php";
 class RbOCust extends RbObject {
   

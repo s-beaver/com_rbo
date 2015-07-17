@@ -1,5 +1,4 @@
 <?php
-// jimport ('etc.json_lib');
 include_once 'configuration.php';
 class RbObject {
   public $is_multiple = false; // читать одну запись или несколько по идентификатору
