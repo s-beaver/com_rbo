@@ -1,7 +1,7 @@
 <?php
-// jimport ('etc.json_lib');
 include_once "models/rbobject.php";
 include_once "models/rboproducts.php";
+include_once "models/rboproductref.php";
 include_once "models/rbocust.php";
 include_once "rbohelper.php";
 include_once "configuration.php";
@@ -12,7 +12,7 @@ class RbODocument extends RbObject {
   public function __construct($keyValue, $readBaseDocument) {
     parent::__construct ($keyValue);
     
-    $this->setTableName("rbo_docs");
+    $this->setTableName ("rbo_docs");
     $this->flds ["docId"] = array ("type" => "numeric","is_key" => true );
     $this->flds ["doc_num"] = array ("type" => "string" );
     $this->flds ["doc_date"] = array ("type" => "date" );
@@ -94,6 +94,20 @@ class RbODocument extends RbObject {
     }
     
     foreach ( $doc_products as &$p ) {
+      if (! ($p ["productId"] > 0)) { // создадим новый товар в справочнике
+        $pRef = array ();
+        $pRef ["productId"] = $p ["productId"];
+        $pRef ["product_code"] = $p ["product_code"];
+        $pRef ["name"] = $p ["product_name"];
+        $pRef ["price"] = $p ["product_price"];
+        // $pRef ["categoryID"] = ;
+        // $pRef ["list_price"] = ;
+        
+        $input->set ("SS_products", $pRef);
+        $prodRef = new RbOProductRef ();
+        $prodRef->createObject ();
+        $p ["productId"] = $prodRef->insertid;
+      }
       $p ["docId"] = $this->keyValue;
     }
     parent::updateObject ();
@@ -106,10 +120,12 @@ class RbODocument extends RbObject {
     $response = $response && $prod->response;
     
     $this->response = $this->response && $response;
-    /*if ($this->response) {
-      RbOHelper::sendEMail ("документ изменен", 
-          "Изменен документ. Детали: " . RbODocument::docBuffer2Str ($this->buffer));
-    }*/
+    /*
+     * if ($this->response) {
+     * RbOHelper::sendEMail ("документ изменен",
+     * "Изменен документ. Детали: " . RbODocument::docBuffer2Str ($this->buffer));
+     * }
+     */
   }
   
   // =================================================================
@@ -142,6 +158,20 @@ class RbODocument extends RbObject {
     
     $docId = $this->insertid;
     foreach ( $doc_products as &$p ) {
+      if (! ($p ["productId"] > 0)) { // создадим новый товар в справочнике
+        $pRef = array ();
+        $pRef ["productId"] = $p ["productId"];
+        $pRef ["product_code"] = $p ["product_code"];
+        $pRef ["name"] = $p ["product_name"];
+        $pRef ["price"] = $p ["product_price"];
+        // $pRef ["categoryID"] = ;
+        // $pRef ["list_price"] = ;
+        
+        $input->set ("SS_products", $pRef);
+        $prodRef = new RbOProductRef ();
+        $prodRef->createObject ();
+        $p ["productId"] = $prodRef->insertid;
+      }
       $p ["docId"] = $docId;
     }
     

@@ -4,6 +4,7 @@
 
 //===================================================================================
 function rboProduct(o) {
+  this.bInputMode = 'select';
 }
 
 //===================================================================================
@@ -22,7 +23,7 @@ rboProduct.prototype.attachProductModule = function() {
     self.productSearch();
     return false;
   });
-  
+
   //навешиваем обработчик при выборе товара из списка найденных
   $("#prod_name").change(function(event) {
     self.setProductPrice();
@@ -44,8 +45,36 @@ rboProduct.prototype.attachProductModule = function() {
 }
 
 //===================================================================================
+/* Преобразует тэг select в input для ввода там поисковой строки */
+rboProduct.prototype.convertSelect2Input = function() {
+  if (this.bInputMode == 'select') {
+    var tag = $('#prod_name').parent().html();
+    tag = tag.replace("<select", "<input type=\"text\"");
+    tag = tag.replace("onChange", "onChange1");//событие првязывается через jquery, но убирать нельзя
+    tag = tag.replace(">", "/>");
+    tag = tag.replace("</select>", "");
+    $('#prod_name').parent().html(tag);
+    this.bInputMode = 'input';
+  }
+}
+
+//===================================================================================
+/* Преобразует тэг input в select для выбора из найденных вариантов */
+rboProduct.prototype.convertInput2Select = function() {
+  if (this.bInputMode == 'input') {
+    var tag = $('#prod_name').parent().html();
+    tag = tag.replace("<input type=\"text\"", "<select");
+    tag = tag.replace("onChange1", "onChange");
+    tag = tag.replace("/>", "></select>");
+    $('#prod_name').parent().html(tag);
+    this.bInputMode = 'select';
+  }
+}
+
+//===================================================================================
 rboProduct.prototype.showProductForm = function(o) {
   var self = this;
+  self.convertInput2Select();
 
   $("#prodId").val(o.pData.productId);
   $("#prod_code").val(o.pData.product_code);
@@ -59,8 +88,15 @@ rboProduct.prototype.showProductForm = function(o) {
   $("#prod_sum").val(o.pData.product_sum);
 
   $("#product-form").dialog({
-    title : "Позиция - " + NullTo(o.pData.product_code,""),
+    title : "Позиция - " + NullTo(o.pData.product_code, ""),
     buttons : {
+      "Новый товар" : function() {
+        var sStr = $('#prod_name option:selected').text();
+        $('#prod_name option').remove();
+        self.convertSelect2Input();
+        $('#prod_name').val(sStr);
+      },
+
       "Удалить" : function() {
         Ask("Удалить строку из документа?", "Удалить", "Отмена", function() {
           o.fnDelete();
@@ -72,7 +108,11 @@ rboProduct.prototype.showProductForm = function(o) {
         var p = {};
         p.productId = $("#prodId").val();
         p.product_code = $("#prod_code").val();
-        p.product_name = $('#prod_name option:selected').text();
+        if (self.bInputMode == 'input') {
+          p.product_name = $('#prod_name').val();
+        } else {
+          p.product_name = $('#prod_name option:selected').text();
+        }
         p.product_price = $("#prod_price").val();
         p.product_cnt = $("#prod_cnt").val();
         p.product_sum = $("#prod_sum").val();
@@ -89,6 +129,10 @@ rboProduct.prototype.showProductForm = function(o) {
 }
 
 //===================================================================================
+/*
+ * Поиск товара по подстроке в элементе prod_search. Список найденных вариантов
+ * записывается в тэг select prod_name
+ */
 rboProduct.prototype.productSearch = function() {
   var self = this;
   $.ajax({
@@ -99,6 +143,7 @@ rboProduct.prototype.productSearch = function() {
     },
     url : comPath + "ajax.php?task=product_search",
     success : function(p) {
+      self.convertInput2Select();
       $('#prod_name option').remove();
       for (var i = 0; i < p.result.length; i++) {
         $('#prod_name').append(

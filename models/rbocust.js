@@ -10,7 +10,7 @@ function rboCust(parentDoc) {
   };
   this.flds.cust_data = NullTo(this.flds.cust_data, {});
   this.arSearchedCust = new Array(); // массив объектов содержащих поля покупателя
-  this.bCustInput = 'select';
+  this.bInputMode = 'select';
   this.parentDoc = parentDoc;
 }
 
@@ -76,27 +76,27 @@ rboCust.prototype.attachCustomerModule = function() {
 //===================================================================================
 /* Преобразует тэг select в input для ввода там поисковой строки */
 rboCust.prototype.convertSelect2Input = function() {
-  if (this.bCustInput == 'select') {
-    tag = $('#cust_name').parent().html();
+  if (this.bInputMode == 'select') {
+    var tag = $('#cust_name').parent().html();
     tag = tag.replace("<select", "<input type=\"text\"");
-    tag = tag.replace("onChange", "onChange1");//а ведь этого сейчас нет. событие првязывается через jquery
+    tag = tag.replace("onChange", "onChange1");//событие првязывается через jquery, но убирать нельзя
     tag = tag.replace(">", "/>");
     tag = tag.replace("</select>", "");
     $('#cust_name').parent().html(tag);
-    this.bCustInput = 'input';
+    this.bInputMode = 'input';
   }
 }
 
 //===================================================================================
 /* Преобразует тэг input в select для выбора из найденных вариантов */
 rboCust.prototype.convertInput2Select = function() {
-  if (this.bCustInput == 'input') {
-    tag = $('#cust_name').parent().html();
+  if (this.bInputMode == 'input') {
+    var tag = $('#cust_name').parent().html();
     tag = tag.replace("<input type=\"text\"", "<select");
     tag = tag.replace("onChange1", "onChange");
     tag = tag.replace("/>", "></select>");
     $('#cust_name').parent().html(tag);
-    this.bCustInput = 'select';
+    this.bInputMode = 'select';
   }
 }
 
@@ -118,7 +118,7 @@ rboCust.prototype.setCustFlds = function(cmd, o) {
     self.flds = {
       cust_data : {}
     };
-    if (self.bCustInput == 'select')
+    if (self.bInputMode == 'select')
       $('#cust_name option').remove();
     else
       $('#cust_name').val();
@@ -209,7 +209,7 @@ rboCust.prototype.chooseCustomer = function() {
 
       "Сохранить" : function() {
         var saveCust = self.flds.cust_name;
-        if (self.bCustInput == 'input')
+        if (self.bInputMode == 'input')
           $("#doc_cust").val($("#cust_name").val());
         self.saveCustFlds();
 

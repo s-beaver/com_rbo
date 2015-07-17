@@ -14,6 +14,7 @@ if (! defined ('_JDEFINES')) {
 require_once JPATH_BASE . '/includes/framework.php';
 include_once "models/rbohelper.php";
 include_once "models/rbodocument.php";
+include_once "models/rboproductref.php";
 include_once "models/rbocust.php";
 include_once "models/rbopers.php";
 JLog::addLogger (array ('text_file' => 'com_rbo.php' ), JLog::ALL, array ('com_rbo' ));
@@ -69,7 +70,7 @@ switch ($cmd) {
   
   case "product_search" :
     {
-      RbOProducts::getProductListBySubstr ();
+      RbOProductRef::getProductListBySubstr ();
       break;
     }
   
