@@ -4,6 +4,7 @@
 <head>
 <?php include RBO_PATH.'/views/header.head.links.php'?>
 <script src="<?php echo JRBO_PATH?>/library/lib.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/rboform.js"></script>
 <script src="<?php echo JRBO_PATH?>/models/rboproduct.js"></script>
 <script src="<?php echo JRBO_PATH?>/models/rbocust.js"></script>
 <script src="<?php echo JRBO_PATH?>/models/opers.js"></script>
@@ -30,30 +31,16 @@
           <tr>
             <td>
               <div style="float: left">
-                <label for="sDate">Дата</label>
-                <input type="text" name="sDate" id="sDate" style='text-align: center; width: 100px' />
+                <label for="rbo_opers.oper_date">Дата</label>
+                <input type="text" name="rbo_opers.oper_date" id="rbo_opers.oper_date" style='text-align: center; width: 100px' />
+                <label id="rbo_opers.operId" style="visibility: hidden"></label>
               </div>
               <div style="float: right">
-                <label for="sOperType">Операция</label>
-                <select id="sOperType" name="sOperType" style="width: 200px" autofocus>
-                  <option value="продажа">продажа</option>
-                  <option value="закуп">закуп</option>
-                  <option value="затраты-аренда">затраты-аренда</option>
-                  <option value="затраты-коммун">затраты-коммун</option>
-                  <option value="затраты-произв">затраты-произв</option>
-                  <option value="затраты-банков">затраты-банков</option>
-                  <option value="затраты-прочие">затраты-прочие</option>
-                  <option value="затраты-связь">затраты-связь</option>
-                  <option value="затраты-налоги">затраты-налоги</option>
-                  <option value="затраты-бухгал">затраты-бухгал</option>
+                <label for="rbo_opers.oper_type">Операция</label>
+                <select id="rbo_opers.oper_type" name="rbo_opers.oper_type" style="width: 200px" autofocus>
                 </select>
-                <label for="sOperMan">Менеджер</label>
-                <select id="sOperMan" name="sOperMan" style="width: 120px">
-                  <option value=""></option>
-                  <option value="Алексей">Алексей</option>
-                  <option value="Аня">Аня</option>
-                  <option value="Володя">Володя</option>
-                  <option value="Николай">Николай</option>
+                <label for="rbo_opers.oper_manager">Менеджер</label>
+                <select id="rbo_opers.oper_manager" name="rbo_opers.oper_manager" style="width: 120px">
                 </select>
               </div>
             </td>
@@ -64,10 +51,8 @@
                 <label for="doc_cust">Покупатель</label>
                 <input disabled type="text" name="doc_cust" id="doc_cust" style='width: 450px' />
                 <button id="cedit">..</button>
-                <label for="doc_firm">Фирма</label>
-                <select id="doc_firm" name="doc_firm" style="width: 70px">
-                  <option value="ип">ИП</option>
-                  <option value="ооо">ООО</option>
+                <label for="rbo_opers.oper_firm">Фирма</label>
+                <select id="rbo_opers.oper_firm" name="rbo_opers.oper_firm" style="width: 120px">
                 </select>
               </div>
             </td>
@@ -81,18 +66,18 @@
                   </a></td>
                 </tr>
                 <tr>
-                  <td><label for="prod_name">Название</label> <select name="prod_name" id="prod_name" style="width: 500px">
-                    </select>&nbsp;(Цена Опт.1&nbsp;<label id="prod_price1"></label>)</td>
+                  <td><label for="rbo_opers.product_name">Название</label> <select name="rbo_opers.product_name" id="rbo_opers.product_name" style="width: 500px">
+                    </select>&nbsp;<label id="prod_price1">Цена Опт.1</label></td>
                 </tr>
                 <tr>
-                  <td><label for="prod_price">Цена</label> <input type="text" name="prod_price" id="prod_price" 
-                    style="text-align: center; width: 50px" /> <label for="prod_cnt">р.&nbsp;Х&nbsp;</label> <input type="text" name="prod_cnt"
-                    id="prod_cnt" style="text-align: center; width: 30px" /> <label for="sSum">ед.&nbsp;=&nbsp;</label> <input type="text"
-                    name="sSum" id="sSum" style="text-align: center; width: 50px" />&nbsp;р.<input style="visibility: hidden"
-                    id="prodId" /> <input style="visibility: hidden" id="prod_code" /></td>
+                  <td><label for="rbo_opers.product_price">Цена</label> <input type="text" name="rbo_opers.product_price" id="rbo_opers.product_price" 
+                    style="text-align: center; width: 50px" /> <label for="rbo_opers.product_cnt">р.&nbsp;Х&nbsp;</label> <input type="text" name="rbo_opers.product_cnt"
+                    id="rbo_opers.product_cnt" style="text-align: center; width: 30px" /> <label for="rbo_opers.oper_sum">ед.&nbsp;=&nbsp;</label> <input type="text"
+                    name="rbo_opers.oper_sum" id="rbo_opers.oper_sum" style="text-align: center; width: 50px" />&nbsp;р.<input style="visibility: hidden"
+                    id="rbo_opers.productId" /> <input style="visibility: hidden" id="rbo_opers.product_code" /></td>
                 </tr>
-                <td><label for="sRem" style="vertical-align: top;">Примечание</label>
-                  <textarea name="sRem" id="sRem" rows="3" cols="70"></textarea></td>
+                <td><label for="rbo_opers.oper_rem" style="vertical-align: top;">Примечание</label>
+                  <textarea name="rbo_opers.oper_rem" id="rbo_opers.oper_rem" rows="3" cols="70"></textarea></td>
                 <tr>
                 </tr>
               </table>

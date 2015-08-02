@@ -104,6 +104,30 @@ switch ($cmd) {
       break;
     }
   
+  case "oper_create" :
+    {
+      $oper = new RbOpers ();
+      $doc->createObject ();
+      echo $oper->getResponse ();
+      break;
+    }
+  
+  case "oper_update" :
+    {
+      $oper = new RbOpers ();
+      $oper->updateObject ();
+      echo $oper->getResponse ();
+      break;
+    }
+  
+  case "oper_delete" :
+    {
+      $oper = new RbOpers ();
+      $oper->deleteObject ();
+      echo $oper->getResponse ();
+      break;
+    }
+  
   default :
     {
       echo "";

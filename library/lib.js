@@ -67,6 +67,7 @@ function IsArray(obj) {
         if ((obj.constructor + "") == (aAr.constructor + ""))
           return true;
         else {
+          if (obj.length == undefined) return false;
           if (obj.length > 0)
             obj[0] = obj[0];
           else

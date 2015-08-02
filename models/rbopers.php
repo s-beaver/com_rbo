@@ -7,41 +7,83 @@ class RbOpers extends RbObject {
     parent::__construct ($keyValue);
     
     $this->is_multiple = false;
-    $this->setTableName ("SS_opers"); // case sensitive?
+    $this->setTableName ("rbo_opers"); 
     
-    $this->flds ["sKey"] = array ("type" => "numeric","is_key" => true );
-    $this->flds ["sOperType"] = array ("type" => "string" );
-    $this->flds ["sDate"] = array ("type" => "date" );
-    $this->flds ["sContragent"] = array ("type" => "string" );
-    $this->flds ["sSklad1"] = array ("type" => "string" );
-    $this->flds ["sSklad2"] = array ("type" => "string" );
-    $this->flds ["sProductID"] = array ("type" => "numeric" );
-    $this->flds ["sProductCode"] = array ("type" => "string" );
-    $this->flds ["sProductName"] = array ("type" => "string" );
-    $this->flds ["sPrice"] = array ("type" => "numeric" );
-    $this->flds ["sCnt"] = array ("type" => "numeric" );
-    $this->flds ["sSum"] = array ("type" => "numeric" );
-    $this->flds ["sOperMan"] = array ("type" => "string" );
-    $this->flds ["sAuthor"] = array ("type" => "string" );
-    $this->flds ["sPayDate"] = array ("type" => "date" );
-    $this->flds ["sCashPlace1"] = array ("type" => "string" );
-    $this->flds ["sCashPlace2"] = array ("type" => "string" );
-    $this->flds ["sPaySum"] = array ("type" => "numeric" );
-    $this->flds ["sRem"] = array ("type" => "numeric" );
-    $this->flds ["sLevel"] = array ("type" => "numeric" );
-    /*
-     * sAuthorTime datetime DEFAULT NULL,
-     * sTZ varchar(5) DEFAULT NULL,
-     */
+    $this->flds ["operId"] = array ("type" => "numeric","is_key" => true );
+    $this->flds ["oper_type"] = array ("type" => "string" );
+    $this->flds ["oper_date"] = array ("type" => "date" );
+    $this->flds ["custId"] = array ("type" => "numeric" );
+    $this->flds ["oper_firm"] = array ("type" => "string" );
+    $this->flds ["productId"] = array ("type" => "numeric" );
+    $this->flds ["product_code"] = array ("type" => "string" );
+    $this->flds ["product_name"] = array ("type" => "string" );
+    $this->flds ["product_price"] = array ("type" => "numeric" );
+    $this->flds ["product_cnt"] = array ("type" => "numeric" );
+    $this->flds ["oper_sum"] = array ("type" => "numeric" );
+    $this->flds ["oper_manager"] = array ("type" => "string" );
+    $this->flds ["oper_rem"] = array ("type" => "string" );
+
+    $this->flds ["created_by"] = array ("type" => "string" );
+    $this->flds ["created_on"] = array ("type" => "datetime" );
+    $this->flds ["modified_by"] = array ("type" => "string" );
+    $this->flds ["modified_on"] = array ("type" => "datetime" );
     
     $this->getInputBuffer ();
-    if (! isset ($keyValue)) $this->keyValue = $this->buffer->sKey;
+    if (! isset ($keyValue)) $this->keyValue = $this->buffer->operId;
   }
   
   // =================================================================
   public function readObject() {
     parent::readObject ();
     $this->response = json_encode ($this->buffer, JSON_UNESCAPED_UNICODE);
+  }
+  
+  // =================================================================
+  public function updateObject() {
+    $response = true;
+    $custId = $this->buffer->custId;
+    $oper_cust = $this->buffer->oper_cust;
+    $oper_cust ['cust_data'] = json_encode ($doc_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
+    $productId = $this->buffer->productId;
+    
+    $response = $response && RbOCust::updateOrCreateCustomer ($custId, $oper_cust);
+    $this->buffer->custId = $custId; 
+    
+    $response = $response && RbOProductRef::updateOrCreateProduct ($productId, $this->buffer);
+    $this->buffer->productId = $productId; 
+
+    $this->buffer->sAuthor = JFactory::getUser ()->username;
+    $this->buffer->sAuthorTime = RbOHelper::getCurrentTimeForDb ();
+    
+    parent::updateObject ();
+    
+    $this->response = $this->response && $response;
+  }
+  
+  // =================================================================
+  public function createObject() {
+    $response = true;
+    $custId = $this->buffer->custId;
+    $oper_cust = $this->buffer->oper_cust;
+    $doc_cust = $this->buffer->doc_cust;
+    $oper_cust ['cust_data'] = json_encode ($doc_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
+    $product_data = json_encode (
+        array ("productId" => $this->buffer->sProductID,
+            "product_code" => $this->buffer->sProductCode,"name" => $this->buffer->sProductName,
+            "price" => $this->buffer->sPrice ), JSON_UNESCAPED_UNICODE);
+    
+    // $this->buffer->sAuthor = JFactory::getUser ()->username;
+    // $this->buffer->sAuthorTime = RbOHelper::getCurrentTimeForDb ();
+    
+    $response = $response && RbOCust::updateOrCreateCustomer ($custId, $oper_cust);
+    $this->buffer->custId = $custId; // должно было передаться по ссылке
+    
+    $response = $response && RbOProductRef::updateOrCreateProduct ($prodId, $product_data);
+    $this->buffer->custId = $prodId; // должно было передаться по ссылке
+    
+    parent::createObject ();
+    
+    $this->response = $this->response && $response;
   }
   
   // =================================================================
@@ -52,7 +94,6 @@ class RbOpers extends RbObject {
     $iDisplayStart = $input->getInt ('iDisplayStart');
     $iDisplayLength = $input->getInt ('iDisplayLength');
     $sEcho = $input->getString ('sEcho');
-    $doc_type = $input->getString ('doc_type');
     $sSearch = $input->getString ('sSearch');
     $sWhere = array ();
     /*
@@ -64,15 +105,15 @@ class RbOpers extends RbObject {
     $query = $db->getQuery (true);
     
     $query->clear ();
-    $query->select ($this->getFieldsForSelectClause ());
+    $where = $this->getFieldsForSelectClause ('so');
+    $where[] = "rc.cust_name cust_name";
+    $query->select ($where);
     $query->from ($db->quoteName ($this->table_name, 'so'));
     // $query->where ($sWhere);
-    $query->order ($db->quoteName ('so.sDate') . " DESC");
-    /*
-     * $query->leftJoin (
-     * $db->quoteName ('rbo_cust', 'rc') . ' ON (' . $db->quoteName ('rd.custId') . ' = ' .
-     * $db->quoteName ('rc.custId') . ')');
-     */
+    $query->order ($db->quoteName ('so.oper_date') . " DESC");
+    $query->leftJoin (
+        $db->quoteName ('rbo_cust', 'rc') . ' ON (' . $db->quoteName ('so.custId') . ' = ' .
+             $db->quoteName ('rc.custId') . ')');
     
     if (isset ($_POST ['iDisplayStart']) && $_POST ['iDisplayLength'] != '-1') {
       $db->setQuery ($query, intval ($iDisplayStart), intval ($iDisplayLength));

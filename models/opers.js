@@ -4,7 +4,6 @@ var oper;
 //===================================================================================
 function rbOper(o) {
 
-  this.oProduct = new rboProduct();
   this.oCust = new rboCust();
 
   this.arSearchedCust = new Array(); // массив объектов содержащих поля покупателя
@@ -15,7 +14,15 @@ function rbOper(o) {
 //===================================================================================
 rbOper.prototype.attachOperModule = function() {
   var self = this;
-  
+  //подключаем форму для редакции документов
+  $("#oper-form").dialog({
+    autoOpen : false,
+    height : 450,
+    width : 900,
+    modal : true,
+    resizable : true
+  });
+
   self.oTable = $('#TableOper').dataTable({
     "bJQueryUI" : true,
     "bProcessing" : true,
@@ -36,28 +43,28 @@ rbOper.prototype.attachOperModule = function() {
       "sTitle" : "Ключ",
       "sClass" : "center",
       "mData" : function(source, type, val) {
-        return "<a href='javascript:oper.readOper(" + source.sKey + ")'>#" + source.sKey + "</a>";
+        return "<a href='javascript:oper.readOper(" + source.operId + ")'>#" + source.operId + "</a>";
       }
     }, {
       "sTitle" : "Дата",
-      "mData" : "sDate"
+      "mData" : "oper_date"
     }, {
       "sTitle" : "Операция",
-      "mData" : "sOperType"
+      "mData" : "oper_type"
     }, {
       "sTitle" : "Покупатель",
-      "mData" : "sContragent"
+      "mData" : "cust_name"
     }, {
       "sTitle" : "Сумма",
       "sClass" : "center",
-      "mData" : "sSum"
+      "mData" : "oper_sum"
     }, {
       "sTitle" : "Фирма",
       "sClass" : "center",
-      "mData" : "sCashPlace1"
+      "mData" : "oper_firm"
     }, {
       "sTitle" : "Менеджер",
-      "mData" : "sOperMan"
+      "mData" : "oper_manager"
     } ],
     "oLanguage" : {
       "sProcessing" : "Подождите...",
@@ -88,40 +95,40 @@ rbOper.prototype.attachOperModule = function() {
     self.productSearch();
     return false;
   });
-  
+
   //навешиваем обработчик при выборе товара из списка найденных
-  $("#prod_name").change(function(event) {
+  $("#rbo_opers\\.product_name").change(function(event) {
     self.setProductPrice();
     return false;
   });
 
   //навешиваем обработчик при изменении цены на товар 
-  $("#prod_price").change(function(event) {
+  $("#rbo_opers\\.product_price").change(function(event) {
     self.calcSum();
     return false;
   });
 
   //навешиваем обработчик при изменении количества товара
-  $("#prod_cnt").change(function(event) {
+  $("#rbo_opers\\.product_cnt").change(function(event) {
     self.calcSum();
     return false;
   });
 }
 
 //===================================================================================
-rbOper.prototype.setRW = function(sStatus) {
-    return false;
+rbOper.prototype.setRW = function(oData) {
+  return false;
 }
 
 //===================================================================================
-rbOper.prototype.readOper = function(sKey) {
+rbOper.prototype.readOper = function(operId) {
   var self = this;
   $.ajax({
     dataType : 'json',
     type : "POST",
     data : {
-      "SS_opers" : {
-        "sKey" : sKey
+      "rbo_opers" : {
+        "operId" : operId
       }
     },
     url : comPath + "ajax.php?task=oper_read",
@@ -132,41 +139,42 @@ rbOper.prototype.readOper = function(sKey) {
 }
 
 //===================================================================================
-rbOper.prototype.saveOper = function(sKey) {
+rbOper.prototype.saveOper = function() {
   var self = this;
   var bValid = true;
+  var oData = getFormData("oper-form", "rbo_opers");
+  if (!bValid)
+    return;
+
+  var taskCmd = "oper_create";
+  if (!IsNull(oData.rbo_opers.operId) && oData.rbo_opers.operId > 0)
+    taskCmd = "oper_update";
+  $.ajax({
+    dataType : 'json',
+    type : "POST",
+    data : oData,
+    url : comPath + "ajax.php?task=" + taskCmd,
+    success : function(doc_data) {
+      $("#oper-form").dialog("close");
+      self.oTable.fnDraw();
+    }
+  });
 }
 
 //===================================================================================
 rbOper.prototype.createOper = function() {
   var self = this;
-  /*$.ajax({
-    dataType : 'json',
-    type : "POST",
-    data : {
-      "SS_opers" : {
-        "doc_type" : self.sDocType
-      }
-    },
-    url : comPath + "ajax.php?task=get_doc_num",
-    success : function(p) {
-      var i = {};
-      i.doc_num = p.new_num;
-      i.doc_date = p.new_date;
-      self.showDocForm(i);
-    }
-  });*/
 }
 
 // ===================================================================================
-rbOper.prototype.deleteOper = function(sKey) {
+rbOper.prototype.deleteOper = function(operId) {
   var self = this;
   $.ajax({
     dataType : 'json',
     type : "POST",
     data : {
-      "SS_opers" : {
-        "sKey" : sKey
+      "rbo_opers" : {
+        "operId" : operId
       }
     },
     url : comPath + "ajax.php?task=oper_delete",
@@ -181,54 +189,35 @@ rbOper.prototype.deleteOper = function(sKey) {
 // ===================================================================================
 rbOper.prototype.showOperForm = function(i) {
   var self = this;
-  $("#sDate").val(i.sDate);
-  $("#sSum").val(i.sSum);
-  $("#sRem").html(i.sRem);
-  /*Как быть если автор или операция не попадают в список select
-   * Продумать общую наличную кассу и общий склад при разных банках
-   * Надо ли иметь отдельную сумму для оплаты или нет?*/
 
-  $('#sOperType option:selected').each(function() {
-    this.selected = false;
-  });
-  if (!IsEmpty(i.sOperType))
-    $("#sOperType option:contains('" + i.sOperType + "')").prop("selected", "selected");
-  
-  $('#sOperMan option:selected').each(function() {
-    this.selected = false;
-  });
-  if (!IsEmpty(i.sOperMan))
-    $("#sOperMan option:contains('" + i.sOperMan + "')").prop("selected", "selected");
-  
-  /*var sDocBase = "";
-  $("#doc_baseId").val(i.doc_base);
-  if ((i.doc_base > 0) && !IsNull(i.doc_base_doc)) {
-    sDocBase = "Счет №" + i.doc_base_doc.doc_num + " от " + i.doc_base_doc.doc_date;
-  }
-  $("#doc_base").val(sDocBase);*/
+  refillSelect("rbo_opers\\.oper_manager", getPeopleList());
+  refillSelect("rbo_opers\\.oper_firm", getFirmList());
+  refillSelect("rbo_opers\\.oper_type", getOperTypeList());
 
-  /*this.oCust = NullTo(i.doc_cust, {
-    cust_data : {}
-  });
-  this.oCust.cust_data = NullTo(this.oCust.cust_data, {});
-  this.setCustFlds('saved');
-  if (!IsNull(i.doc_firm))
-    $("#doc_firm option:contains('" + i.doc_firm.toUpperCase() + "')").prop("selected", "selected");
-  $("#doc_rem").val(i.doc_rem);*/
+  setFormData("oper-form", "rbo_opers", i);
 
-  var readOnly = this.setRW(i.doc_status);
+  /*
+   * this.oCust = NullTo(i.doc_cust, { cust_data : {} }); this.oCust.cust_data =
+   * NullTo(this.oCust.cust_data, {}); this.setCustFlds('saved'); if
+   * (!IsNull(i.doc_firm)) $("#doc_firm option:contains('" +
+   * i.doc_firm.toUpperCase() + "')").prop("selected", "selected");
+   * $("#doc_rem").val(i.doc_rem);
+   */
+
+  var readOnly = this.setRW(i);
 
   var oBtns = {};
   if (!readOnly) {
     oBtns["Удалить"] = function() {
       Ask("Операция будет удалена. Продолжить?", "Удалить операцию", "Отмена", function() {
-        self.deleteOper(i.sKey);
+        self.deleteOper(i.operId);
+        $("#oper-form").dialog("close");
       }, null, "#dialog-confirm");
     }
   }
 
   oBtns["Сохранить"] = function() {
-    self.saveOper(i.sKey);
+    self.saveOper();
   };
 
   oBtns["Отмена"] = function() {
@@ -236,7 +225,7 @@ rbOper.prototype.showOperForm = function(i) {
   };
 
   $("#oper-form").dialog({
-    title : i.sOperType + " #" + i.sKey,
+    title : i.oper_type + " #" + i.operId,
     buttons : oBtns
   });
 
@@ -254,16 +243,14 @@ rbOper.prototype.productSearch = function() {
     },
     url : comPath + "ajax.php?task=product_search",
     success : function(p) {
-      $('#prod_name option').remove();
+      var oProd = {};
       for (var i = 0; i < p.result.length; i++) {
-        $('#prod_name').append(
-            '<option value="' + p.result[i].productID + "|" + p.result[i].price + "|" + p.result[i].product_code + "|" + p.result[i].list_price + '">' + p.result[i].name
-                + '</option>');
+        oProd[p.result[i].productId + "|" + p.result[i].product_price + "|" + p.result[i].product_code + "|" + p.result[i].product_price1] = p.result[i].product_name;
       }
-      $("#prod_name option:first").prop("selected", "selected");
+      refillSelect("rbo_opers\\.product_name", oProd);
       self.setProductPrice();
       if (p.count > p.result.length) {
-        $('#prod_name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
+        $('#rbo_opers\\.product_name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
       }
 
     }
@@ -272,29 +259,26 @@ rbOper.prototype.productSearch = function() {
 
 // ===================================================================================
 rbOper.prototype.setProductPrice = function() {
-  var oVal = $("#prod_name option:selected").val();
-  $("#product-form").dialog("option", "title", "Позиция - " + oVal);
+  var oVal = $("#rbo_opers\\.product_name option:selected").val();
   var arProd = oVal.split("|");
-  $("#prodId").val(arProd[0]);
-  $("#prod_price").val(arProd[1]);
-  $("#prod_code").val(arProd[2]);
-  $("#prod_cnt").val(1);
-  $("#prod_price1").html(arProd[3] + "р.");
+  $("#rbo_opers\\.productId").val(arProd[0]);
+  $("#rbo_opers\\.product_price").val(arProd[1]);
+  $("#rbo_opers\\.product_code").val(arProd[2]);
+  $("#rbo_opers\\.product_cnt").val(1);
+  $("#prod_price1").html("Цена Опт.1= " + arProd[3] + "р.");
   this.calcSum();
 }
 
 //===================================================================================
 rbOper.prototype.calcSum = function() {
-  $("#sSum").val($("#prod_price").val() * $("#prod_cnt").val());
+  $("#rbo_opers\\.oper_sum").val($("#rbo_opers\\.product_price").val() * $("#rbo_opers\\.product_cnt").val());
 }
 
 // ===================================================================================
 $(document).ready(function() {
-  
-  oper = new rbOper({
-  });
+
+  oper = new rbOper({});
   oper.attachOperModule();
-  oper.oProduct.attachProductModule();
   oper.oCust.attachCustomerModule();
 
   $("#dialog-confirm").dialog({

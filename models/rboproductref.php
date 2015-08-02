@@ -7,15 +7,36 @@ class RbOProductRef extends RbObject {
     parent::__construct ($keyValue);
     
     $this->is_multiple = false;
-    $this->setTableName("SS_products");
+    $this->setTableName ("rbo_productref");
     $this->flds ["productId"] = array ("type" => "numeric","is_key" => true );
-    $this->flds ["categoryID"] = array ("type" => "numeric" );
+    $this->flds ["categoryId"] = array ("type" => "numeric" );
     $this->flds ["product_code"] = array ("type" => "string" );
-    $this->flds ["name"] = array ("type" => "string" );
-    $this->flds ["price"] = array ("type" => "numeric" );
-    $this->flds ["list_price"] = array ("type" => "numeric" );
+    $this->flds ["product_name"] = array ("type" => "string" );
+    $this->flds ["product_price"] = array ("type" => "numeric" );
+    $this->flds ["product_price1"] = array ("type" => "numeric" );
     
     $this->getInputBuffer ();
+  }
+  
+  // =================================================================
+  static function updateOrCreateProduct(& $prodId, $prod_data) {
+    $input = JFactory::getApplication ()->input;
+    $input->set ("rbo_productref", $prod_data);
+    $prodRef = new RbOProductRef ($prodId);
+    if ($prodId > 0) {
+      if ($prodRef->buffer->_product_data_changed) {
+        $prodRef->updateObject ();
+      } else {
+        $prodRef->response = true;
+      }
+    } elseif ($prodId == - 1) {
+      $prodId = 0;
+      $prodRef->response = true;
+    } else {
+      $prodRef->createObject ();
+      $prodId = $prodRef->insertid;
+    }
+    return $prodRef->response;
   }
   
   // =================================================================
@@ -29,11 +50,12 @@ class RbOProductRef extends RbObject {
     
     $searchAr = split (" ", $searchSubstr);
     
+    $prodRef = new RbOProductRef ();
     $query->clear ();
-    $query->select ("productID, name, price, product_code, list_price");
-    $query->from ("SS_products");
+    $query->select ($prodRef->getFieldsForSelectClause ());
+    $query->from ($db->quoteName ($prodRef->table_name));
     foreach ( $searchAr as $v ) {
-      $query->where ("LOWER(name) LIKE '%" . strtolower($v) . "%'");
+      $query->where ("LOWER(product_name) LIKE '%" . strtolower ($v) . "%'");
     }
     
     try {

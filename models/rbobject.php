@@ -33,21 +33,25 @@ class RbObject {
   }
   
   // =================================================================
-  public function getFieldsForSelectClause() {
+  public function getFieldsForSelectClause($prefix) {
+    if (! isset ($prefix)) $prefix = '';
+    else $prefix = $prefix . '.';
     $flds_names = array ();
     foreach ( $this->flds as $fldname => $fldvalue ) {
+      $fldnameWOPrefix = $fldname;
+      $fldname = $prefix . $fldname;
       if ($fldvalue ["formula"]) {
-        $fldname = "(" . $fldvalue ["formula"] . ") as " . $fldname;
+        $fldname = "(" . $fldvalue ["formula"] . ") as " . $fldnameWOPrefix;
       }
       switch ($fldvalue ["type"]) {
         case "date" :
           {
-            $fldname = "DATE_FORMAT($fldname,'%d.%m.%Y') as $fldname"; // http://dev.mysql.com/doc/refman/5.6/en/date-and-time-functions.html#function_date-format
+            $fldname = "DATE_FORMAT($fldname,'%d.%m.%Y') as $fldnameWOPrefix"; // http://dev.mysql.com/doc/refman/5.6/en/date-and-time-functions.html#function_date-format
             break;
           }
         case "datetime" :
           {
-            $fldname = "DATE_FORMAT($fldname,'%d.%m.%Y %H:%i') as $fldname"; // http://dev.mysql.com/doc/refman/5.6/en/date-and-time-functions.html#function_date-format
+            $fldname = "DATE_FORMAT($fldname,'%d.%m.%Y %H:%i') as $fldnameWOPrefix"; // http://dev.mysql.com/doc/refman/5.6/en/date-and-time-functions.html#function_date-format
             break;
           }
       }
@@ -262,6 +266,6 @@ class RbObject {
     $query->delete ($db->quoteName ($this->table_name));
     $query->where ($this->getWhereClause ());
     $db->setQuery ($query);
-    $result = $db->execute ();
+    $this->response = $db->execute ();
   }
 }

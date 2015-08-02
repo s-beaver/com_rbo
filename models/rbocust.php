@@ -6,7 +6,7 @@ class RbOCust extends RbObject {
   public function __construct($keyValue) {
     parent::__construct ($keyValue);
     
-    $this->setTableName("rbo_cust");
+    $this->setTableName ("rbo_cust");
     $this->flds ["custId"] = array ("type" => "numeric","is_key" => true );
     $this->flds ["cust_name"] = array ("type" => "string" );
     $this->flds ["cust_fullname"] = array ("type" => "string" );
@@ -23,7 +23,30 @@ class RbOCust extends RbObject {
   }
   
   // =================================================================
-  public function getCustListBySubstr() { 
+  static function updateOrCreateCustomer(& $custId, $doc_cust) {
+    $input = JFactory::getApplication ()->input;
+    $input->set ("rbo_cust", $doc_cust);
+    $cust = new RbOCust ($custId);
+    if ($custId > 0) {
+      if (! isset ($doc_cust) || ! isset ($doc_cust->cust_name) || $doc_cust->cust_name != '') return false;
+      if ($cust->buffer->_cust_data_changed) {
+        $cust->updateObject ();
+      } else {
+        $prodRef->response = true;
+      }
+    } elseif ($custId == - 1) {
+      $custId = 0;
+      $prodRef->response = true;
+    } else {
+      if (! isset ($doc_cust) || ! isset ($doc_cust->cust_name) || $doc_cust->cust_name != '') return true;
+      $cust->createObject ();
+      $custId = $cust->insertid;
+    }
+    return $cust->response;
+  }
+  
+  // =================================================================
+  public function getCustListBySubstr() {
     $input = JFactory::getApplication ()->input;
     $searchSubstr = $input->get ("search", null, null);
     
@@ -35,7 +58,7 @@ class RbOCust extends RbObject {
     $query->select ("custId, cust_name, cust_fullname, cust_email, cust_data, cust_phone");
     $query->from ("rbo_cust");
     $query->where ("cust_name LIKE '%" . $searchSubstr . "%'", "OR");
-    //$query->where ("cust_data LIKE '%" . $searchSubstr . "%'", "OR");пока не хотим искать по данным
+    // $query->where ("cust_data LIKE '%" . $searchSubstr . "%'", "OR");пока не хотим искать по данным
     
     try {
       $db->setQuery ($query, 0, 30);
@@ -47,7 +70,7 @@ class RbOCust extends RbObject {
     foreach ( $buffer as &$v ) {
       $v->cust_data = json_decode ($v->cust_data);
     }
-    $res->count =  $db->getAffectedRows ();
+    $res->count = $db->getAffectedRows ();
     $res->result = $buffer;
     echo json_encode ($res);
   }
