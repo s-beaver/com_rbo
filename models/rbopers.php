@@ -1,5 +1,6 @@
 <?php
 include_once "models/rbobject.php";
+include_once "models/rbocust.php";
 class RbOpers extends RbObject {
   
   // =================================================================
@@ -35,6 +36,13 @@ class RbOpers extends RbObject {
   // =================================================================
   public function readObject() {
     parent::readObject ();
+    $custId = $this->buffer->custId;
+
+    $cust = new RbOCust ($custId);
+    $cust->readObject ();
+    $cust->buffer->cust_data = json_decode ($cust->buffer->cust_data);
+    $this->buffer->oper_cust = $cust->buffer;
+    
     $this->response = json_encode ($this->buffer, JSON_UNESCAPED_UNICODE);
   }
   
@@ -52,8 +60,8 @@ class RbOpers extends RbObject {
     $response = $response && RbOProductRef::updateOrCreateProduct ($productId, $this->buffer);
     $this->buffer->productId = $productId; 
 
-    $this->buffer->sAuthor = JFactory::getUser ()->username;
-    $this->buffer->sAuthorTime = RbOHelper::getCurrentTimeForDb ();
+    $this->buffer->modified_by = JFactory::getUser ()->username;
+    $this->buffer->modified_on = RbOHelper::getCurrentTimeForDb ();
     
     parent::updateObject ();
     
@@ -65,21 +73,17 @@ class RbOpers extends RbObject {
     $response = true;
     $custId = $this->buffer->custId;
     $oper_cust = $this->buffer->oper_cust;
-    $doc_cust = $this->buffer->doc_cust;
     $oper_cust ['cust_data'] = json_encode ($doc_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
-    $product_data = json_encode (
-        array ("productId" => $this->buffer->sProductID,
-            "product_code" => $this->buffer->sProductCode,"name" => $this->buffer->sProductName,
-            "price" => $this->buffer->sPrice ), JSON_UNESCAPED_UNICODE);
-    
-    // $this->buffer->sAuthor = JFactory::getUser ()->username;
-    // $this->buffer->sAuthorTime = RbOHelper::getCurrentTimeForDb ();
+    $productId = $this->buffer->productId;
     
     $response = $response && RbOCust::updateOrCreateCustomer ($custId, $oper_cust);
-    $this->buffer->custId = $custId; // должно было передаться по ссылке
+    $this->buffer->custId = $custId; 
     
-    $response = $response && RbOProductRef::updateOrCreateProduct ($prodId, $product_data);
-    $this->buffer->custId = $prodId; // должно было передаться по ссылке
+    $response = $response && RbOProductRef::updateOrCreateProduct ($productId, $this->buffer);
+    $this->buffer->productId = $productId; 
+    
+    $this->buffer->created_by = JFactory::getUser ()->username;
+    $this->buffer->created_on = RbOHelper::getCurrentTimeForDb ();
     
     parent::createObject ();
     

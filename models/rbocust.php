@@ -24,19 +24,20 @@ class RbOCust extends RbObject {
   
   // =================================================================
   static function updateOrCreateCustomer(& $custId, $doc_cust) {
+    $doc_cust = ( object ) $doc_cust;
     $input = JFactory::getApplication ()->input;
     $input->set ("rbo_cust", $doc_cust);
     $cust = new RbOCust ($custId);
     if ($custId > 0) {
-      if (! isset ($doc_cust) || ! isset ($doc_cust->cust_name) || $doc_cust->cust_name != '') return false;
+      if (! isset ($doc_cust) || ! isset ($doc_cust->cust_name) || $doc_cust->cust_name == '') return false;
       if ($cust->buffer->_cust_data_changed) {
         $cust->updateObject ();
       } else {
-        $prodRef->response = true;
+        $cust->response = true;
       }
     } elseif ($custId == - 1) {
       $custId = 0;
-      $prodRef->response = true;
+      $cust->response = true;
     } else {
       if (! isset ($doc_cust) || ! isset ($doc_cust->cust_name) || $doc_cust->cust_name != '') return true;
       $cust->createObject ();

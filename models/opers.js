@@ -59,6 +59,10 @@ rbOper.prototype.attachOperModule = function() {
       "sClass" : "center",
       "mData" : "oper_sum"
     }, {
+      "sTitle" : "Товар/услуга",
+      "sClass" : "left",
+      "mData" : "product_name"
+    }, {
       "sTitle" : "Фирма",
       "sClass" : "center",
       "mData" : "oper_firm"
@@ -146,6 +150,12 @@ rbOper.prototype.saveOper = function() {
   if (!bValid)
     return;
 
+  if (self.oCust.flds.cust_name == "")
+    $("#custId").val("-1");//значит мы сознательно удаляем покупателя из документа
+  
+  oData["rbo_opers"]["custId"] = self.oCust.flds.custId;  
+  oData["rbo_opers"]["oper_cust"] = self.oCust.flds;  
+  
   var taskCmd = "oper_create";
   if (!IsNull(oData.rbo_opers.operId) && oData.rbo_opers.operId > 0)
     taskCmd = "oper_update";
@@ -196,14 +206,9 @@ rbOper.prototype.showOperForm = function(i) {
 
   setFormData("oper-form", "rbo_opers", i);
 
-  /*
-   * this.oCust = NullTo(i.doc_cust, { cust_data : {} }); this.oCust.cust_data =
-   * NullTo(this.oCust.cust_data, {}); this.setCustFlds('saved'); if
-   * (!IsNull(i.doc_firm)) $("#doc_firm option:contains('" +
-   * i.doc_firm.toUpperCase() + "')").prop("selected", "selected");
-   * $("#doc_rem").val(i.doc_rem);
-   */
-
+  //установим поля контрагента
+  self.oCust.setCustFlds('saved', i.oper_cust);
+  
   var readOnly = this.setRW(i);
 
   var oBtns = {};
