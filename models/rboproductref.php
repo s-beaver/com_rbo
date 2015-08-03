@@ -7,7 +7,7 @@ class RbOProductRef extends RbObject {
     parent::__construct ($keyValue);
     
     $this->is_multiple = false;
-    $this->setTableName ("rbo_productref");
+    $this->setTableName ("rbo_products");
     $this->flds ["productId"] = array ("type" => "numeric","is_key" => true );
     $this->flds ["categoryId"] = array ("type" => "numeric" );
     $this->flds ["product_code"] = array ("type" => "string" );
@@ -21,7 +21,7 @@ class RbOProductRef extends RbObject {
   // =================================================================
   static function updateOrCreateProduct(& $prodId, $prod_data) {
     $input = JFactory::getApplication ()->input;
-    $input->set ("rbo_productref", $prod_data);
+    $input->set ("rbo_products", $prod_data);
     $prodRef = new RbOProductRef ($prodId);
     if ($prodId > 0) {
       if ($prodRef->buffer->_product_data_changed) {

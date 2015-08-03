@@ -14,9 +14,9 @@ SET NAMES 'utf8';
 
 
 --
--- Изменить таблицу "rbo_productref"
+-- Изменить таблицу "rbo_products"
 --
-ALTER TABLE rbo_productref
+ALTER TABLE rbo_products
   DROP COLUMN description,
   DROP COLUMN customers_rating,
   DROP COLUMN picture,
