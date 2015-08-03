@@ -423,7 +423,7 @@ rboDoc.prototype.showProductForm = function(x) {// x-номер редактир
     fnSave : function(pObj) {
       if (self.editing_lineNo >= 0) {
         pObj.lineNo = self.editing_lineNo;
-        self.oTableProducts.fnUpdate(p, x);
+        self.oTableProducts.fnUpdate(pObj, pObj.lineNo);
       } else {
         pObj.lineNo = self.lines_before_update;
         self.oTableProducts.fnAddData(pObj);

@@ -147,7 +147,7 @@ rboProduct.prototype.productSearch = function() {
       $('#prod_name option').remove();
       for (var i = 0; i < p.result.length; i++) {
         $('#prod_name').append(
-            '<option value="' + p.result[i].productID + "|" + p.result[i].price + "|" + p.result[i].product_code + "|" + p.result[i].list_price + '">' + p.result[i].name
+            '<option value="' + p.result[i].productId + "|" + p.result[i].product_price + "|" + p.result[i].product_code + "|" + p.result[i].product_price1 + '">' + p.result[i].product_name
                 + '</option>');
       }
       $("#prod_name option:first").prop("selected", "selected");
