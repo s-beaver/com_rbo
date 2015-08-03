@@ -294,7 +294,7 @@ rboCust.prototype.chooseBaseDoc = function() {
             doc_data.doc_base_doc.doc_num = doc_data.doc_num;
             doc_data.doc_base_doc.doc_date = doc_data.doc_date;
 
-            doc_data.docId = self.parentDoc.doctId;//self.parentDoc.oDoc.doctId;
+            doc_data.docId = self.parentDoc.docId;//self.parentDoc.oDoc.docId;
             doc_data.doc_num = $("#doc_num").val();//self.parentDoc.oDoc.doc_num;
             doc_data.doc_date = $("#doc_date").val();//self.parentDoc.oDoc.doc_date;
             doc_data.doc_status = $("#doc_status").val();//self.parentDoc.oDoc.doc_status;
@@ -339,7 +339,7 @@ rboCust.prototype.baseDocSearch = function() {
           $('#base-doc-cust-name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
         }
         $("#base-doc-cust-name option:first").prop("selected", "selected");
-        self.setCustFlds('selected');
+        //self.setCustFlds('selected');
         self.setBaseDocList();
       }
     }
