@@ -95,15 +95,18 @@ class RbObject {
   }
   
   // =================================================================
-  public function getSetForUpdateClause($db, $buffer) { // заменить на перебор flds вместо buffer (см. ниже)
+  public function getSetForUpdateClause($db, $buffer, $useNull = true) { // заменить на перебор flds вместо buffer (см. ниже)
     $buffer = ( object ) $buffer;
-    
     $setFlds = get_object_vars ($buffer);
     $setAr = array ();
     foreach ( $setFlds as $key => $value ) {
       if (! isset ($this->flds [$key])) continue;
       if (is_array ($value) || is_object ($value)) continue;
       if ($this->flds [$key] ["read_only"]) continue;
+      if ($useNull && ! isset ($value)) {
+        $setAr [] = $db->quoteName ($key) . "=NULL";
+        continue;
+      }
       switch ($this->flds [$key] ["type"]) {
         case "string" :
           {

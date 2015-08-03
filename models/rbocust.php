@@ -39,7 +39,7 @@ class RbOCust extends RbObject {
       $custId = 0;
       $cust->response = true;
     } else {
-      if (! isset ($doc_cust) || ! isset ($doc_cust->cust_name) || $doc_cust->cust_name != '') return true;
+      if (! isset ($doc_cust) || ! isset ($doc_cust->cust_name) || $doc_cust->cust_name == '') return true;
       $cust->createObject ();
       $custId = $cust->insertid;
     }
