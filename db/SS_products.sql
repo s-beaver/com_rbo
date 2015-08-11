@@ -32,4 +32,4 @@ ALTER TABLE rbo_products
   CHANGE COLUMN name product_name VARCHAR(255) DEFAULT NULL AFTER categoryId,
   CHANGE COLUMN Price product_price FLOAT DEFAULT NULL AFTER product_name,
   CHANGE COLUMN in_stock product_in_stock INT(11) DEFAULT NULL AFTER product_price,
-  CHANGE COLUMN list_price product_price1 FLOAT DEFAULT NULL AFTER customer_votes;
+  CHANGE COLUMN list_price product_price1 FLOAT DEFAULT NULL;

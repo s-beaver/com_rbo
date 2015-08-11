@@ -73,7 +73,9 @@ function setFormData(formName, objPrefix, o) {
       });
       if (!IsEmpty(o[s])) {
         $("#" + sIdDot + " option:contains('" + o[s] + "')").prop("selected", "selected");
-        if ($('#' + sIdDot + ' option:selected').val() != o[s]) {
+        var sCheck1 = NullTo($('#' + sIdDot + ' option:selected').val(),"");
+        var sCheck2 = NullTo(o[s],"");
+        if (sCheck1.toUpperCase() != sCheck2.toUpperCase()) {
           $(elem).append('<option value="' + o[s] + '">' + o[s] + '</option>');
           $("#" + sIdDot + " option:contains('" + o[s] + "')").prop("selected", "selected");
         }
@@ -119,8 +121,8 @@ function getPeopleList() {
 //===================================================================================
 function getFirmList() {
   return {
-    "ип" : "ИП",
-    "ооо" : "ООО"
+    "ИП" : "ИП",
+    "ООО" : "ООО"
   };
 
 }

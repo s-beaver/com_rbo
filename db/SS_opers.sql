@@ -37,7 +37,7 @@ ALTER TABLE rbo_opers
   CHANGE COLUMN sPrice product_price FLOAT DEFAULT NULL AFTER product_name,
   CHANGE COLUMN sCnt product_cnt INT(11) DEFAULT NULL AFTER product_price,
   CHANGE COLUMN sSum oper_sum FLOAT DEFAULT 0 AFTER product_cnt,
-  CHANGE COLUMN sOperMan oper_manager VARCHAR(30) DEFAULT NULL AFTER product_sum,
+  CHANGE COLUMN sOperMan oper_manager VARCHAR(30) DEFAULT NULL,
   CHANGE COLUMN sCashPlace1 oper_firm VARCHAR(10) DEFAULT '' AFTER oper_manager,
   CHANGE COLUMN sRem oper_rem TEXT DEFAULT NULL AFTER oper_firm,
   CHANGE COLUMN sTZ oper_TZ VARCHAR(5) DEFAULT NULL AFTER oper_rem,

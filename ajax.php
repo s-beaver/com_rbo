@@ -28,6 +28,15 @@ $input = $app->input;
 $cmd = $input->getCmd ('task');
 
 switch ($cmd) {
+  case "get_current_date" :
+    {
+      $currentTime=new JDate ();
+      $res = new stdClass();
+      $res->new_date = $currentTime->format ('d.m.Y', true); 
+      echo json_encode ($res, JSON_UNESCAPED_UNICODE);
+      break;
+    }
+  
   case "get_doc_list" :
     {
       $docList = new RbODocument ();
@@ -107,7 +116,7 @@ switch ($cmd) {
   case "oper_create" :
     {
       $oper = new RbOpers ();
-      $doc->createObject ();
+      $oper->createObject ();
       echo $oper->getResponse ();
       break;
     }

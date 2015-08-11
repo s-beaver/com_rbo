@@ -117,6 +117,12 @@ rbOper.prototype.attachOperModule = function() {
     self.calcSum();
     return false;
   });
+  
+  $("#rbo_opers\\.oper_date").datepicker({
+    showButtonPanel : true,
+    dateFormat : "dd.mm.yy"
+  });
+  
 }
 
 //===================================================================================
@@ -152,10 +158,10 @@ rbOper.prototype.saveOper = function() {
 
   if (self.oCust.flds.cust_name == "")
     $("#custId").val("-1");//значит мы сознательно удаляем покупателя из документа
-  
-  oData["rbo_opers"]["custId"] = self.oCust.flds.custId;  
-  oData["rbo_opers"]["oper_cust"] = self.oCust.flds;  
-  
+
+  oData["rbo_opers"]["custId"] = self.oCust.flds.custId;
+  oData["rbo_opers"]["oper_cust"] = self.oCust.flds;
+
   var taskCmd = "oper_create";
   if (!IsNull(oData.rbo_opers.operId) && oData.rbo_opers.operId > 0)
     taskCmd = "oper_update";
@@ -174,6 +180,16 @@ rbOper.prototype.saveOper = function() {
 //===================================================================================
 rbOper.prototype.createOper = function() {
   var self = this;
+  $.ajax({
+    dataType : 'json',
+    type : "POST",
+    url : comPath + "ajax.php?task=get_current_date",
+    success : function(p) {
+      var i = {};
+      i.oper_date = p.new_date;
+      self.showOperForm(i);
+    }
+  });
 }
 
 // ===================================================================================
@@ -208,7 +224,7 @@ rbOper.prototype.showOperForm = function(i) {
 
   //установим поля контрагента
   self.oCust.setCustFlds('saved', i.oper_cust);
-  
+
   var readOnly = this.setRW(i);
 
   var oBtns = {};
@@ -230,7 +246,7 @@ rbOper.prototype.showOperForm = function(i) {
   };
 
   $("#oper-form").dialog({
-    title : i.oper_type + " #" + i.operId,
+    title : NullTo(i.oper_type,"") + " #" + NullTo(i.operId,"новая"),
     buttons : oBtns
   });
 
