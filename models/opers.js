@@ -117,12 +117,16 @@ rbOper.prototype.attachOperModule = function() {
     self.calcSum();
     return false;
   });
-  
+
   $("#rbo_opers\\.oper_date").datepicker({
     showButtonPanel : true,
     dateFormat : "dd.mm.yy"
   });
-  
+
+  $("#dialog-confirm").dialog({
+    autoOpen : false
+  });
+
 }
 
 //===================================================================================
@@ -185,9 +189,9 @@ rbOper.prototype.createOper = function() {
     type : "POST",
     url : comPath + "ajax.php?task=get_current_date",
     success : function(p) {
-      var i = {};
-      i.oper_date = p.new_date;
-      self.showOperForm(i);
+      self.showOperForm({
+        "oper_date" : p.new_date
+      });
     }
   });
 }
@@ -209,7 +213,7 @@ rbOper.prototype.deleteOper = function(operId) {
     }
   });
 
-  $("#doc-form").dialog("close");
+  $("#oper-form").dialog("close");
 }
 
 // ===================================================================================
@@ -246,7 +250,7 @@ rbOper.prototype.showOperForm = function(i) {
   };
 
   $("#oper-form").dialog({
-    title : NullTo(i.oper_type,"") + " #" + NullTo(i.operId,"новая"),
+    title : NullTo(i.oper_type, "") + " #" + NullTo(i.operId, "новая"),
     buttons : oBtns
   });
 
@@ -301,14 +305,5 @@ $(document).ready(function() {
   oper = new rbOper({});
   oper.attachOperModule();
   oper.oCust.attachCustomerModule();
-
-  $("#dialog-confirm").dialog({
-    autoOpen : false
-  });
-
-  $("#sDate").datepicker({
-    showButtonPanel : true,
-    dateFormat : "dd.mm.yy"
-  });
 
 });

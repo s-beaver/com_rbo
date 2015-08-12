@@ -173,7 +173,7 @@ class RbObject {
   }
   
   // =================================================================
-  public function readObject() {
+  public function readObject($echoResponse = false) {
     $db = JFactory::getDBO ();
     $query = $db->getQuery (true);
     
@@ -191,10 +191,14 @@ class RbObject {
     } catch ( Exception $e ) {
       JLog::add (get_class ($this) . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
     }
+    if ($echoResponse) {
+      $this->response = json_encode ($this->buffer, JSON_UNESCAPED_UNICODE);
+      echo $this->response;
+    }
   }
   
   // =================================================================
-  public function updateObject() {
+  public function updateObject($echoResponse = false) {
     $db = JFactory::getDBO ();
     $query = $db->getQuery (true);
     
@@ -223,10 +227,13 @@ class RbObject {
           JLog::ERROR, 'com_rbo');
     }
     $this->response = $result;
+    if ($echoResponse) {
+      echo $this->response;
+    }
   }
   
   // =================================================================
-  public function createObject() {
+  public function createObject($echoResponse = false) {
     $db = JFactory::getDBO ();
     $query = $db->getQuery (true);
     
@@ -260,15 +267,21 @@ class RbObject {
           JLog::ERROR, 'com_rbo');
     }
     $this->response = $result;
+    if ($echoResponse) {
+      echo $this->response;
+    }
   }
   
   // =================================================================
-  public function deleteObject() {
+  public function deleteObject($echoResponse = false) {
     $db = JFactory::getDBO ();
     $query = $db->getQuery (true);
     $query->delete ($db->quoteName ($this->table_name));
     $query->where ($this->getWhereClause ());
     $db->setQuery ($query);
     $this->response = $db->execute ();
+    if ($echoResponse) {
+      echo $this->response;
+    }
   }
 }

@@ -16,6 +16,7 @@ class RbOProducts extends RbObject {
     $this->flds ["product_price1"] = array ("type" => "numeric" );
     
     $this->getInputBuffer ();
+    if (! isset ($keyValue)) $this->keyValue = $this->buffer->productId;
   }
   
   // =================================================================
@@ -40,20 +41,20 @@ class RbOProducts extends RbObject {
   }
   
   // =================================================================
-  static function getProductListBySubstr() {
+  static function getProductListForm() {
     $input = JFactory::getApplication ()->input;
-    $searchSubstr = $input->get ("search", null, null);
+    $searchSubstr = $input->getString ('search');
+    if (! is_string ($searchSubstr) || strlen ($searchSubstr) < 2) return;
     
-    if (! is_string ($searchSubstr) || strlen ($searchSubstr) < 2) {return;}
     $db = JFactory::getDBO ();
     $query = $db->getQuery (true);
-    
-    $searchAr = split (" ", $searchSubstr);
     
     $prodRef = new RbOProducts ();
     $query->clear ();
     $query->select ($prodRef->getFieldsForSelectClause ());
     $query->from ($db->quoteName ($prodRef->table_name));
+    
+    $searchAr = split (" ", $searchSubstr);
     foreach ( $searchAr as $v ) {
       $query->where ("LOWER(product_name) LIKE '%" . strtolower ($v) . "%'");
     }
@@ -65,6 +66,51 @@ class RbOProducts extends RbObject {
       $res = new stdClass ();
       $res->count = $count;
       $res->result = $buffer;
+      echo json_encode ($res);
+    } catch ( Exception $e ) {
+      JLog::add (get_class ($this) . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
+    }
+  }
+  
+  // =================================================================
+  static function getProductList() {
+    $input = JFactory::getApplication ()->input;
+    $iDisplayStart = $input->getInt ('iDisplayStart');
+    $iDisplayLength = $input->getInt ('iDisplayLength');
+    $sEcho = $input->getString ('sEcho');
+    $searchSubstr = $input->getString ('sSearch');
+    
+    $db = JFactory::getDBO ();
+    $query = $db->getQuery (true);
+    
+    $prodRef = new RbOProducts ();
+    $query->clear ();
+    $query->select ($prodRef->getFieldsForSelectClause ());
+    $query->from ($db->quoteName ($prodRef->table_name,"rp"));
+    $query->order ($db->quoteName ('rp.productId') . " DESC");
+    
+    if (! empty ($searchSubstr)) {
+      $searchAr = split (" ", $searchSubstr);
+      foreach ( $searchAr as $v ) {
+        $query->where ("LOWER(product_name) LIKE '%" . strtolower ($v) . "%'");
+      }
+    }
+    
+    try {
+      if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
+        $db->setQuery ($query, intval ($iDisplayStart), intval ($iDisplayLength));
+      } else {
+        $db->setQuery ($query);
+      }
+      
+      $data_rows_assoc_list = $db->loadAssocList ();
+      $iTotalDisplayRecords = $db->getAffectedRows ();
+      
+      $res = new stdClass ();
+      $res->sEcho = $sEcho;
+      $res->iTotalRecords = $iTotalDisplayRecords;
+      $res->iTotalDisplayRecords = $iTotalDisplayRecords;
+      $res->aaData = $data_rows_assoc_list;
       echo json_encode ($res);
     } catch ( Exception $e ) {
       JLog::add (get_class ($this) . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');

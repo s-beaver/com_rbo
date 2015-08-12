@@ -30,9 +30,9 @@ $cmd = $input->getCmd ('task');
 switch ($cmd) {
   case "get_current_date" :
     {
-      $currentTime=new JDate ();
-      $res = new stdClass();
-      $res->new_date = $currentTime->format ('d.m.Y', true); 
+      $currentTime = new JDate ();
+      $res = new stdClass ();
+      $res->new_date = $currentTime->format ('d.m.Y', true);
       echo json_encode ($res, JSON_UNESCAPED_UNICODE);
       break;
     }
@@ -77,9 +77,10 @@ switch ($cmd) {
       break;
     }
   
-  case "product_search" :
+  case "get_doc_num" :
     {
-      RbOProducts::getProductListBySubstr ();
+      $doc = new RbODocs ();
+      $doc->getNextDocNumber ();
       break;
     }
   
@@ -87,13 +88,6 @@ switch ($cmd) {
     {
       $cust = new RbOCust ();
       $cust->getCustListBySubstr ();
-      break;
-    }
-  
-  case "get_doc_num" :
-    {
-      $doc = new RbODocs ();
-      $doc->getNextDocNumber ();
       break;
     }
   
@@ -134,6 +128,46 @@ switch ($cmd) {
       $oper = new RbOpers ();
       $oper->deleteObject ();
       echo $oper->getResponse ();
+      break;
+    }
+  
+  case "product_search" :
+    {
+      RbOProducts::getProductListForm ();
+      break;
+    }
+  
+  case "get_product_list" :
+    {
+      RbOProducts::getProductList ();
+      break;
+    }
+  
+  case "product_read" :
+    {
+      $prd = new RbOProducts ();
+      $prd->readObject (true);
+      break;
+    }
+  
+  case "product_create" :
+    {
+      $prd = new RbOProducts ();
+      $prd->createObject (true);
+      break;
+    }
+  
+  case "product_update" :
+    {
+      $prd = new RbOProducts ();
+      $prd->updateObject (true);
+      break;
+    }
+  
+  case "product_delete" :
+    {
+      $prd = new RbOProducts ();
+      $prd->deleteObject (true);
       break;
     }
   

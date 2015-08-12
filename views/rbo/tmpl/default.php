@@ -18,7 +18,7 @@
     <li class="ui-widget-content1"><a href='/index.php?option=com_rbo&view=shipments'>Накладные</a></li>
     <li class="ui-widget-content1"><a href='/index.php?option=com_rbo&view=acts'>Акты</a></li>
     <li class="ui-widget-content1"><a href='/index.php?option=com_rbo&view=opers'>Операции</a></li>
-    <li class="ui-widget-content1">Справочник - товары</li>
+    <li class="ui-widget-content1"><a href='/index.php?option=com_rbo&view=products'>Справочник - товары</a></li>
     <li class="ui-widget-content1">Отчеты</li>
     <li class="ui-widget-content1"><a href='http://robik.ru/zakrytye-materialy/39-rabota-v-uchetnoj-sisteme-robika'>Описание работы в учетной системе</a></li>
     <li class="ui-widget-content1"><a href='http://robik.ru/zakrytye-materialy/40-tipovye-operatsii'>Описание типовых операций</a></li>

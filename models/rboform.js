@@ -50,6 +50,7 @@ function setFormData(formName, objPrefix, o) {
     sId = $(this).attr("id");
     sIdDot = sId.replace(objPrefix + ".", objPrefix + "\\.");
     s = sId.replace(objPrefix + ".", "");
+    o[s] = NullTo(o[s],"");
     switch ($(this).prop("tagName")) {
     case "DIV":
     case "LABEL":
