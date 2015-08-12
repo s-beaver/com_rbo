@@ -1,6 +1,6 @@
 <?php
 include_once "models/rbobject.php";
-class RbOProducts extends RbObject {
+class RbODocsProducts extends RbObject {
   
   // =================================================================
   public function __construct($keyValue) {

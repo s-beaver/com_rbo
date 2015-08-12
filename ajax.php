@@ -13,10 +13,10 @@ if (! defined ('_JDEFINES')) {
 
 require_once JPATH_BASE . '/includes/framework.php';
 include_once "models/rbohelper.php";
-include_once "models/rbodocument.php";
-include_once "models/rboproductref.php";
-include_once "models/rbocust.php";
-include_once "models/rbopers.php";
+include_once "models/rbo_docs.php";
+include_once "models/rbo_products.php";
+include_once "models/rbo_cust.php";
+include_once "models/rbo_opers.php";
 JLog::addLogger (array ('text_file' => 'com_rbo.php' ), JLog::ALL, array ('com_rbo' ));
 
 $app = JFactory::getApplication ('site');
@@ -39,7 +39,7 @@ switch ($cmd) {
   
   case "get_doc_list" :
     {
-      $docList = new RbODocument ();
+      $docList = new RbODocs ();
       $docList->getDocList ();
       echo $docList->getResponse ();
       break;
@@ -47,7 +47,7 @@ switch ($cmd) {
   
   case "doc_read" :
     {
-      $doc = new RbODocument ();
+      $doc = new RbODocs ();
       $doc->readObject ();
       echo $doc->getResponse ();
       break;
@@ -55,7 +55,7 @@ switch ($cmd) {
   
   case "doc_create" :
     {
-      $doc = new RbODocument ();
+      $doc = new RbODocs ();
       $doc->createObject ();
       echo $doc->getResponse ();
       break;
@@ -63,7 +63,7 @@ switch ($cmd) {
   
   case "doc_update" :
     {
-      $doc = new RbODocument ();
+      $doc = new RbODocs ();
       $doc->updateObject ();
       echo $doc->getResponse ();
       break;
@@ -71,7 +71,7 @@ switch ($cmd) {
   
   case "doc_delete" :
     {
-      $doc = new RbODocument ();
+      $doc = new RbODocs ();
       $doc->deleteObject ();
       echo $doc->getResponse ();
       break;
@@ -79,7 +79,7 @@ switch ($cmd) {
   
   case "product_search" :
     {
-      RbOProductRef::getProductListBySubstr ();
+      RbOProducts::getProductListBySubstr ();
       break;
     }
   
@@ -92,7 +92,7 @@ switch ($cmd) {
   
   case "get_doc_num" :
     {
-      $doc = new RbODocument ();
+      $doc = new RbODocs ();
       $doc->getNextDocNumber ();
       break;
     }

@@ -1,6 +1,6 @@
 <?php
 include_once "models/rbobject.php";
-class RbOProductRef extends RbObject {
+class RbOProducts extends RbObject {
   
   // =================================================================
   public function __construct($keyValue) {
@@ -22,7 +22,7 @@ class RbOProductRef extends RbObject {
   static function updateOrCreateProduct(& $prodId, $prod_data) {
     $input = JFactory::getApplication ()->input;
     $input->set ("rbo_products", $prod_data);
-    $prodRef = new RbOProductRef ($prodId);
+    $prodRef = new RbOProducts ($prodId);
     if ($prodId > 0) {
       if ($prodRef->buffer->_product_data_changed) {
         $prodRef->updateObject ();
@@ -50,7 +50,7 @@ class RbOProductRef extends RbObject {
     
     $searchAr = split (" ", $searchSubstr);
     
-    $prodRef = new RbOProductRef ();
+    $prodRef = new RbOProducts ();
     $query->clear ();
     $query->select ($prodRef->getFieldsForSelectClause ());
     $query->from ($db->quoteName ($prodRef->table_name));

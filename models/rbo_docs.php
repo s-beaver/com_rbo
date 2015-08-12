@@ -1,11 +1,11 @@
 <?php
 include_once "models/rbobject.php";
-include_once "models/rboproducts.php";
-include_once "models/rboproductref.php";
-include_once "models/rbocust.php";
+include_once "models/rbo_docs_products.php";
+include_once "models/rbo_products.php";
+include_once "models/rbo_cust.php";
 include_once "rbohelper.php";
 include_once "configuration.php";
-class RbODocument extends RbObject {
+class RbODocs extends RbObject {
   public $readBaseDocument = true;
   
   // =================================================================
@@ -47,12 +47,12 @@ class RbODocument extends RbObject {
     
     if ($this->readBaseDocument) {
       if (! isset ($doc_base)) $doc_base = 0; // иначе объект возъмет из буфера, а там ключ самого себя
-      $doc_base_doc = new RbODocument ($doc_base, false);
+      $doc_base_doc = new RbODocs ($doc_base, false);
       $doc_base_doc->readObject ();
       $this->buffer->doc_base_doc = $doc_base_doc->buffer;
     }
     
-    $prod = new RbOProducts ($this->keyValue);
+    $prod = new RbODocsProducts ($this->keyValue);
     $prod->readObject ();
     $this->buffer->doc_products = $prod->buffer;
     
@@ -104,7 +104,7 @@ class RbODocument extends RbObject {
         // $pRef ["list_price"] = ;
         
         $input->set ("SS_products", $pRef);
-        $prodRef = new RbOProductRef ();
+        $prodRef = new RbOProducts ();
         $prodRef->createObject ();
         $p ["productId"] = $prodRef->insertid;
       }
@@ -114,7 +114,7 @@ class RbODocument extends RbObject {
     
     $input = JFactory::getApplication ()->input;
     $input->set ("rbo_docs_products", $doc_products);
-    $prod = new RbOProducts ($this->keyValue);
+    $prod = new RbODocsProducts ($this->keyValue);
     $prod->deleteObject ();
     $prod->createObject ();
     $response = $response && $prod->response;
@@ -123,7 +123,7 @@ class RbODocument extends RbObject {
     /*
      * if ($this->response) {
      * RbOHelper::sendEMail ("документ изменен",
-     * "Изменен документ. Детали: " . RbODocument::docBuffer2Str ($this->buffer));
+     * "Изменен документ. Детали: " . RbODocs::docBuffer2Str ($this->buffer));
      * }
      */
   }
@@ -168,7 +168,7 @@ class RbODocument extends RbObject {
         // $pRef ["list_price"] = ;
         
         $input->set ("SS_products", $pRef);
-        $prodRef = new RbOProductRef ();
+        $prodRef = new RbOProducts ();
         $prodRef->createObject ();
         $p ["productId"] = $prodRef->insertid;
       }
@@ -176,7 +176,7 @@ class RbODocument extends RbObject {
     }
     
     $input->set ("rbo_docs_products", $doc_products);
-    $prod = new RbOProducts ($docId);
+    $prod = new RbODocsProducts ($docId);
     $prod->createObject ();
     $response = $response && $prod->response;
     

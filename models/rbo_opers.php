@@ -1,6 +1,6 @@
 <?php
 include_once "models/rbobject.php";
-include_once "models/rbocust.php";
+include_once "models/rbo_cust.php";
 class RbOpers extends RbObject {
   
   // =================================================================
@@ -57,7 +57,7 @@ class RbOpers extends RbObject {
     $response = $response && RbOCust::updateOrCreateCustomer ($custId, $oper_cust);
     $this->buffer->custId = $custId; 
     
-    $response = $response && RbOProductRef::updateOrCreateProduct ($productId, $this->buffer);
+    $response = $response && RbOProducts::updateOrCreateProduct ($productId, $this->buffer);
     $this->buffer->productId = $productId; 
 
     $this->buffer->modified_by = JFactory::getUser ()->username;
@@ -79,7 +79,7 @@ class RbOpers extends RbObject {
     $response = $response && RbOCust::updateOrCreateCustomer ($custId, $oper_cust);
     $this->buffer->custId = $custId; 
     
-    $response = $response && RbOProductRef::updateOrCreateProduct ($productId, $this->buffer);
+    $response = $response && RbOProducts::updateOrCreateProduct ($productId, $this->buffer);
     $this->buffer->productId = $productId; 
     
     $this->buffer->created_by = JFactory::getUser ()->username;
