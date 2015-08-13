@@ -43,7 +43,7 @@ function fillInvoicePrintForm(i) {
 
   if (!IsNull(i.doc_cust)) {
     var c = i.doc_cust;
-    var cd = c.cust_data;
+    var cd = NullTo(c.cust_data,{});
     var arCust = [ c.cust_fullname, "ИНН " + cd.cust_inn, "КПП " + cd.cust_kpp, cd.cust_addr,
         c.f_phone, "банк "+cd.cust_bank, "БИК "+cd.cust_bik, "р/сч "+cd.cust_rch, "к/сч "+cd.cust_kch ];
     $("[id^='doc_cust']").each(function(x, elem) {

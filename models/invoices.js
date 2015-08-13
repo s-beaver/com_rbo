@@ -12,7 +12,12 @@ $(document).ready(function() {
     printList : [ {
       title : "Печатать",
       viewname : "printinv"
-    } ]
+    } ],
+    statusList : {
+      "выставлен" : "выставлен",
+      "оплачен" : "оплачен",
+      "удален" : "удален"
+    }
   });
   doc.attachDocModule();
   doc.oProduct.attachProductModule();

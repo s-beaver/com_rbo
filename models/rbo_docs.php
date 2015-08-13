@@ -61,8 +61,11 @@ class RbODocs extends RbObject {
     $cust->buffer->cust_data = json_decode ($cust->buffer->cust_data);
     $this->buffer->doc_cust = $cust->buffer;
     
-    // $cfg = new RbOConfig ();
-    $this->buffer->doc_firm_details = RbOConfig::$firms [$this->buffer->doc_firm];
+    $firm = RbOConfig::$firms [mb_strtoupper ($this->buffer->doc_firm,"UTF-8")];
+    if (is_string ($firm ["copyof"]) && strlen ($firm ["copyof"]) > 0) {
+      $firm = RbOConfig::$firms [$firm ["copyof"]];
+    }
+    $this->buffer->doc_firm_details = $firm;
     $this->buffer->doc_manager_details = RbOConfig::$managers [$this->buffer->doc_manager];
     $this->response = json_encode ($this->buffer, JSON_UNESCAPED_UNICODE);
   }
