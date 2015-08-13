@@ -24,6 +24,7 @@ function rboDoc(o) {
   this.editing_lineNo = 0;
   this.lines_before_update = 0;
 
+  this.oStatusList = o.statusList;
 }
 
 //===================================================================================
@@ -298,6 +299,9 @@ rboDoc.prototype.deleteDoc = function(docId) {
 // ===================================================================================
 rboDoc.prototype.showDocForm = function(i) {
   var self = this;
+  refillSelect("doc_manager", getPeopleList(),true);
+  refillSelect("doc_firm", getFirmList());
+  refillSelect("doc_status", self.oStatusList,true);
 
   self.docId = i.docId;
 

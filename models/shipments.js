@@ -9,7 +9,11 @@ $(document).ready(function() {
     sDocTypeTitle : 'Накладная',
     allFields : $("#doc_num").add($("#doc_date")).add($("#doc_manager")).add($("#doc_firm")).add($("#cedit")),
     tips : $(".validateTips"),
-    printList : [{title:"Печатать ТОРГ-12", viewname:"printtorg12"},{title:"Печатать накл.", viewname:"printship"},{title:"Печатать тов.чек", viewname:"printtovcheck"}]
+    printList : [{title:"Печатать ТОРГ-12", viewname:"printtorg12"},{title:"Печатать накл.", viewname:"printship"},{title:"Печатать тов.чек", viewname:"printtovcheck"}],
+    statusList : {
+      "подписан" : "подписан",
+      "удален" : "удален"
+    }
   });
 
   doc.attachDocModule();
