@@ -61,9 +61,10 @@
             <td>
               <table>
                 <tr>
-                  <td><label for="prod_search">Поиск</label> <input type="text" name="prod_search" id="prod_search" style='width: 350px' /> <a
-                    href="" id="prod_search_btn"> <img src="<?php echo JRBO_PATH?>/images/icon-32-search-on.png" />
-                  </a></td>
+                  <td><label for="prod_search">Поиск</label> <input type="text" name="prod_search" id="prod_search" style='width: 350px' /> 
+                    <a href="" id="prod_search_btn"> <img src="<?php echo JRBO_PATH?>/images/icon-32-search-on.png" /></a>
+                    <a href="" id="prod_search_off_btn"> <img src="<?php echo JRBO_PATH?>/images/icon-32-delete-on.png" /></a>
+                  </td>
                 </tr>
                 <tr>
                   <td><label for="rbo_opers.product_name">Название</label> <select name="rbo_opers.product_name" id="rbo_opers.product_name" style="width: 500px">

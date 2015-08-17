@@ -8,7 +8,9 @@ function rbOper(o) {
 
   this.arSearchedCust = new Array(); // массив объектов содержащих поля покупателя
   this.bCustInput = 'select';
-
+  this.oSavedData = {
+    "rbo_opers" : {}
+  };
 }
 
 //===================================================================================
@@ -100,6 +102,11 @@ rbOper.prototype.attachOperModule = function() {
     return false;
   });
 
+  $("#prod_search_off_btn").click(function(event) {
+    self.productSearchOff();
+    return false;
+  });
+
   //навешиваем обработчик при выборе товара из списка найденных
   $("#rbo_opers\\.product_name").change(function(event) {
     self.setProductPrice();
@@ -156,23 +163,23 @@ rbOper.prototype.readOper = function(operId) {
 rbOper.prototype.saveOper = function() {
   var self = this;
   var bValid = true;
-  var oData = getFormData("oper-form", "rbo_opers");
+  self.oSavedData = getFormData("oper-form", "rbo_opers");
   if (!bValid)
     return;
 
   if (self.oCust.flds.cust_name == "")
     $("#custId").val("-1");//значит мы сознательно удаляем покупателя из документа
 
-  oData["rbo_opers"]["custId"] = self.oCust.flds.custId;
-  oData["rbo_opers"]["oper_cust"] = self.oCust.flds;
+  self.oSavedData["rbo_opers"]["custId"] = self.oCust.flds.custId;
+  self.oSavedData["rbo_opers"]["oper_cust"] = self.oCust.flds;
 
   var taskCmd = "oper_create";
-  if (!IsNull(oData.rbo_opers.operId) && oData.rbo_opers.operId > 0)
+  if (!IsNull(self.oSavedData.rbo_opers.operId) && self.oSavedData.rbo_opers.operId > 0)
     taskCmd = "oper_update";
   $.ajax({
     dataType : 'json',
     type : "POST",
-    data : oData,
+    data : self.oSavedData,
     url : comPath + "ajax.php?task=" + taskCmd,
     success : function(doc_data) {
       $("#oper-form").dialog("close");
@@ -189,9 +196,12 @@ rbOper.prototype.createOper = function() {
     type : "POST",
     url : comPath + "ajax.php?task=get_current_date",
     success : function(p) {
-      self.showOperForm({
-        "oper_date" : p.new_date
-      });
+      self.oSavedData["rbo_opers"]["oper_date"] = p.new_date;
+      self.oSavedData["rbo_opers"]["productId"] = "";
+      self.oSavedData["rbo_opers"]["product_price"] = "";
+      self.oSavedData["rbo_opers"]["product_cnt"] = "";
+      self.oSavedData["rbo_opers"]["oper_sum"] = "";
+      self.showOperForm(self.oSavedData.rbo_opers);
     }
   });
 }
@@ -225,7 +235,10 @@ rbOper.prototype.showOperForm = function(i) {
   refillSelect("rbo_opers\\.oper_type", getOperTypeList());
 
   setFormData("oper-form", "rbo_opers", i);
-
+  
+  var pId = $('#rbo_opers\\.productId').val();
+  if (!(pId>0)) self.productSearchOff();
+  
   //установим поля контрагента
   self.oCust.setCustFlds('saved', i.oper_cust);
 
@@ -280,6 +293,15 @@ rbOper.prototype.productSearch = function() {
 
     }
   });
+}
+
+//===================================================================================
+rbOper.prototype.productSearchOff = function() {
+  $('#rbo_opers\\.product_name option').remove();
+  $('#rbo_opers\\.productId').val("");
+  $('#rbo_opers\\.product_price').val("");
+  $('#rbo_opers\\.product_cnt').val("");
+  $('#rbo_opers\\.oper_sum').val("");
 }
 
 // ===================================================================================
