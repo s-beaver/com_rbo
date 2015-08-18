@@ -201,6 +201,7 @@ rbOper.prototype.createOper = function() {
       self.oSavedData["rbo_opers"]["product_price"] = "";
       self.oSavedData["rbo_opers"]["product_cnt"] = "";
       self.oSavedData["rbo_opers"]["oper_sum"] = "";
+      self.oSavedData["rbo_opers"]["operId"] = "";
       self.showOperForm(self.oSavedData.rbo_opers);
     }
   });
