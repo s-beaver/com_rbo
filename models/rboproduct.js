@@ -5,6 +5,7 @@
 //===================================================================================
 function rboProduct(o) {
   this.bInputMode = 'select';
+  this.aFoundProducts = new Array();
 }
 
 //===================================================================================
@@ -145,10 +146,10 @@ rboProduct.prototype.productSearch = function() {
     success : function(p) {
       self.convertInput2Select();
       $('#prod_name option').remove();
+      self.aFoundProducts = new Array();
       for (var i = 0; i < p.result.length; i++) {
-        $('#prod_name').append(
-            '<option value="' + p.result[i].productId + "|" + p.result[i].product_price + "|" + p.result[i].product_code + "|" + p.result[i].product_price1 + '">' + p.result[i].product_name
-                + '</option>');
+        $('#prod_name').append('<option value="' + i + '">' + p.result[i].product_name + '</option>');
+        self.aFoundProducts[i] = p.result[i];
       }
       $("#prod_name option:first").prop("selected", "selected");
       self.setProductPrice();
@@ -161,14 +162,14 @@ rboProduct.prototype.productSearch = function() {
 
 //===================================================================================
 rboProduct.prototype.setProductPrice = function() {
+  var self = this;
   var oVal = $("#prod_name option:selected").val();
   $("#product-form").dialog("option", "title", "Позиция - " + oVal);
-  var arProd = oVal.split("|");
-  $("#prodId").val(arProd[0]);
-  $("#prod_price").val(arProd[1]);
-  $("#prod_code").val(arProd[2]);
+  $("#prodId").val(self.aFoundProducts[oVal].productId);
+  $("#prod_price").val(self.aFoundProducts[oVal].product_price);
+  $("#prod_code").val(self.aFoundProducts[oVal].product_code);
   $("#prod_cnt").val(1);
-  $("#prod_price1").html("Цена Опт.1= " + arProd[3] + "р.");
+  $("#prod_price1").html("Цена Опт.1= " + NullTo(self.aFoundProducts[oVal].product_price1,0) + "р. Остаток на складе=" + NullTo(self.aFoundProducts[oVal].product_in_stock, 0));
   this.calcSum();
 }
 

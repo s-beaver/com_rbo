@@ -51,12 +51,16 @@ rboProduct.prototype.attachProductModule = function() {
       "sClass" : "center",
       "mData" : "categoryId"
     }, {
+      "sTitle" : "К-во",
+      "sClass" : "center",
+      "mData" : "product_in_stock"
+    }, {
       "sTitle" : "Цена",
-      "sClass" : "left",
+      "sClass" : "center",
       "mData" : "product_price"
     }, {
       "sTitle" : "Цена опт.",
-      "sClass" : "left",
+      "sClass" : "center",
       "mData" : "product_price1"
     } ],
     "oLanguage" : {

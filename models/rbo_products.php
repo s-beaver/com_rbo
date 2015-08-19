@@ -12,6 +12,7 @@ class RbOProducts extends RbObject {
     $this->flds ["categoryId"] = array ("type" => "numeric" );
     $this->flds ["product_code"] = array ("type" => "string" );
     $this->flds ["product_name"] = array ("type" => "string" );
+    $this->flds ["product_in_stock"] = array ("type" => "numeric" );
     $this->flds ["product_price"] = array ("type" => "numeric" );
     $this->flds ["product_price1"] = array ("type" => "numeric" );
     

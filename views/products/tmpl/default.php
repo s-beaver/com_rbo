@@ -55,6 +55,10 @@
                &nbsp;<label for="rbo_products.product_price1">Цена опт.</label> 
                <input type="text" name="rbo_products.product_price1" id="rbo_products.product_price1" style="text-align: right; width: 50px" /> 
               </div>
+              <div style="float: left">
+               &nbsp;<label for="rbo_products.product_in_stock">Количество на складе</label> 
+               <input type="text" name="rbo_products.product_in_stock" id="rbo_products.product_in_stock" style="text-align: right; width: 50px" />&nbsp;
+              </div>
             </td>
           </tr>
         </table>
