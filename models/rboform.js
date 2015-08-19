@@ -9,12 +9,13 @@
  * объект
  */
 function getFormData(formName, objPrefix) {
-  var s, o = {};
+  var s, o = {},tagName,tagType;
   o[objPrefix] = {};
   $("#" + formName + " *").find("[id^='" + objPrefix + "']").each(function(x, elem) {
     s = $(this).attr("id");
     s = s.replace(objPrefix + ".", "");
-    switch ($(this).prop("tagName")) {
+    tagName = $(this).prop("tagName"); 
+    switch (tagName.toUpperCase()) {
     case "DIV":
     case "LABEL":
       o[objPrefix][s] = $(this).html();
@@ -29,7 +30,8 @@ function getFormData(formName, objPrefix) {
       break;
 
     case "INPUT":
-      if ($(this).attr("type") == "CHECKBOX")
+      tagType = NullTo($(this).attr("type"),"");
+      if (tagType.toUpperCase() == "CHECKBOX")
         o[objPrefix][s] = $(this).prop("checked") ? "1" : "0";
       else
         o[objPrefix][s] = $(this).val();
@@ -45,13 +47,14 @@ function getFormData(formName, objPrefix) {
 
 //===================================================================================
 function setFormData(formName, objPrefix, o) {
-  var s, sId, sIdDot, o = NullTo(o, {});
+  var s, sId, sIdDot, o = NullTo(o, {}), tagName,tagType;
   $("#" + formName + " *").find("[id^='" + objPrefix + "']").each(function(x, elem) {
     sId = $(this).attr("id");
     sIdDot = sId.replace(objPrefix + ".", objPrefix + "\\.");
     s = sId.replace(objPrefix + ".", "");
     o[s] = NullTo(o[s],"");
-    switch ($(this).prop("tagName")) {
+    tagName = $(this).prop("tagName"); 
+    switch (tagName.toUpperCase()) {
     case "DIV":
     case "LABEL":
       $(this).html(o[s]);
@@ -62,7 +65,8 @@ function setFormData(formName, objPrefix, o) {
       break;
 
     case "INPUT":
-      if ($(this).attr("type") == "CHECKBOX")
+      tagType = NullTo($(this).attr("type"),"");
+      if (tagType.toUpperCase() == "CHECKBOX")
         $(this).prop("checked", (o[s] == "1" || o[s]));
       else
         $(this).val(o[s]);

@@ -3,7 +3,8 @@ var prd;
 
 //===================================================================================
 function rboProduct(o) {
-
+  this.tips = o.tips;
+  this.allFields = o.allFields;
 }
 
 //===================================================================================
@@ -88,6 +89,11 @@ rboProduct.prototype.attachProductModule = function() {
     return false;
   });
 
+  //обработчик нажатия кнопки добавления документа
+  $("#rbo_products\\.product_type").click(function(event) {
+    self.switchInStockField();
+  });
+
   $("#dialog-confirm").dialog({
     autoOpen : false
   });
@@ -120,8 +126,14 @@ rboProduct.prototype.readProduct = function(productId) {
 //===================================================================================
 rboProduct.prototype.saveProduct = function() {
   var self = this;
-  var bValid = true;
   var oData = getFormData("prd-form", "rbo_products");
+  var bValid = true;
+  self.allFields.removeClass("ui-state-error");
+  bValid = bValid && checkNotEmpty($("#rbo_products\\.product_price"), "Цена", self.tips);
+  bValid = bValid && checkNotEmpty($("#rbo_products\\.product_price1"), "Цена1", self.tips);
+  if (oData.rbo_products.product_type == "1")
+    bValid = bValid && checkNotEmpty($("#rbo_products\\.product_in_stock"), "К-во на складе", self.tips);
+  oData.rbo_products.product_in_stock = EmptyTo(oData.rbo_products.product_in_stock, 0);
   if (!bValid)
     return;
 
@@ -171,6 +183,7 @@ rboProduct.prototype.showProductForm = function(i) {
   var self = this;
 
   setFormData("prd-form", "rbo_products", i);
+  self.switchInStockField();
 
   var readOnly = this.setRW(i);
 
@@ -200,10 +213,24 @@ rboProduct.prototype.showProductForm = function(i) {
   $("#prd-form").dialog("open");
 }
 
+//===================================================================================
+rboProduct.prototype.switchInStockField = function() {
+  if ($("#rbo_products\\.product_type").prop("checked")) {
+    $("#label_rbo_products\\.product_in_stock").show();
+    $("#rbo_products\\.product_in_stock").show();
+  } else {
+    $("#label_rbo_products\\.product_in_stock").show();
+    $("#rbo_products\\.product_in_stock").hide();
+  }
+}
+
 // ===================================================================================
 $(document).ready(function() {
 
-  prd = new rboProduct({});
+  prd = new rboProduct({
+    allFields : $("#rbo_products\\.product_price").add($("#rbo_products\\.product_price1")).add($("#rbo_products\\.product_in_stock")),
+    tips : $(".validateTips")
+  });
   prd.attachProductModule();
   prd.oCust.attachCustomerModule();
 

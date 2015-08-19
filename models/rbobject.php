@@ -103,7 +103,7 @@ class RbObject {
       if (! isset ($this->flds [$key])) continue;
       if (is_array ($value) || is_object ($value)) continue;
       if ($this->flds [$key] ["read_only"]) continue;
-      if ($useNull && ! isset ($value)) {
+      if ($useNull && is_null ($value)) {
         $setAr [] = $db->quoteName ($key) . "=NULL";
         continue;
       }

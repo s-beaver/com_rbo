@@ -15,6 +15,7 @@ class RbOProducts extends RbObject {
     $this->flds ["product_in_stock"] = array ("type" => "numeric" );
     $this->flds ["product_price"] = array ("type" => "numeric" );
     $this->flds ["product_price1"] = array ("type" => "numeric" );
+    $this->flds ["product_type"] = array ("type" => "numeric" );
     
     $this->getInputBuffer ();
     if (! isset ($keyValue)) $this->keyValue = $this->buffer->productId;

@@ -56,8 +56,10 @@
                <input type="text" name="rbo_products.product_price1" id="rbo_products.product_price1" style="text-align: right; width: 50px" /> 
               </div>
               <div style="float: left">
-               &nbsp;<label for="rbo_products.product_in_stock">Количество на складе</label> 
+               &nbsp;<label for="rbo_products.product_in_stock" id="label_rbo_products.product_in_stock">Количество на складе</label> 
                <input type="text" name="rbo_products.product_in_stock" id="rbo_products.product_in_stock" style="text-align: right; width: 50px" />&nbsp;
+               <label for="rbo_products.product_type">Товар/Услуга</label>
+               <input type="checkbox" name="rbo_products.product_type" id="rbo_products.product_type">
               </div>
             </td>
           </tr>
