@@ -7,6 +7,7 @@ function rbOper(o) {
   this.oCust = new rboCust();
 
   this.arSearchedCust = new Array(); // массив объектов содержащих поля покупателя
+  this.arFoundProducts = new Array();
   this.bCustInput = 'select';
   this.oSavedData = {
     "rbo_opers" : {}
@@ -283,8 +284,10 @@ rbOper.prototype.productSearch = function() {
     url : comPath + "ajax.php?task=product_search",
     success : function(p) {
       var oProd = {};
+      self.arFoundProducts = new Array();
       for (var i = 0; i < p.result.length; i++) {
-        oProd[p.result[i].productId + "|" + p.result[i].product_price + "|" + p.result[i].product_code + "|" + p.result[i].product_price1] = p.result[i].product_name;
+        oProd[i] = p.result[i].product_name;
+        self.arFoundProducts[i] = p.result[i];
       }
       refillSelect("rbo_opers\\.product_name", oProd);
       self.setProductPrice();
@@ -307,13 +310,13 @@ rbOper.prototype.productSearchOff = function() {
 
 // ===================================================================================
 rbOper.prototype.setProductPrice = function() {
+  var self = this;
   var oVal = $("#rbo_opers\\.product_name option:selected").val();
-  var arProd = oVal.split("|");
-  $("#rbo_opers\\.productId").val(arProd[0]);
-  $("#rbo_opers\\.product_price").val(arProd[1]);
-  $("#rbo_opers\\.product_code").val(arProd[2]);
+  $("#rbo_opers\\.productId").val(self.arFoundProducts[oVal].productId);
+  $("#rbo_opers\\.product_price").val(self.arFoundProducts[oVal].product_price);
+  $("#rbo_opers\\.product_code").val(self.arFoundProducts[oVal].product_code);
   $("#rbo_opers\\.product_cnt").val(1);
-  $("#prod_price1").html("Цена Опт.1= " + arProd[3] + "р.");
+  $("#prod_price1").html("Цена Опт.1= " + NullTo(self.arFoundProducts[oVal].product_price1,0) + "р. Остаток на складе=" + NullTo(self.arFoundProducts[oVal].product_in_stock, 0));
   this.calcSum();
 }
 

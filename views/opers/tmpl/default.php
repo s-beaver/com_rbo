@@ -67,15 +67,23 @@
                   </td>
                 </tr>
                 <tr>
-                  <td><label for="rbo_opers.product_name">Название</label> <select name="rbo_opers.product_name" id="rbo_opers.product_name" style="width: 500px">
-                    </select>&nbsp;<label id="prod_price1">Цена Опт.1</label></td>
+                  <td>
+                    <label for="rbo_opers.product_name">Название</label>
+                    <select name="rbo_opers.product_name" id="rbo_opers.product_name" style="width: 500px"></select>
+                  </td>
                 </tr>
                 <tr>
-                  <td><label for="rbo_opers.product_price">Цена</label> <input type="text" name="rbo_opers.product_price" id="rbo_opers.product_price" 
-                    style="text-align: center; width: 50px" /> <label for="rbo_opers.product_cnt">р.&nbsp;Х&nbsp;</label> <input type="text" name="rbo_opers.product_cnt"
-                    id="rbo_opers.product_cnt" style="text-align: center; width: 30px" /> <label for="rbo_opers.oper_sum">ед.&nbsp;=&nbsp;</label> <input type="text"
-                    name="rbo_opers.oper_sum" id="rbo_opers.oper_sum" style="text-align: center; width: 50px" />&nbsp;р.<input style="visibility: hidden"
-                    id="rbo_opers.productId" /> <input style="visibility: hidden" id="rbo_opers.product_code" /></td>
+                  <td>
+                    <label for="rbo_opers.product_price">Цена</label>
+                    <input type="text" name="rbo_opers.product_price" id="rbo_opers.product_price" style="text-align: center; width: 50px" /> 
+                    <label for="rbo_opers.product_cnt">р.&nbsp;Х&nbsp;</label>
+                    <input type="text" name="rbo_opers.product_cnt" id="rbo_opers.product_cnt" style="text-align: center; width: 30px" /> 
+                    <label for="rbo_opers.oper_sum">ед.&nbsp;=&nbsp;</label>
+                    <input type="text" name="rbo_opers.oper_sum" id="rbo_opers.oper_sum" style="text-align: center; width: 50px" />&nbsp;р.
+                    <label id="prod_price1">Цена Опт.1</label>
+                    <input style="visibility: hidden; width: 5px" id="rbo_opers.productId" /> 
+                    <input style="visibility: hidden; width: 5px" id="rbo_opers.product_code" />
+                  </td>
                 </tr>
                 <td><label for="rbo_opers.oper_rem" style="vertical-align: top;">Примечание</label>
                   <textarea name="rbo_opers.oper_rem" id="rbo_opers.oper_rem" rows="3" cols="70"></textarea></td>
