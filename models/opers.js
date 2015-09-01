@@ -199,6 +199,7 @@ rbOper.prototype.createOper = function() {
     success : function(p) {
       self.oSavedData["rbo_opers"]["oper_date"] = p.new_date;
       self.oSavedData["rbo_opers"]["productId"] = "";
+      self.oSavedData["rbo_opers"]["product_code"] = "";
       self.oSavedData["rbo_opers"]["product_price"] = "";
       self.oSavedData["rbo_opers"]["product_cnt"] = "";
       self.oSavedData["rbo_opers"]["oper_sum"] = "";
@@ -303,6 +304,7 @@ rbOper.prototype.productSearch = function() {
 rbOper.prototype.productSearchOff = function() {
   $('#rbo_opers\\.product_name option').remove();
   $('#rbo_opers\\.productId').val("");
+  $('#rbo_opers\\.product_code').val("");
   $('#rbo_opers\\.product_price').val("");
   $('#rbo_opers\\.product_cnt').val("");
   $('#rbo_opers\\.oper_sum').val("");

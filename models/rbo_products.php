@@ -23,10 +23,12 @@ class RbOProducts extends RbObject {
   
   // =================================================================
   static function updateOrCreateProduct(& $prodId, $prod_data) {
+    $prod_data = ( object ) $prod_data;
     $input = JFactory::getApplication ()->input;
     $input->set ("rbo_products", $prod_data);
     $prodRef = new RbOProducts ($prodId);
     if ($prodId > 0) {
+      if (! isset ($prod_data) || ! isset ($prod_data->product_name) || $prod_data->product_name == '') return true;
       if ($prodRef->buffer->_product_data_changed) {
         $prodRef->updateObject ();
       } else {
@@ -36,6 +38,7 @@ class RbOProducts extends RbObject {
       $prodId = 0;
       $prodRef->response = true;
     } else {
+      if (! isset ($prod_data) || ! isset ($prod_data->product_name) || $prod_data->product_name == '') return true;
       $prodRef->createObject ();
       $prodId = $prodRef->insertid;
     }
