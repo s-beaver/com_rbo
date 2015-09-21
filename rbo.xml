@@ -1,55 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="component" version="2.5.0" method="upgrade">
-
 	<name>COM_RBO</name>
-	<!-- Следующие элементы необязательны -->
 	<creationDate>Февраль 2015</creationDate>
 	<author>Сергей Ефремов</author>
 	<authorEmail>s_efremov@mail.ru</authorEmail>
 	<authorUrl>robik.ru</authorUrl>
-	<copyright>(c) Робик.РУ 2015</copyright>
+	<copyright>(c) Efremov Sergei</copyright>
 	<license>Информация о лицензии</license>
-	<!--  Версия записывается в таблицу компонентов -->
-	<version>0.0.5</version>
-	<!-- Описание необязательно -->
-	<description>COM_RBO_DESCRIPTION</description>
+	<version>0.2.2</version>
+	<description>Учетная система для небольших торговых предприятий</description>
 
-	<!-- Запускается при установке -->
-	<!--install>
-		<sql>
-			<file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
-		</sql>
-	</install-->
-	<!-- Запускается при удалении -->
-	<!--uninstall>
-		<sql>
-			<file driver="mysql" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
-		</sql>
-	</uninstall-->
-	<!-- Запускается при обновлении -->
-	<update>
+	<install>
+		<sql><file driver="mysql" charset="utf8">install.com_rbo.sql</file></sql>
+	</install>
+
+	<uninstall>
+		<sql><file driver="mysql" charset="utf8">uninstall.com_rbo.sql</file></sql>
+	</uninstall>
+
+	<!--update>
 		<schemas>
 			<schemapath type="mysql">sql/updates/mysql</schemapath>
 		</schemas>
-	</update>
+	</update-->
 
-	<!-- Раздел основных файлов сайта -->
-	<!-- Обратите внимание на значение аттрибута folder: Этот аттрибут описывает папку нашего пакета-установщика из которой должны копироваться файлы. 
-	Поэтому указанные в этом разделе файлы будут скопированы из папки /site/ нашего пакета-установщика в соответствующую папку установки. -->
 	<files folder="site">
-		<filename>index.html</filename>
-		<filename>controller.php</filename>
-		<filename>rbo.php</filename>
+		<folder>css</folder>
+		<folder>db</folder>
+		<folder>images</folder>
 		<folder>language</folder>
+		<folder>library</folder>
 		<folder>models</folder>
 		<folder>views</folder>
-		<folder>images</folder>
-		<filename>images/index.html</filename>
+		<filename>ajax.php</filename>
+		<filename>configuration.php</filename>
+		<filename>controller.php</filename>
+		<filename>index.html</filename>
+		<filename>index.php</filename>
+		<filename>rbo.php</filename>
+		<filename>rbo.xml</filename>
+		<filename>router.php</filename>
 	</files>
 
-	<!--media destination="com_rbo" folder="media">
-		<filename>index.html</filename>
-		<folder>images</folder>
-	</media-->
+	<languages folder="site">
+		<language tag="ru-RU">language/ru-RU/ru-RU.com_rbo.ini</language>
+	</languages>
+
+	<scriptfile>install.php</scriptfile>
+
+	<administration>
+		<menu>COM_RBO</menu>
+		<files folder="admin">
+			<filename>index.html</filename>
+			<filename>install.com_rbo.sql</filename>
+			<filename>uninstall.com_rbo.sql</filename>
+		</files>
+	</administration>
 
 </extension>
