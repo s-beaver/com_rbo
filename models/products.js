@@ -83,13 +83,13 @@ rboProduct.prototype.attachProductModule = function() {
     }
   });
 
-  //обработчик нажатия кнопки добавления документа
+  //обработчик нажатия кнопки добавления товара
   $("#prd_add_btn").click(function(event) {
     self.createProduct();
     return false;
   });
 
-  //обработчик нажатия кнопки добавления документа
+  //обработчик нажатия чекбокса "услуга/товар"
   $("#rbo_products\\.product_type").click(function(event) {
     self.switchInStockField();
   });
@@ -232,6 +232,5 @@ $(document).ready(function() {
     tips : $(".validateTips")
   });
   prd.attachProductModule();
-  prd.oCust.attachCustomerModule();
 
 });

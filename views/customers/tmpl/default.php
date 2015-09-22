@@ -15,15 +15,15 @@
 <body>
   <div>
     <div style="float: left" id="header_doclist_adddoc">
-      <a href="" id="prd_add_btn"> <img src="<?php echo JRBO_PATH?>/images/icon-32-new-on.png" /></a>
+      <a href="" id="cst_add_btn"> <img src="<?php echo JRBO_PATH?>/images/icon-32-new-on.png" /></a>
     </div>
     <div id="header_doclist_choose_list">
       <a href='zakrytye-materialy/rbo'><h2>Справочник-контрагенты</h2></a>
     </div>
   </div>
 
-  <div id="prd-form" title="Справочник-товары">
-    <form id="prd-form-form" method="post" action="">
+  <div id="cst-form" title="Справочник-контрагенты">
+    <form id="cst-form-form" method="post" action="">
       <fieldset style='padding: 0'>
         <table style='width: 100%'>
           <tr>

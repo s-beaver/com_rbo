@@ -37,6 +37,7 @@ switch ($cmd) {
       break;
     }
   
+  // ==================================== doc ==========================
   case "get_doc_list" :
     {
       $docList = new RbODocs ();
@@ -84,13 +85,7 @@ switch ($cmd) {
       break;
     }
   
-  case "cust_search" :
-    {
-      $cust = new RbOCust ();
-      $cust->getCustListBySubstr ();
-      break;
-    }
-  
+  // ==================================== opers ==========================
   case "get_oper_list" :
     {
       $operList = new RbOpers ();
@@ -131,6 +126,7 @@ switch ($cmd) {
       break;
     }
   
+  // ==================================== product ==========================
   case "product_search" :
     {
       RbOProducts::getProductListForm ();
@@ -168,6 +164,48 @@ switch ($cmd) {
     {
       $prd = new RbOProducts ();
       $prd->deleteObject (true);
+      break;
+    }
+  
+  // ==================================== customer ==========================
+  case "cust_search" :
+    {
+      $cust = new RbOCust ();
+      $cust->getCustListBySubstr ();
+      break;
+    }
+  
+  case "get_cust_list" :
+    {
+      RbOCust::getCustList();
+      break;
+    }
+  
+  case "cust_read" :
+    {
+      $cst = new RboCust ();
+      $cst->readObject (true);
+      break;
+    }
+  
+  case "cust_create" :
+    {
+      $cst = new RboCust ();
+      $cst->createObject (true);
+      break;
+    }
+  
+  case "cust_update" :
+    {
+      $cst = new RboCust ();
+      $cst->updateObject (true);
+      break;
+    }
+  
+  case "cust_delete" :
+    {
+      $cst = new RboCust ();
+      $cst->deleteObject (true);
       break;
     }
   

@@ -75,6 +75,52 @@ class RbOCust extends RbObject {
     $res->result = $buffer;
     echo json_encode ($res);
   }
+  
+  // =================================================================
+  static function getCustList() {
+    $input = JFactory::getApplication ()->input;
+    $iDisplayStart = $input->getInt ('iDisplayStart');
+    $iDisplayLength = $input->getInt ('iDisplayLength');
+    $sEcho = $input->getString ('sEcho');
+    $searchSubstr = $input->getString ('sSearch');
+  
+    $db = JFactory::getDBO ();
+    $query = $db->getQuery (true);
+  
+    $custRef = new RbOCust();
+    $query->clear ();
+    $query->select ($custRef->getFieldsForSelectClause ());
+    $query->from ($db->quoteName ($custRef->table_name,"rc"));
+    $query->order ($db->quoteName ('rc.custId') . " DESC");
+  
+    if (! empty ($searchSubstr)) {
+      $searchAr = split (" ", $searchSubstr);
+      foreach ( $searchAr as $v ) {
+        $query->where ("LOWER(cust_name) LIKE '%" . strtolower ($v) . "%'");
+      }
+    }
+  
+    try {
+      if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
+        $db->setQuery ($query, intval ($iDisplayStart), intval ($iDisplayLength));
+      } else {
+        $db->setQuery ($query);
+      }
+  
+      $data_rows_assoc_list = $db->loadAssocList ();
+      $iTotalDisplayRecords = $db->getAffectedRows ();
+  
+      $res = new stdClass ();
+      $res->sEcho = $sEcho;
+      $res->iTotalRecords = $iTotalDisplayRecords;
+      $res->iTotalDisplayRecords = $iTotalDisplayRecords;
+      $res->aaData = $data_rows_assoc_list;
+      echo json_encode ($res);
+    } catch ( Exception $e ) {
+      JLog::add (get_class ($this) . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
+    }
+  }
+  
 }
 
 
