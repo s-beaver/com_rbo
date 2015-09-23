@@ -4,11 +4,11 @@
 <head>
 <?php include RBO_PATH.'/views/header.head.links.php'?>
 <script src="<?php echo JRBO_PATH?>/library/lib.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/rboform.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/rbodocument.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/rboproduct.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/rbocust.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/shipments.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/js/rboForm.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/js/rboDocument.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/js/rboProduct.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/js/rboCust.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/js/shipments.js"></script>
 <link rel="stylesheet" href="<?php echo JRBO_PATH?>/css/rbo.css" />
 
 <style>

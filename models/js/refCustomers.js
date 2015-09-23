@@ -1,14 +1,18 @@
+/**
+ * Объект JavaScript для работы со справочником контрагентов 
+ */
+
 var comPath = "/components/com_rbo/";
 var cst;
 
 //===================================================================================
-function rboCustomer(o) {
+function refCustomers(o) {
   this.tips = o.tips;
   this.allFields = o.allFields;
 }
 
 //===================================================================================
-rboCustomer.prototype.attachProductModule = function() {
+refCustomers.prototype.attachCustomerModule = function() {
   var self = this;
   //подключаем форму для редакции контрагентов
   $("#cst-form").dialog({
@@ -47,9 +51,6 @@ rboCustomer.prototype.attachProductModule = function() {
     }, {
       "sTitle" : "Название полное",
       "mData" : "cust_fullname"
-    }, {
-      "sTitle" : "Данные",
-      "mData" : "cust_data"
     } ],
     "oLanguage" : {
       "sProcessing" : "Подождите...",
@@ -72,7 +73,7 @@ rboCustomer.prototype.attachProductModule = function() {
 
   //обработчик нажатия кнопки добавления 
   $("#cst_add_btn").click(function(event) {
-    self.createProduct();
+    self.createCustomer();
     return false;
   });
 
@@ -83,12 +84,12 @@ rboCustomer.prototype.attachProductModule = function() {
 }
 
 //===================================================================================
-rboCustomer.prototype.setRW = function(oData) {
+refCustomers.prototype.setRW = function(oData) {
   return false;
 }
 
 //===================================================================================
-rboCustomer.prototype.readProduct = function(custId) {
+refCustomers.prototype.readCustomer = function(custId) {
   var self = this;
   $.ajax({
     dataType : 'json',
@@ -100,13 +101,13 @@ rboCustomer.prototype.readProduct = function(custId) {
     },
     url : comPath + "ajax.php?task=cust_read",
     success : function(data) {
-      self.showProductForm(data);
+      self.showCustomerForm(data);
     }
   });
 }
 
 //===================================================================================
-rboCustomer.prototype.saveProduct = function() {
+refCustomers.prototype.saveCustomer = function() {
   var self = this;
   var oData = getFormData("cst-form", "rbo_cust");
   var bValid = true;
@@ -132,13 +133,13 @@ rboCustomer.prototype.saveProduct = function() {
 }
 
 //===================================================================================
-rboCustomer.prototype.createProduct = function() {
+refCustomers.prototype.createCustomer = function() {
   var self = this;
-  self.showProductForm({});
+  self.showCustomerForm({});
 }
 
 // ===================================================================================
-rboCustomer.prototype.deleteProduct = function(custId) {
+refCustomers.prototype.deleteCustomer = function(custId) {
   var self = this;
   $.ajax({
     dataType : 'json',
@@ -158,7 +159,7 @@ rboCustomer.prototype.deleteProduct = function(custId) {
 }
 
 // ===================================================================================
-rboCustomer.prototype.showProductForm = function(i) {
+refCustomers.prototype.showCustomerForm = function(i) {
   var self = this;
 
   setFormData("cst-form", "rbo_cust", i);
@@ -169,14 +170,14 @@ rboCustomer.prototype.showProductForm = function(i) {
   if (!readOnly) {
     oBtns["Удалить"] = function() {
       Ask("Контрагент будет удален. Продолжить?", "Удалить контрагента", "Отмена", function() {
-        self.deleteProduct(i.custId);
+        self.deleteCustomer(i.custId);
         $("#cst-form").dialog("close");
       }, null, "#dialog-confirm");
     }
   }
 
   oBtns["Сохранить"] = function() {
-    self.saveProduct();
+    self.saveCustomer();
   };
 
   oBtns["Отмена"] = function() {
@@ -198,6 +199,6 @@ $(document).ready(function() {
     allFields : $("#rbo_cust\\.cust_name").add($("#rbo_cust\\.cust_fullname")),
     tips : $(".validateTips")
   });
-  cst.attachProductModule();
+  cst.attachCustomerModule();
 
 });

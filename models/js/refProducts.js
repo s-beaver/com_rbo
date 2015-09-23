@@ -2,13 +2,13 @@ var comPath = "/components/com_rbo/";
 var prd;
 
 //===================================================================================
-function rboProduct(o) {
+function refProducts(o) {
   this.tips = o.tips;
   this.allFields = o.allFields;
 }
 
 //===================================================================================
-rboProduct.prototype.attachProductModule = function() {
+refProducts.prototype.attachProductModule = function() {
   var self = this;
   //подключаем форму для редакции документов
   $("#prd-form").dialog({
@@ -101,12 +101,12 @@ rboProduct.prototype.attachProductModule = function() {
 }
 
 //===================================================================================
-rboProduct.prototype.setRW = function(oData) {
+refProducts.prototype.setRW = function(oData) {
   return false;
 }
 
 //===================================================================================
-rboProduct.prototype.readProduct = function(productId) {
+refProducts.prototype.readProduct = function(productId) {
   var self = this;
   $.ajax({
     dataType : 'json',
@@ -124,7 +124,7 @@ rboProduct.prototype.readProduct = function(productId) {
 }
 
 //===================================================================================
-rboProduct.prototype.saveProduct = function() {
+refProducts.prototype.saveProduct = function() {
   var self = this;
   var oData = getFormData("prd-form", "rbo_products");
   var bValid = true;
@@ -153,13 +153,13 @@ rboProduct.prototype.saveProduct = function() {
 }
 
 //===================================================================================
-rboProduct.prototype.createProduct = function() {
+refProducts.prototype.createProduct = function() {
   var self = this;
   self.showProductForm({});
 }
 
 // ===================================================================================
-rboProduct.prototype.deleteProduct = function(productId) {
+refProducts.prototype.deleteProduct = function(productId) {
   var self = this;
   $.ajax({
     dataType : 'json',
@@ -179,7 +179,7 @@ rboProduct.prototype.deleteProduct = function(productId) {
 }
 
 // ===================================================================================
-rboProduct.prototype.showProductForm = function(i) {
+refProducts.prototype.showProductForm = function(i) {
   var self = this;
 
   setFormData("prd-form", "rbo_products", i);
@@ -214,7 +214,7 @@ rboProduct.prototype.showProductForm = function(i) {
 }
 
 //===================================================================================
-rboProduct.prototype.switchInStockField = function() {
+refProducts.prototype.switchInStockField = function() {
   if ($("#rbo_products\\.product_type").prop("checked")) {
     $("#label_rbo_products\\.product_in_stock").show();
     $("#rbo_products\\.product_in_stock").show();
@@ -227,7 +227,7 @@ rboProduct.prototype.switchInStockField = function() {
 // ===================================================================================
 $(document).ready(function() {
 
-  prd = new rboProduct({
+  prd = new refProducts({
     allFields : $("#rbo_products\\.product_price").add($("#rbo_products\\.product_price1")).add($("#rbo_products\\.product_in_stock")),
     tips : $(".validateTips")
   });

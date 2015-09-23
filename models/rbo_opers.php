@@ -1,6 +1,7 @@
 <?php
-include_once "models/rbobject.php";
-include_once "models/rbo_cust.php";
+require_once "models/rbobject.php";
+require_once "models/rbo_cust.php";
+require_once "models/rbohelper.php";
 class RbOpers extends RbObject {
   
   // =================================================================

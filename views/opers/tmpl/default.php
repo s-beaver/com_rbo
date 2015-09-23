@@ -4,10 +4,10 @@
 <head>
 <?php include RBO_PATH.'/views/header.head.links.php'?>
 <script src="<?php echo JRBO_PATH?>/library/lib.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/rboform.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/rboproduct.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/rbocust.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/opers.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/js/rboForm.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/js/rboProduct.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/js/rboCust.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/js/opers.js"></script>
 <link rel="stylesheet" href="<?php echo JRBO_PATH?>/css/rbo.css" />
 
 <style>

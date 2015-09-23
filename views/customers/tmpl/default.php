@@ -4,8 +4,8 @@
 <head>
 <?php include RBO_PATH.'/views/header.head.links.php'?>
 <script src="<?php echo JRBO_PATH?>/library/lib.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/rboform.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/customers.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/js/rboForm.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/js/refCustomers.js"></script>
 <link rel="stylesheet" href="<?php echo JRBO_PATH?>/css/rbo.css" />
 
 <style>
@@ -24,44 +24,60 @@
 
   <div id="cst-form" title="Справочник-контрагенты">
     <form id="cst-form-form" method="post" action="">
+
       <fieldset style='padding: 0'>
-        <table style='width: 100%'>
-          <tr>
-            <td>
-                <label for="rbo_products.product_code">Код</label>
-                <input type="text" name="rbo_products.product_code" id="rbo_products.product_code" style='text-align: center; width: 100px' />
-                <label id="rbo_products.productId" style="visibility: hidden"></label>
-            </td>
+        <table>
+          <tr colspan=2>
+            <td><input style="visibility: hidden" id="rbo_cust.custId" /></td>
           </tr>
           <tr>
-            <td>
-                <label for="rbo_products.categoryId">Категория</label>
-                <select id="rbo_products.categoryId" name="rbo_products.categoryId" style="width: 200px" autofocus></select>
-            </td>
+            <td><label for="rbo_cust.cust_name">Название</label></td>
+            <td><select name="rbo_cust.cust_name" id="rbo_cust.cust_name" style="width: 500px"></select></td>
+          </tr>
+        </table>
+        <table>
+          <tr>
+            <td><label for="rbo_cust.cust_fullname">
+                Название<br>полностью
+              </label></td>
+            <td><input type="text" name="rbo_cust.cust_fullname" id="rbo_cust.cust_fullname" style='width: 500px' /></td>
           </tr>
           <tr>
-            <td>
-              <label for="rbo_products.product_name">Название</label> 
-              <input type="text" name="rbo_products.product_name" id="rbo_products.product_name" style='width: 700px' />
-            </td>
+            <td><label for="rbo_cust.cust_addr">Адрес</label></td>
+            <td><input type="text" name="rbo_cust.cust_addr" id="rbo_cust.cust_addr" style='width: 500px' /></td>
           </tr>
           <tr>
-            <td>
-              <div style="float: left">
-               <label for="rbo_products.product_price">Цена</label> 
-               <input type="text" name="rbo_products.product_price" id="rbo_products.product_price" style="text-align: right; width: 50px" />&nbsp;
-              </div>
-              <div style="float: left">
-               &nbsp;<label for="rbo_products.product_price1">Цена опт.</label> 
-               <input type="text" name="rbo_products.product_price1" id="rbo_products.product_price1" style="text-align: right; width: 50px" /> 
-              </div>
-            </td>
+            <td colspan="2"><label for="rbo_cust.cust_nonds">Без НДС</label><input type="checkbox" name="rbo_cust.cust_nonds" id="rbo_cust.cust_nonds"> <label for="rbo_cust.cust_phone">&nbsp;Тел.</label> <input
+              type="text" name="rbo_cust.cust_phone" id="rbo_cust.cust_phone" style='width: 200px' /> <label for="rbo_cust.cust_email">&nbsp;@</label> <input type="text" name="rbo_cust.cust_email"
+              id="rbo_cust.cust_email" style='width: 200px' /></td>
+          </tr>
+        </table>
+        <table>
+          <tr>
+            <td colspan="2"><label for="rbo_cust.cust_inn">&nbsp;ИНН</label><input type="text" name="rbo_cust.cust_inn" id="rbo_cust.cust_inn" style='width: 150px' /> <label for="rbo_cust.cust_kpp">&nbsp;КПП</label><input
+              type="text" name="rbo_cust.cust_kpp" id="rbo_cust.cust_kpp" style='width: 150px' /></td>
+          </tr>
+          <tr>
+            <td colspan="2"><label for="rbo_cust.cust_okpo">ОКПО</label><input type="text" name="rbo_cust.cust_okpo" id="rbo_cust.cust_okpo" style='width: 150px' /> <label for="rbo_cust.cust_ogrn">&nbsp;ОГРН</label>
+              <input type="text" name="rbo_cust.cust_ogrn" id="rbo_cust.cust_ogrn" style='width: 150px' /></td>
+          </tr>
+          <tr>
+            <td><label for="rbo_cust.cust_bank">Банк</label></td>
+            <td><input type="text" name="rbo_cust.cust_bank" id="rbo_cust.cust_bank" style='width: 500px' /></td>
+          </tr>
+          <tr>
+            <td><label for="rbo_cust.cust_bik">БИК</label></td>
+            <td><input type="text" name="rbo_cust.cust_bik" id="rbo_cust.cust_bik" style='width: 150px' /></td>
+          </tr>
+          <tr>
+            <td colspan="2"><label for="rbo_cust.cust_rch">р/сч</label><input type="text" name="rbo_cust.cust_rch" id="rbo_cust.cust_rch" style='width: 250px' /> <label for="rbo_cust.cust_kch">к/сч</label><input
+              type="text" name="rbo_cust.cust_kch" id="rbo_cust.cust_kch" style='width: 250px' /></td>
           </tr>
         </table>
       </fieldset>
     </form>
   </div>
-  
+
   <?php include RBO_PATH.'/views/form.del-doc.php'?>
 
   <table id="TableCustomer" class="display compact"></table>

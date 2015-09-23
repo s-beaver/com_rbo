@@ -1,5 +1,5 @@
 <?php
-include_once 'configuration.php';
+require_once 'configuration.php';
 class RbObject {
   public $is_multiple = false; // читать одну запись или несколько по идентификатору
   public $response = ""; // подготовленный ответ для отправки в ответ на ajax запрос

@@ -1,5 +1,5 @@
 <?php
-include_once "models/rbobject.php";
+require_once "models/rbobject.php";
 class RbODocsProducts extends RbObject {
   
   // =================================================================

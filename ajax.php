@@ -3,7 +3,7 @@ define ('_JEXEC', 1);
 define ('DS', DIRECTORY_SEPARATOR);
 
 if (file_exists (dirname (__FILE__) . '/defines.php')) {
-  include_once dirname (__FILE__) . '/defines.php';
+  require_once dirname (__FILE__) . '/defines.php';
 }
 if (! defined ('_JDEFINES')) {
   define ('RBO_PATH', realpath (dirname (__FILE__)));
@@ -12,11 +12,12 @@ if (! defined ('_JDEFINES')) {
 }
 
 require_once JPATH_BASE . '/includes/framework.php';
-include_once "models/rbohelper.php";
-include_once "models/rbo_docs.php";
-include_once "models/rbo_products.php";
-include_once "models/rbo_cust.php";
-include_once "models/rbo_opers.php";
+require_once "models/rbohelper.php";
+require_once "models/rbo_docs.php";
+require_once "models/rbo_products.php";
+require_once "models/rbo_docs_products.php";
+require_once "models/rbo_cust.php";
+require_once "models/rbo_opers.php";
 JLog::addLogger (array ('text_file' => 'com_rbo.php' ), JLog::ALL, array ('com_rbo' ));
 
 $app = JFactory::getApplication ('site');
@@ -177,7 +178,7 @@ switch ($cmd) {
   
   case "get_cust_list" :
     {
-      RbOCust::getCustList();
+      RbOCust::getCustList ();
       break;
     }
   

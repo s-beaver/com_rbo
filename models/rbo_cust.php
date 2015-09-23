@@ -1,5 +1,5 @@
 <?php
-include_once "models/rbobject.php";
+require_once "models/rbobject.php";
 class RbOCust extends RbObject {
   
   // =================================================================
@@ -20,6 +20,7 @@ class RbOCust extends RbObject {
     $this->flds ["modified_on"] = array ("type" => "datetime" );
     
     $this->getInputBuffer ();
+    if (! isset ($keyValue)) $this->keyValue = $this->buffer->custId;
   }
   
   // =================================================================

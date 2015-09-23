@@ -1,10 +1,10 @@
 <?php
-include_once "models/rbobject.php";
-include_once "models/rbo_docs_products.php";
-include_once "models/rbo_products.php";
-include_once "models/rbo_cust.php";
-include_once "rbohelper.php";
-include_once "configuration.php";
+require_once "models/rbobject.php";
+require_once "models/rbo_docs_products.php";
+require_once "models/rbo_products.php";
+require_once "models/rbo_cust.php";
+require_once "models/rbohelper.php";
+require_once "configuration.php";
 class RbODocs extends RbObject {
   public $readBaseDocument = true;
   
