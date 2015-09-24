@@ -67,7 +67,7 @@ class RbOCust extends RbObject {
       $buffer = $db->loadObjectList ();
       $res = new stdClass ();
     } catch ( Exception $e ) {
-      JLog::add (get_class ($this) . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
+      JLog::add (get_class () . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
     }
     foreach ( $buffer as &$v ) {
       $v->cust_data = json_decode ($v->cust_data);
@@ -118,7 +118,7 @@ class RbOCust extends RbObject {
       $res->aaData = $data_rows_assoc_list;
       echo json_encode ($res);
     } catch ( Exception $e ) {
-      JLog::add (get_class ($this) . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
+      JLog::add (get_class () . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
     }
   }
   

@@ -78,7 +78,7 @@ class RbObject {
         if ($this->flds [$key] ["is_key"]) return "$key=$value";
       }
     }
-    JLog::add (get_class ($this) . "->getWhereClause() " . print_r ($buffer, true), JLog::ERROR, 
+    JLog::add (get_class () . "->getWhereClause() " . print_r ($buffer, true), JLog::ERROR,
         'com_rbo');
     throw new Exception ('Не найдено ключевое поле');
   }
@@ -89,7 +89,7 @@ class RbObject {
     foreach ( $buffProp as $key => $value ) {
       if ($this->flds [$key] ["is_key"]) return $key;
     }
-    JLog::add (get_class ($this) . "->getKeyField() " . print_r ($this->buffer, true), JLog::ERROR, 
+    JLog::add (get_class () . "->getKeyField() " . print_r ($this->buffer, true), JLog::ERROR,
         'com_rbo');
     throw new Exception ('Не найдено ключевое поле');
   }
@@ -189,7 +189,7 @@ class RbObject {
         $this->buffer = $db->loadObject (); // возвращает объект
       }
     } catch ( Exception $e ) {
-      JLog::add (get_class ($this) . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
+      JLog::add (get_class () . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
     }
     if ($echoResponse) {
       $this->response = json_encode ($this->buffer, JSON_UNESCAPED_UNICODE);
@@ -223,7 +223,7 @@ class RbObject {
       }
     } catch ( Exception $e ) {
       JLog::add (
-          get_class ($this) . ":" . $e->getMessage () . " buffer=" . print_r ($this->buffer, true), 
+          get_class () . ":" . $e->getMessage () . " buffer=" . print_r ($this->buffer, true),
           JLog::ERROR, 'com_rbo');
     }
     $this->response = $result;
@@ -263,7 +263,7 @@ class RbObject {
       }
     } catch ( Exception $e ) {
       JLog::add (
-          get_class ($this) . ":" . $e->getMessage () . " buffer=" . print_r ($this->buffer, true), 
+          get_class () . ":" . $e->getMessage () . " buffer=" . print_r ($this->buffer, true),
           JLog::ERROR, 'com_rbo');
     }
     $this->response = $result;

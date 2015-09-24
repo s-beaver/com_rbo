@@ -73,7 +73,7 @@ class RbOProducts extends RbObject {
       $res->result = $buffer;
       echo json_encode ($res);
     } catch ( Exception $e ) {
-      JLog::add (get_class ($this) . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
+      JLog::add (get_class () . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
     }
   }
   
@@ -118,7 +118,7 @@ class RbOProducts extends RbObject {
       $res->aaData = $data_rows_assoc_list;
       echo json_encode ($res);
     } catch ( Exception $e ) {
-      JLog::add (get_class ($this) . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
+      JLog::add (get_class () . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
     }
   }
 }

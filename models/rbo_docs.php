@@ -199,7 +199,7 @@ class RbODocs extends RbObject {
       $result = $db->execute ();
     } catch ( Exception $e ) {
       JLog::add (
-          get_class ($this) . ":" . $e->getMessage () . " buffer=" . print_r ($this->buffer, true), 
+          get_class () . ":" . $e->getMessage () . " buffer=" . print_r ($this->buffer, true),
           JLog::ERROR, 'com_rbo');
     }
     $this->response = $result;
@@ -273,7 +273,7 @@ class RbODocs extends RbObject {
       $res->new_date = $currentTime->format ('d.m.Y', true);
       echo json_encode ($res);
     } catch ( Exception $e ) {
-      JLog::add (get_class ($this) . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
+      JLog::add (get_class () . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');
     }
   }
   
