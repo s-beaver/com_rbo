@@ -15,14 +15,7 @@
 
 </head>
 <body>
-  <div>
-    <div style="float: left" id="header_doclist_adddoc">
-      <a href="" id="oper_add_btn"> <img src="<?php echo JRBO_PATH?>/images/icon-32-new-on.png" /></a>
-    </div>
-    <div id="header_doclist_choose_list">
-      <a href='zakrytye-materialy/rbo'><h2>Операции</h2></a>
-    </div>
-  </div>
+  <?php include RBO_PATH.'/views/header.doclist.php'?>
 
   <div id="oper-form" title="Операция">
     <form id="oper-form-form" method="post" action="">

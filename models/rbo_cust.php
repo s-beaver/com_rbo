@@ -95,7 +95,7 @@ class RbOCust extends RbObject {
     $query->order ($db->quoteName ('rc.custId') . " DESC");
   
     if (! empty ($searchSubstr)) {
-      $searchAr = split (" ", $searchSubstr);
+      $searchAr = preg_split ("/[\s,]+/", $searchSubstr);// split the phrase by any number of commas or space characters
       foreach ( $searchAr as $v ) {
         $query->where ("LOWER(cust_name) LIKE '%" . strtolower ($v) . "%'");
       }

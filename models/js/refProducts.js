@@ -83,6 +83,16 @@ refProducts.prototype.attachProductModule = function() {
     }
   });
 
+  $("#header_doclist_choose_list h2").html("Справочник - товары");
+
+  //подключаем меню перехода в другой раздел
+  $("#links").selectmenu({
+    select: function (event, ui) {
+      if (!IsEmpty($(this).val()))
+        location.href = $(this).val();
+    }
+  });
+
   //обработчик нажатия кнопки добавления товара
   $("#prd_add_btn").click(function(event) {
     self.createProduct();

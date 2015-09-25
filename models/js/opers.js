@@ -94,6 +94,16 @@ rbOper.prototype.attachOperModule = function () {
         }
     });
 
+    $("#header_doclist_choose_list h2").html("Операции");
+
+    //подключаем меню перехода в другой раздел
+    $("#links").selectmenu({
+        select: function (event, ui) {
+            if (!IsEmpty($(this).val()))
+                location.href = $(this).val();
+        }
+    });
+
     //обработчик нажатия кнопки добавления документа
     $("#oper_add_btn").click(function (event) {
         self.createOper();
