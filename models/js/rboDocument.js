@@ -43,7 +43,6 @@ rboDoc.prototype.attachDocModule = function () {
         "bJQueryUI": true,
         "bProcessing": true,
         "bServerSide": true,
-        // "dom": 'HFT<"toolbar"><t>lfrtip',
         "tableTools": {
             "sSwfPath": "/swf/copy_csv_xls_pdf.swf"
         },

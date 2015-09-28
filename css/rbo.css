@@ -1,32 +1,43 @@
 h2 {
-	width: 100%;
-	text-align: center;
+    width: 100%;
+    text-align: center;
 }
 
 #doc-form * label input {
-	display: block;
+    display: block;
 }
 
 #doc-form * label select {
-	display: block;
+    display: block;
 }
 
 #doc-form * input.text {
-	margin-bottom: 0px;
-	padding: .2em;
+    margin-bottom: 0px;
+    padding: .2em;
 }
 
 #doc-form * select {
-	margin-bottom: 0px;
-	padding: .2em;
+    margin-bottom: 0px;
+    padding: .2em;
 }
 
 #doc-form * textarea {
-	margin-bottom: 0px;
-	padding: .2em;
+    margin-bottom: 0px;
+    padding: .2em;
+}
+
+.oper_totals {
+    float: left;
+}
+.oper_filter {
+    float: left;
+}
+
+.oper_filter input {
+    width: 100px;
 }
 
 .validateTips {
-	border: 1px solid transparent;
-	padding: 0.3em;
+    border: 1px solid transparent;
+    padding: 0.3em;
 }

@@ -45,5 +45,6 @@ class RbOHelper {
       JLog::add ("Ошибка при отправке почты " . $send->message, JLog::ERROR, 'com_rbo');
     }
   }
+
 }
 

@@ -7,6 +7,8 @@ function rbOper(o) {
     this.oCust = new rboCust();
     this.tips = o.tips;
     this.allFields = o.allFields;
+    this.oTable = null;
+    this.oTableAPI = null;
 
     this.arSearchedCust = new Array(); // массив объектов содержащих поля покупателя
     this.arFoundProducts = new Array();
@@ -14,6 +16,10 @@ function rbOper(o) {
     this.oSavedData = {
         "rbo_opers": {}
     };
+    this.saleTotal = 0;
+    this.purchTotal = 0;
+    this.expTotals = 0;
+
 }
 
 //===================================================================================
@@ -29,69 +35,76 @@ rbOper.prototype.attachOperModule = function () {
     });
 
     self.oTable = $('#TableOper').dataTable({
-        "bJQueryUI": true,
-        "bProcessing": true,
-        "bServerSide": true,
-        "sAjaxSource": comPath + "ajax.php?task=get_oper_list",
-        "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
-            oSettings.jqXHR = $.ajax({
-                "dataType": 'json',
-                "type": "POST",
-                "data": aoData,
-                "url": sSource,
-                "success": function (json) {
-                    fnCallback(json);
-                }
-            });
+        jQueryUI: true,
+        processing: true,
+        serverSide: true,
+        lengthMenu: [50, 100, 200],
+        dom: '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"l<"oper_filter">fr>t<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"<"oper_totals">p>',
+        ajax: {
+            type: "POST",
+            url: comPath + "ajax.php?task=get_oper_list"
         },
-        "aoColumns": [{
-            "sTitle": "Ключ",
-            "sClass": "center",
-            "mData": function (source, type, val) {
+        columns: [{
+            title: "Ключ",
+            className: "center",
+            data: function (source, type, val) {
                 return "<a href='javascript:oper.readOper(" + source.operId + ")'>#" + source.operId + "</a>";
             }
         }, {
-            "sTitle": "Дата",
-            "mData": "oper_date"
+            title: "Дата",
+            data: "oper_date"
         }, {
-            "sTitle": "Операция",
-            "mData": "oper_type"
+            title: "Операция",
+            data: "oper_type"
         }, {
-            "sTitle": "Покупатель",
-            "mData": "cust_name"
+            title: "Покупатель",
+            data: "cust_name"
         }, {
-            "sTitle": "Сумма",
-            "sClass": "center",
-            "mData": "oper_sum"
+            title: "Сумма",
+            className: "center",
+            data: "oper_sum"
         }, {
-            "sTitle": "Товар/услуга",
-            "sClass": "left",
-            "mData": "product_name"
+            title: "Товар/услуга",
+            className: "left",
+            data: "product_name"
         }, {
-            "sTitle": "Фирма",
-            "sClass": "center",
-            "mData": "oper_firm"
+            title: "Фирма",
+            className: "center",
+            data: "oper_firm"
         }, {
-            "sTitle": "Менеджер",
-            "mData": "oper_manager"
+            title: "Менеджер",
+            data: "oper_manager"
         }],
-        "oLanguage": {
-            "sProcessing": "Подождите...",
-            "sLengthMenu": "Показать _MENU_ строк",
-            "sZeroRecords": "Записи отсутствуют.",
-            "sInfo": "Операции с _START_ по _END_ (всего: _TOTAL_)",
-            "sInfoEmpty": "Операций нет",
-            "sInfoFiltered": "(отфильтровано из _MAX_ записей)",
-            "sInfoPostFix": "",
-            "sSearch": "Поиск:",
-            "sUrl": "",
-            "oPaginate": {
-                "sFirst": "В начало",
-                "sPrevious": "Предыдущие",
-                "sNext": "Следующие",
-                "sLast": "В конец"
+        language: {
+            processing: "Подождите...",
+            lengthMenu: "Показать _MENU_ строк",
+            zeroRecords: "Записи отсутствуют.",
+            info: "Операции с _START_ по _END_ (всего: _TOTAL_)",
+            infoEmpty: "Операций нет",
+            infoFiltered: "(отфильтровано из _MAX_ записей)",
+            infoPostFix: "",
+            search: "Поиск:",
+            paginate: {
+                first: "В начало",
+                previous: "Предыдущие",
+                next: "Следующие",
+                last: "В конец"
             }
         }
+    });
+    self.oTableAPI = self.oTable.api();
+
+    self.oTableAPI.on('draw.dt', function () {
+        self.calcTotals();
+        $("div.oper_totals").html("Продажа=" + self.saleTotal + " Закуп=" + self.purchTotal + " Затраты=" + self.expTotals);
+    });
+
+    $("div.oper_filter").html('<input type="text" id="oper_filter_date">');
+    $("#oper_filter_date").datepicker({
+        showButtonPanel: true,
+        dateFormat: "dd.mm.yy"
+    }).change(function (event) {
+        self.oTableAPI.ajax.url(comPath + "ajax.php?task=get_oper_list&date_filter=" + $(this).val()).load();
     });
 
     $("#header_doclist_choose_list h2").html("Операции");
@@ -344,12 +357,31 @@ rbOper.prototype.calcSum = function () {
     $("#rbo_opers\\.oper_sum").val($("#rbo_opers\\.product_price").val() * $("#rbo_opers\\.product_cnt").val());
 }
 
+//===================================================================================
+rbOper.prototype.calcTotals = function () {
+    var self = this;
+    var oData = self.oTableAPI.data();
+    self.saleTotal = 0, self.purchTotal = 0, self.expTotals = 0;
+    for (var i = 0; i < oData.length; i++) {
+        if (oData[i].oper_type.indexOf("продажа") >= 0) {
+            self.saleTotal += Number(oData[i].oper_sum);
+        }
+        if (oData[i].oper_type.indexOf("закуп") >= 0) {
+            self.purchTotal += Number(oData[i].oper_sum);
+        }
+        if (oData[i].oper_type.indexOf("затраты") >= 0) {
+            self.expTotals += Number(oData[i].oper_sum);
+        }
+    }
+}
+
 // ===================================================================================
 $(document).ready(function () {
 
     oper = new rbOper({
-        allFields : $("#rbo_opers\\.oper_date").add($("#rbo_opers\\.oper_type")).add($("#rbo_opers\\.oper_firm")).add($("#rbo_opers\\.oper_manager")),
-        tips : $(".validateTips")});
+        allFields: $("#rbo_opers\\.oper_date").add($("#rbo_opers\\.oper_type")).add($("#rbo_opers\\.oper_firm")).add($("#rbo_opers\\.oper_manager")),
+        tips: $(".validateTips")
+    });
     oper.attachOperModule();
     oper.oCust.attachCustomerModule();
 
