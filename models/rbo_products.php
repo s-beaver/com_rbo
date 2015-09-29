@@ -127,5 +127,38 @@ class RbOProducts extends RbObject
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
         }
     }
+
+    // =================================================================
+    static function getProductInStock()
+    {
+        $db = JFactory::getDBO();
+        $query = $db->getQuery(true);
+
+        $prodRef = new RbOProducts ();
+        $query->clear();
+        $query->select($prodRef->getFieldsForSelectClause());
+        $query->from($db->quoteName($prodRef->table_name, "rp"));
+        $query->order($db->quoteName('rp.product_name'));
+        $query->where(array($db->quoteName('rp.product_in_stock') . '>0'/*,
+            $db->quoteName('rp.product_in_stock') . ' > 0'*/));
+
+        //$query->where('a = 1')->where('b = 2');
+        //$query->where(array('a = 1', 'b = 2'));
+        /*$query->where("rp.product_type=0", "AND");
+        $query->where("rp.product_in_stock>0");*/
+
+        try {
+            $db->setQuery($query);
+
+            $res = new stdClass ();
+            $res->sql=$query->__toString();
+            $res->date = RbOHelper::getCurrentTimeForDb();
+            $res->products = $db->loadAssocList();
+
+            echo json_encode($res);
+        } catch (Exception $e) {
+            JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
+        }
+    }
 }
 

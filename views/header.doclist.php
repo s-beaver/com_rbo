@@ -11,6 +11,7 @@
             <option value="/index.php?option=com_rbo&view=acts">Акты</option>
             <option value="/index.php?option=com_rbo&view=opers">Операции</option>
             <option value="/index.php?option=com_rbo&view=products">Справочник - товары</option>
+            <option value="/index.php?option=com_rbo&view=printinstock&format=raw">Товарные остатки</option>
             <!--option value="/index.php?option=com_rbo&view=customers">Справочник - контрагенты</option-->
         </select>
     </div>
