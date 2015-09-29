@@ -26,7 +26,6 @@ function fillReport(rep_data) {
     report += "<td>Сумма</td>";
     report += "</thead>";
     for (var i = 0; i < prd.length; i++) {
-        if (NullTo(prd[i].product_type, 0) == 1) continue;
         product_code = NullTo(prd[i].product_code, "");
         product_name = NullTo(prd[i].product_name, "");
         product_in_stock = NullTo(Number(prd[i].product_in_stock), 0);
@@ -44,7 +43,6 @@ function fillReport(rep_data) {
     $("#report_date").html(rep_data.date);
     $("#report_table").html(report);
     $("#report_totals").html("<br><b>Остатков товаров на сумму " + totals + " руб.</b>");
-    //$("#report_debug").html(rep_data.sql);
 }
 
 // ===================================================================================
