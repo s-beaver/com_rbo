@@ -118,7 +118,7 @@ rbOper.prototype.attachOperModule = function () {
     });
 
     //обработчик нажатия кнопки добавления документа
-    $("#oper_add_btn").click(function (event) {
+    $("#doc_add_btn").click(function (event) {
         self.createOper();
         return false;
     });
@@ -227,6 +227,8 @@ rbOper.prototype.createOper = function () {
         type: "POST",
         url: comPath + "ajax.php?task=get_current_date",
         success: function (p) {
+            var chosenDate = $("#oper_filter_date").val();
+            if (!IsEmpty(chosenDate)) p.new_date = chosenDate;
             self.oSavedData["rbo_opers"]["oper_date"] = p.new_date;
             self.oSavedData["rbo_opers"]["productId"] = "";
             self.oSavedData["rbo_opers"]["product_code"] = "";
