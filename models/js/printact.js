@@ -93,4 +93,4 @@ function fillInvoicePrintForm(i) {
 // ===================================================================================
 $(document).ready(function() {
   readDocument($("#docid_transfer").html());
-})
+});

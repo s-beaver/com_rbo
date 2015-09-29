@@ -3,7 +3,7 @@ var doc;
 // ===================================================================================
 $(document).ready(function() {
 
-  doc = new rboDoc({
+  doc = new RboDoc({
     sDocType : 'счет',
     sDocTypeListTitle : 'Счета',
     sDocTypeTitle : 'Счет',

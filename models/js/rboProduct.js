@@ -3,13 +3,13 @@
  */
 
 //===================================================================================
-function rboProduct(o) {
+function RboProduct(o) {
   this.bInputMode = 'select';
-  this.arFoundProducts = new Array();
+  this.arFoundProducts = [];
 }
 
 //===================================================================================
-rboProduct.prototype.attachProductModule = function() {
+RboProduct.prototype.attachProductModule = function() {
   var self = this;
   //подключаем форму добавления новой позиции в документ
   $("#product-form").dialog({
@@ -43,11 +43,11 @@ rboProduct.prototype.attachProductModule = function() {
     return false;
   });
 
-}
+};
 
 //===================================================================================
 /* Преобразует тэг select в input для ввода там поисковой строки */
-rboProduct.prototype.convertSelect2Input = function() {
+RboProduct.prototype.convertSelect2Input = function() {
   if (this.bInputMode == 'select') {
     var tag = $('#prod_name').parent().html();
     tag = tag.replace("<select", "<input type=\"text\"");
@@ -57,11 +57,11 @@ rboProduct.prototype.convertSelect2Input = function() {
     $('#prod_name').parent().html(tag);
     this.bInputMode = 'input';
   }
-}
+};
 
 //===================================================================================
 /* Преобразует тэг input в select для выбора из найденных вариантов */
-rboProduct.prototype.convertInput2Select = function() {
+RboProduct.prototype.convertInput2Select = function() {
   if (this.bInputMode == 'input') {
     var tag = $('#prod_name').parent().html();
     tag = tag.replace("<input type=\"text\"", "<select");
@@ -70,10 +70,10 @@ rboProduct.prototype.convertInput2Select = function() {
     $('#prod_name').parent().html(tag);
     this.bInputMode = 'select';
   }
-}
+};
 
 //===================================================================================
-rboProduct.prototype.showProductForm = function(o) {
+RboProduct.prototype.showProductForm = function(o) {
   var self = this;
   self.convertInput2Select();
 
@@ -127,14 +127,14 @@ rboProduct.prototype.showProductForm = function(o) {
     }
   });
   $("#product-form").dialog("open");
-}
+};
 
 //===================================================================================
 /*
  * Поиск товара по подстроке в элементе prod_search. Список найденных вариантов
  * записывается в тэг select prod_name
  */
-rboProduct.prototype.productSearch = function() {
+RboProduct.prototype.productSearch = function() {
   var self = this;
   $.ajax({
     dataType : 'json',
@@ -146,7 +146,7 @@ rboProduct.prototype.productSearch = function() {
     success : function(p) {
       self.convertInput2Select();
       $('#prod_name option').remove();
-      self.arFoundProducts = new Array();
+      self.arFoundProducts = [];
       for (var i = 0; i < p.result.length; i++) {
         $('#prod_name').append('<option value="' + i + '">' + p.result[i].product_name + '</option>');
         self.arFoundProducts[i] = p.result[i];
@@ -158,10 +158,10 @@ rboProduct.prototype.productSearch = function() {
       }
     }
   });
-}
+};
 
 //===================================================================================
-rboProduct.prototype.setProductPrice = function() {
+RboProduct.prototype.setProductPrice = function() {
   var self = this;
   var oVal = $("#prod_name option:selected").val();
   $("#product-form").dialog("option", "title", "Позиция - " + oVal);
@@ -171,9 +171,9 @@ rboProduct.prototype.setProductPrice = function() {
   $("#prod_cnt").val(1);
   $("#prod_price1").html("Цена Опт.1= " + NullTo(self.arFoundProducts[oVal].product_price1,0) + "р. Остаток на складе=" + NullTo(self.arFoundProducts[oVal].product_in_stock, 0));
   this.calcSum();
-}
+};
 
 //===================================================================================
-rboProduct.prototype.calcSum = function() {
+RboProduct.prototype.calcSum = function() {
   $("#prod_sum").val($("#prod_price").val() * $("#prod_cnt").val());
-}
+};

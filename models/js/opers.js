@@ -2,17 +2,16 @@ var comPath = "/components/com_rbo/";
 var oper;
 
 //===================================================================================
-function rbOper(o) {
+function RbOper(o) {
 
-    this.oCust = new rboCust();
+    this.oCust = new RboCust();
     this.tips = o.tips;
     this.allFields = o.allFields;
     this.oTable = null;
     this.oTableAPI = null;
 
-    this.arSearchedCust = new Array(); // массив объектов содержащих поля покупателя
-    this.arFoundProducts = new Array();
-    this.bCustInput = 'select';
+    this.arSearchedCust = []; // массив объектов содержащих поля покупателя
+    this.arFoundProducts = [];
     this.oSavedData = {
         "rbo_opers": {}
     };
@@ -23,7 +22,7 @@ function rbOper(o) {
 }
 
 //===================================================================================
-rbOper.prototype.attachOperModule = function () {
+RbOper.prototype.attachOperModule = function () {
     var self = this;
     //подключаем форму для редакции документов
     $("#oper-form").dialog({
@@ -160,15 +159,15 @@ rbOper.prototype.attachOperModule = function () {
         autoOpen: false
     });
 
-}
+};
 
 //===================================================================================
-rbOper.prototype.setRW = function (oData) {
+RbOper.prototype.setRW = function (oData) {
     return false;
-}
+};
 
 //===================================================================================
-rbOper.prototype.readOper = function (operId) {
+RbOper.prototype.readOper = function (operId) {
     var self = this;
     $.ajax({
         dataType: 'json',
@@ -183,10 +182,10 @@ rbOper.prototype.readOper = function (operId) {
             self.showOperForm(oper_data);
         }
     });
-}
+};
 
 //===================================================================================
-rbOper.prototype.saveOper = function () {
+RbOper.prototype.saveOper = function () {
     var self = this;
     var bValid = true;
     self.oSavedData = getFormData("oper-form", "rbo_opers");
@@ -217,10 +216,10 @@ rbOper.prototype.saveOper = function () {
             self.oTable.fnDraw();
         }
     });
-}
+};
 
 //===================================================================================
-rbOper.prototype.createOper = function () {
+RbOper.prototype.createOper = function () {
     var self = this;
     $.ajax({
         dataType: 'json',
@@ -239,10 +238,10 @@ rbOper.prototype.createOper = function () {
             self.showOperForm(self.oSavedData.rbo_opers);
         }
     });
-}
+};
 
 // ===================================================================================
-rbOper.prototype.deleteOper = function (operId) {
+RbOper.prototype.deleteOper = function (operId) {
     var self = this;
     $.ajax({
         dataType: 'json',
@@ -259,10 +258,10 @@ rbOper.prototype.deleteOper = function (operId) {
     });
 
     $("#oper-form").dialog("close");
-}
+};
 
 // ===================================================================================
-rbOper.prototype.showOperForm = function (i) {
+RbOper.prototype.showOperForm = function (i) {
     var self = this;
 
     refillSelect("rbo_opers\\.oper_manager", getPeopleList());
@@ -303,10 +302,10 @@ rbOper.prototype.showOperForm = function (i) {
     });
 
     $("#oper-form").dialog("open");
-}
+};
 
 //===================================================================================
-rbOper.prototype.productSearch = function () {
+RbOper.prototype.productSearch = function () {
     var self = this;
     $.ajax({
         dataType: 'json',
@@ -317,7 +316,7 @@ rbOper.prototype.productSearch = function () {
         url: comPath + "ajax.php?task=product_search",
         success: function (p) {
             var oProd = {};
-            self.arFoundProducts = new Array();
+            self.arFoundProducts = [];
             for (var i = 0; i < p.result.length; i++) {
                 oProd[i] = p.result[i].product_name;
                 self.arFoundProducts[i] = p.result[i];
@@ -330,20 +329,20 @@ rbOper.prototype.productSearch = function () {
 
         }
     });
-}
+};
 
 //===================================================================================
-rbOper.prototype.productSearchOff = function () {
+RbOper.prototype.productSearchOff = function () {
     $('#rbo_opers\\.product_name option').remove();
     $('#rbo_opers\\.productId').val("");
     $('#rbo_opers\\.product_code').val("");
     $('#rbo_opers\\.product_price').val("");
     $('#rbo_opers\\.product_cnt').val("");
     $('#rbo_opers\\.oper_sum').val("");
-}
+};
 
 // ===================================================================================
-rbOper.prototype.setProductPrice = function () {
+RbOper.prototype.setProductPrice = function () {
     var self = this;
     var oVal = $("#rbo_opers\\.product_name option:selected").val();
     $("#rbo_opers\\.productId").val(self.arFoundProducts[oVal].productId);
@@ -352,18 +351,18 @@ rbOper.prototype.setProductPrice = function () {
     $("#rbo_opers\\.product_cnt").val(1);
     $("#prod_price1").html("Цена Опт.1= " + NullTo(self.arFoundProducts[oVal].product_price1, 0) + "р. Остаток на складе=" + NullTo(self.arFoundProducts[oVal].product_in_stock, 0));
     this.calcSum();
-}
+};
 
 //===================================================================================
-rbOper.prototype.calcSum = function () {
+RbOper.prototype.calcSum = function () {
     $("#rbo_opers\\.oper_sum").val($("#rbo_opers\\.product_price").val() * $("#rbo_opers\\.product_cnt").val());
-}
+};
 
 //===================================================================================
-rbOper.prototype.calcTotals = function () {
+RbOper.prototype.calcTotals = function () {
     var self = this;
     var oData = self.oTableAPI.data();
-    self.saleTotal = 0, self.purchTotal = 0, self.expTotals = 0;
+    self.saleTotal = 0; self.purchTotal = 0; self.expTotals = 0;
     for (var i = 0; i < oData.length; i++) {
         if (oData[i].oper_type.indexOf("продажа") >= 0) {
             self.saleTotal += Number(oData[i].oper_sum);
@@ -375,12 +374,12 @@ rbOper.prototype.calcTotals = function () {
             self.expTotals += Number(oData[i].oper_sum);
         }
     }
-}
+};
 
 // ===================================================================================
 $(document).ready(function () {
 
-    oper = new rbOper({
+    oper = new RbOper({
         allFields: $("#rbo_opers\\.oper_date").add($("#rbo_opers\\.oper_type")).add($("#rbo_opers\\.oper_firm")).add($("#rbo_opers\\.oper_manager")),
         tips: $(".validateTips")
     });

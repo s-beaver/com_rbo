@@ -4,18 +4,18 @@
  */
 
 //===================================================================================
-function rboCust(parentDoc) {
+function RboCust(parentDoc) {
   this.flds = {
     cust_data : {}
   };
   this.flds.cust_data = NullTo(this.flds.cust_data, {});
-  this.arSearchedCust = new Array(); // массив объектов содержащих поля покупателя
+  this.arSearchedCust = []; // массив объектов содержащих поля покупателя
   this.bInputMode = 'select';
   this.parentDoc = parentDoc;
 }
 
 //===================================================================================
-rboCust.prototype.attachCustomerModule = function() {
+RboCust.prototype.attachCustomerModule = function() {
   var self = this;
   //подключаем форму выбора контрагента
   $("#cust-form").dialog({
@@ -71,11 +71,11 @@ rboCust.prototype.attachCustomerModule = function() {
     return false;
   });
 
-}
+};
 
 //===================================================================================
 /* Преобразует тэг select в input для ввода там поисковой строки */
-rboCust.prototype.convertSelect2Input = function() {
+RboCust.prototype.convertSelect2Input = function() {
   if (this.bInputMode == 'select') {
     var tag = $('#cust_name').parent().html();
     tag = tag.replace("<select", "<input type=\"text\"");
@@ -85,11 +85,11 @@ rboCust.prototype.convertSelect2Input = function() {
     $('#cust_name').parent().html(tag);
     this.bInputMode = 'input';
   }
-}
+};
 
 //===================================================================================
 /* Преобразует тэг input в select для выбора из найденных вариантов */
-rboCust.prototype.convertInput2Select = function() {
+RboCust.prototype.convertInput2Select = function() {
   if (this.bInputMode == 'input') {
     var tag = $('#cust_name').parent().html();
     tag = tag.replace("<input type=\"text\"", "<select");
@@ -98,7 +98,7 @@ rboCust.prototype.convertInput2Select = function() {
     $('#cust_name').parent().html(tag);
     this.bInputMode = 'select';
   }
-}
+};
 
 // ===================================================================================
 /*
@@ -108,13 +108,13 @@ rboCust.prototype.convertInput2Select = function() {
  * считает это порядовым номером в массиве arSearchedCust. Если параметр равен
  * 'clear', то очищает поля
  */
-rboCust.prototype.setCustFlds = function(cmd, o) {
+RboCust.prototype.setCustFlds = function(cmd, o) {
   var self = this;
   cmd = NullTo(cmd, 'saved');
   var f = {};
   var fd = {};
   if (cmd == 'clear') {
-    self.arSearchedCust = new Array();
+    self.arSearchedCust = [];
     self.flds = {
       cust_data : {}
     };
@@ -129,7 +129,7 @@ rboCust.prototype.setCustFlds = function(cmd, o) {
         cust_data : {}
       });
       this.flds.cust_data = NullTo(this.flds.cust_data, {});
-      this.arSearchedCust = new Array(); //????
+      this.arSearchedCust = []; //????
     }
 
     f = self.flds;
@@ -159,10 +159,10 @@ rboCust.prototype.setCustFlds = function(cmd, o) {
   $("#cust_rch").val(fd.cust_rch);
   $("#cust_kch").val(fd.cust_kch);
   $("#cust_nonds").prop("checked", (fd.cust_nonds == "1"));
-}
+};
 
 //===================================================================================
-rboCust.prototype.saveCustFlds = function() {
+RboCust.prototype.saveCustFlds = function() {
   this.flds.custId = $("#custId").val();
   this.flds.cust_name = $("#doc_cust").val();
   this.flds.cust_fullname = $("#cust_fullname").val();
@@ -178,15 +178,15 @@ rboCust.prototype.saveCustFlds = function() {
   this.flds.cust_data.cust_rch = $("#cust_rch").val();
   this.flds.cust_data.cust_kch = $("#cust_kch").val();
   this.flds.cust_data.cust_nonds = $("#cust_nonds").prop("checked") ? "1" : "0";
-}
+};
 
 //===================================================================================
-rboCust.prototype.chooseCustomer = function() {
+RboCust.prototype.chooseCustomer = function() {
   var self = this;
   var custId = $("#custId").val();
   var custName = $("#doc_cust").val();
   self.convertInput2Select();
-  self.arSearchedCust = new Array();
+  self.arSearchedCust = [];
 
   $('#cust_name option').remove();
   $('#cust_name').append('<option value="">' + custName + '</option>');
@@ -232,14 +232,14 @@ rboCust.prototype.chooseCustomer = function() {
   $("#cust-form").dialog("open");
 
   return false;
-}
+};
 
 //===================================================================================
 /*
  * Поиск покупателя по подстроке в элементе cust_search. Список найденных
  * вариантов записывается в тэг select cust_name
  */
-rboCust.prototype.custSearch = function() {
+RboCust.prototype.custSearch = function() {
   var self = this;
   $.ajax({
     dataType : 'json',
@@ -264,12 +264,12 @@ rboCust.prototype.custSearch = function() {
       }
     }
   });
-}
+};
 
 //===================================================================================
-rboCust.prototype.chooseBaseDoc = function() {
+RboCust.prototype.chooseBaseDoc = function() {
   var self = this;
-  self.arSearchedCust = new Array();
+  self.arSearchedCust = [];
   $('#base-doc-cust-name option').remove();
   $('#base-doc-doc option').remove();
   self.setCustFlds('saved');
@@ -316,10 +316,10 @@ rboCust.prototype.chooseBaseDoc = function() {
   $("#base-doc-form").dialog("open");
   return false;
 
-}
+};
 
 //===================================================================================
-rboCust.prototype.baseDocSearch = function() {
+RboCust.prototype.baseDocSearch = function() {
   var self = this;
   $.ajax({
     dataType : 'json',
@@ -344,10 +344,10 @@ rboCust.prototype.baseDocSearch = function() {
       }
     }
   });
-}
+};
 
 // ===================================================================================
-rboCust.prototype.setBaseDocList = function() {
+RboCust.prototype.setBaseDocList = function() {
   $.ajax({
     dataType : 'json',
     type : "POST",
@@ -366,4 +366,4 @@ rboCust.prototype.setBaseDocList = function() {
       }
     }
   });
-}
+};

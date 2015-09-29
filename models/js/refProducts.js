@@ -2,13 +2,13 @@ var comPath = "/components/com_rbo/";
 var prd;
 
 //===================================================================================
-function refProducts(o) {
+function RefProducts(o) {
   this.tips = o.tips;
   this.allFields = o.allFields;
 }
 
 //===================================================================================
-refProducts.prototype.attachProductModule = function() {
+RefProducts.prototype.attachProductModule = function() {
   var self = this;
   //подключаем форму для редакции документов
   $("#prd-form").dialog({
@@ -108,15 +108,15 @@ refProducts.prototype.attachProductModule = function() {
     autoOpen : false
   });
 
-}
+};
 
 //===================================================================================
-refProducts.prototype.setRW = function(oData) {
+RefProducts.prototype.setRW = function(oData) {
   return false;
-}
+};
 
 //===================================================================================
-refProducts.prototype.readProduct = function(productId) {
+RefProducts.prototype.readProduct = function(productId) {
   var self = this;
   $.ajax({
     dataType : 'json',
@@ -131,10 +131,10 @@ refProducts.prototype.readProduct = function(productId) {
       self.showProductForm(data);
     }
   });
-}
+};
 
 //===================================================================================
-refProducts.prototype.saveProduct = function() {
+RefProducts.prototype.saveProduct = function() {
   var self = this;
   var oData = getFormData("prd-form", "rbo_products");
   var bValid = true;
@@ -160,16 +160,16 @@ refProducts.prototype.saveProduct = function() {
       self.oTable.fnDraw();
     }
   });
-}
+};
 
 //===================================================================================
-refProducts.prototype.createProduct = function() {
+RefProducts.prototype.createProduct = function() {
   var self = this;
   self.showProductForm({});
-}
+};
 
 // ===================================================================================
-refProducts.prototype.deleteProduct = function(productId) {
+RefProducts.prototype.deleteProduct = function(productId) {
   var self = this;
   $.ajax({
     dataType : 'json',
@@ -186,10 +186,10 @@ refProducts.prototype.deleteProduct = function(productId) {
   });
 
   $("#prd-form").dialog("close");
-}
+};
 
 // ===================================================================================
-refProducts.prototype.showProductForm = function(i) {
+RefProducts.prototype.showProductForm = function(i) {
   var self = this;
 
   setFormData("prd-form", "rbo_products", i);
@@ -221,10 +221,10 @@ refProducts.prototype.showProductForm = function(i) {
   });
 
   $("#prd-form").dialog("open");
-}
+};
 
 //===================================================================================
-refProducts.prototype.switchInStockField = function() {
+RefProducts.prototype.switchInStockField = function() {
   if ($("#rbo_products\\.product_type").prop("checked")) {
     $("#label_rbo_products\\.product_in_stock").show();
     $("#rbo_products\\.product_in_stock").show();
@@ -232,12 +232,12 @@ refProducts.prototype.switchInStockField = function() {
     $("#label_rbo_products\\.product_in_stock").show();
     $("#rbo_products\\.product_in_stock").hide();
   }
-}
+};
 
 // ===================================================================================
 $(document).ready(function() {
 
-  prd = new refProducts({
+  prd = new RefProducts({
     allFields : $("#rbo_products\\.product_price").add($("#rbo_products\\.product_price1")).add($("#rbo_products\\.product_in_stock")),
     tips : $(".validateTips")
   });

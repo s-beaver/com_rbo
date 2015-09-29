@@ -9,7 +9,7 @@
 
 var comPath = "/components/com_rbo/";
 //===================================================================================
-function rboDoc(o) {
+function RboDoc(o) {
     this.docId = 0;
     this.sDocType = o.sDocType;
     this.sDocTypeTitle = o.sDocTypeTitle;
@@ -18,8 +18,8 @@ function rboDoc(o) {
     this.tips = o.tips;
     this.printList = o.printList;//перечень печатных форм документа
 
-    this.oProduct = new rboProduct();//объект для выбора/редакции товарами
-    this.oCust = new rboCust(this);//объект для выбора/редакции контрагента
+    this.oProduct = new RboProduct();//объект для выбора/редакции товарами
+    this.oCust = new RboCust(this);//объект для выбора/редакции контрагента
 
     this.editing_lineNo = 0;
     this.lines_before_update = 0;
@@ -28,7 +28,7 @@ function rboDoc(o) {
 }
 
 //===================================================================================
-rboDoc.prototype.attachDocModule = function () {
+RboDoc.prototype.attachDocModule = function () {
     var self = this;
     //подключаем форму для редакции документов
     $("#doc-form").dialog({
@@ -176,10 +176,10 @@ rboDoc.prototype.attachDocModule = function () {
         return false;
     });
 
-}
+};
 
 // ===================================================================================
-rboDoc.prototype.setRW = function (sStatus) {
+RboDoc.prototype.setRW = function (sStatus) {
     if (sStatus == "выставлен" || sStatus == "оплачен" || sStatus == "удален" || sStatus == "подписан") {
         this.allFields.attr("disabled", "disabled");
         $("[id^='edit_product']").each(function (x, elem) {
@@ -190,10 +190,10 @@ rboDoc.prototype.setRW = function (sStatus) {
         this.allFields.removeAttr("disabled");
         return false;
     }
-}
+};
 
 // ===================================================================================
-rboDoc.prototype.readDoc = function (docId) {
+RboDoc.prototype.readDoc = function (docId) {
     var self = this;
     $.ajax({
         dataType: 'json',
@@ -209,10 +209,10 @@ rboDoc.prototype.readDoc = function (docId) {
             self.showDocForm(doc_data);
         }
     });
-}
+};
 
 // ===================================================================================
-rboDoc.prototype.saveDoc = function (docId) {
+RboDoc.prototype.saveDoc = function (docId) {
     var self = this;
     var bValid = true;
     self.allFields.removeClass("ui-state-error");
@@ -220,7 +220,7 @@ rboDoc.prototype.saveDoc = function (docId) {
     bValid = bValid && checkNotEmpty($("#doc_date"), "Дата", self.tips);
     bValid = bValid && checkNotEmpty($("#doc_manager"), "Менеджер", self.tips);
     var p = self.apiTableProducts.rows().data();
-    var pAr = new Array();
+    var pAr = [];
     for (var i = 0; i < p.length; i++)
         pAr[i] = p[i];
 
@@ -260,10 +260,10 @@ rboDoc.prototype.saveDoc = function (docId) {
             self.oTable.fnDraw();
         }
     });
-}
+};
 
 // ===================================================================================
-rboDoc.prototype.createDoc = function () {
+RboDoc.prototype.createDoc = function () {
     var self = this;
     $.ajax({
         dataType: 'json',
@@ -281,10 +281,10 @@ rboDoc.prototype.createDoc = function () {
             self.showDocForm(i);
         }
     });
-}
+};
 
 // ===================================================================================
-rboDoc.prototype.deleteDoc = function (docId) {
+RboDoc.prototype.deleteDoc = function (docId) {
     var self = this;
     $.ajax({
         dataType: 'json',
@@ -302,10 +302,10 @@ rboDoc.prototype.deleteDoc = function (docId) {
     });
 
     $("#doc-form").dialog("close");
-}
+};
 
 // ===================================================================================
-rboDoc.prototype.showDocForm = function (i) {
+RboDoc.prototype.showDocForm = function (i) {
     var self = this;
     refillSelect("doc_manager", getPeopleList(), true);
     refillSelect("doc_firm", getFirmList());
@@ -384,10 +384,10 @@ rboDoc.prototype.showDocForm = function (i) {
     });
 
     $("#doc-form").dialog("open");
-}
+};
 
 //===================================================================================
-rboDoc.prototype.showPrintView = function (title, docId) {
+RboDoc.prototype.showPrintView = function (title, docId) {
     var self = this;
     var viewname = "";
     if (!IsNull(self.printList) && self.printList.length > 0) {
@@ -400,15 +400,15 @@ rboDoc.prototype.showPrintView = function (title, docId) {
     }
     if (viewname != "")
         window.open('index.php?option=com_rbo&view=' + viewname + '&format=raw&docid=' + docId, '_blank');
-}
+};
 
 //===================================================================================
-rboDoc.prototype.custSearch = function () {
+RboDoc.prototype.custSearch = function () {
     this.oCust.custSearch();
-}
+};
 
 // ===================================================================================
-rboDoc.prototype.showProductForm = function (x) {// x-номер редактируемой строки, x=null-добавляем
+RboDoc.prototype.showProductForm = function (x) {// x-номер редактируемой строки, x=null-добавляем
     var self = this;
     self.editing_lineNo = x;
 
@@ -449,11 +449,11 @@ rboDoc.prototype.showProductForm = function (x) {// x-номер редакти�
         }
     });
 
-}
+};
 
 //===================================================================================
-function rboShipment(o) {
-    rboShipment.superclass.constructor.apply(this, arguments);
+function RboShipment(o) {
+    RboShipment.superclass.constructor.apply(this, arguments);
     //для временного хранения части реквизитов документа - убрать
     /*
      * this.oDoc = { doctId : 0, doc_num : 0, doc_date : 0, doc_status : "" }
@@ -461,11 +461,11 @@ function rboShipment(o) {
 
 }
 //===================================================================================
-extendObject(rboShipment, rboDoc);
+extendObject(RboShipment, RboDoc);
 //===================================================================================
 
 // ===================================================================================
-rboShipment.prototype.readDoc = function (docId) {
+RboShipment.prototype.readDoc = function (docId) {
     var self = this;
     $.ajax({
         dataType: 'json',
@@ -486,10 +486,10 @@ rboShipment.prototype.readDoc = function (docId) {
             self.showDocForm(doc_data);
         }
     });
-}
+};
 
 // ===================================================================================
-rboShipment.prototype.createDoc = function () {
+RboShipment.prototype.createDoc = function () {
     var self = this;
     $.ajax({
         dataType: 'json',
@@ -511,4 +511,4 @@ rboShipment.prototype.createDoc = function () {
             self.showDocForm(i);
         }
     });
-}
+};

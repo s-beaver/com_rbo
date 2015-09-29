@@ -6,13 +6,13 @@ var comPath = "/components/com_rbo/";
 var cst;
 
 //===================================================================================
-function refCustomers(o) {
+function RefCustomers(o) {
     this.tips = o.tips;
     this.allFields = o.allFields;
 }
 
 //===================================================================================
-refCustomers.prototype.attachCustomerModule = function () {
+RefCustomers.prototype.attachCustomerModule = function () {
     var self = this;
     //подключаем форму для редакции контрагентов
     $("#cst-form").dialog({
@@ -91,15 +91,15 @@ refCustomers.prototype.attachCustomerModule = function () {
         autoOpen: false
     });
 
-}
+};
 
 //===================================================================================
-refCustomers.prototype.setRW = function (oData) {
+RefCustomers.prototype.setRW = function (oData) {
     return false;
-}
+};
 
 //===================================================================================
-refCustomers.prototype.readCustomer = function (custId) {
+RefCustomers.prototype.readCustomer = function (custId) {
     var self = this;
     $.ajax({
         dataType: 'json',
@@ -114,14 +114,13 @@ refCustomers.prototype.readCustomer = function (custId) {
             self.showCustomerForm(data);
         }
     });
-}
+};
 
 //===================================================================================
-refCustomers.prototype.saveCustomer = function () {
+RefCustomers.prototype.saveCustomer = function () {
     var self = this;
     var oData = getFormData("cst-form", "rbo_cust");
-    var oDataFlds = getFormData("cst-form", "rbo_cust_flds");
-    oData.cust_data = oDataFlds;
+    oData.cust_data = getFormData("cst-form", "rbo_cust_flds");
 
     var bValid = true;
     self.allFields.removeClass("ui-state-error");
@@ -143,16 +142,16 @@ refCustomers.prototype.saveCustomer = function () {
             self.oTable.fnDraw();
         }
     });
-}
+};
 
 //===================================================================================
-refCustomers.prototype.createCustomer = function () {
+RefCustomers.prototype.createCustomer = function () {
     var self = this;
     self.showCustomerForm({});
-}
+};
 
 // ===================================================================================
-refCustomers.prototype.deleteCustomer = function (custId) {
+RefCustomers.prototype.deleteCustomer = function (custId) {
     var self = this;
     $.ajax({
         dataType: 'json',
@@ -169,10 +168,10 @@ refCustomers.prototype.deleteCustomer = function (custId) {
     });
 
     $("#cst-form").dialog("close");
-}
+};
 
 // ===================================================================================
-refCustomers.prototype.showCustomerForm = function (i) {
+RefCustomers.prototype.showCustomerForm = function (i) {
     var self = this;
 
     setFormData("cst-form", "rbo_cust", i);
@@ -206,12 +205,12 @@ refCustomers.prototype.showCustomerForm = function (i) {
     });
 
     $("#cst-form").dialog("open");
-}
+};
 
 // ===================================================================================
 $(document).ready(function () {
 
-    cst = new refCustomers({
+    cst = new RefCustomers({
         allFields: $("#rbo_cust\\.cust_name").add($("#rbo_cust\\.cust_fullname")),
         tips: $(".validateTips")
     });

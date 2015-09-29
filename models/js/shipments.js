@@ -3,7 +3,7 @@ var doc;
 // ===================================================================================
 $(document).ready(function() {
 
-  doc = new rboShipment({
+  doc = new RboShipment({
     sDocType : 'накл',
     sDocTypeListTitle : 'Накладные',
     sDocTypeTitle : 'Накладная',
