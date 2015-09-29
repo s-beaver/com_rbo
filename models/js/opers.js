@@ -99,7 +99,7 @@ rbOper.prototype.attachOperModule = function () {
         $("div.oper_totals").html("Продажа=" + self.saleTotal + " Закуп=" + self.purchTotal + " Затраты=" + self.expTotals);
     });
 
-    $("div.oper_filter").html('<input type="text" id="oper_filter_date">');
+    $("div.oper_filter").html('&nbsp;Укажите дату:&nbsp;<input type="text" id="oper_filter_date">');
     $("#oper_filter_date").datepicker({
         showButtonPanel: true,
         dateFormat: "dd.mm.yy"

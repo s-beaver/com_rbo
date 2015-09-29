@@ -27,10 +27,13 @@ h2 {
 }
 
 .oper_totals {
+    color: black;
     float: left;
 }
+
 .oper_filter {
-    float: left;
+    color: black;
+    float: right;
 }
 
 .oper_filter input {
