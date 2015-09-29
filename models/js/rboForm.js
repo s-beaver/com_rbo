@@ -68,7 +68,7 @@ function setFormData(formName, objPrefix, o) {
             case "INPUT":
                 tagType = NullTo($(this).attr("type"), "");
                 if (tagType.toUpperCase() == "CHECKBOX")
-                    $(this).prop("checked", (o[s] == "1" || o[s]));
+                    $(this).prop("checked", o[s] == "1");//(o[s] == "1" || o[s]));
                 else
                     $(this).val(o[s]);
                 break;

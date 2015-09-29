@@ -54,7 +54,10 @@ RefProducts.prototype.attachProductModule = function() {
     }, {
       "sTitle" : "К-во",
       "sClass" : "center",
-      "mData" : "product_in_stock"
+      "mData" : //"product_in_stock"
+          function(source, type, val) {
+            return source.product_type=='1'?"услуга":source.product_in_stock;
+          }
     }, {
       "sTitle" : "Цена",
       "sClass" : "center",
@@ -226,11 +229,11 @@ RefProducts.prototype.showProductForm = function(i) {
 //===================================================================================
 RefProducts.prototype.switchInStockField = function() {
   if ($("#rbo_products\\.product_type").prop("checked")) {
-    $("#label_rbo_products\\.product_in_stock").show();
-    $("#rbo_products\\.product_in_stock").show();
+    $("#label_rbo_products\\.product_in_stock").hide();
+    $("#rbo_products\\.product_in_stock").hide();
   } else {
     $("#label_rbo_products\\.product_in_stock").show();
-    $("#rbo_products\\.product_in_stock").hide();
+    $("#rbo_products\\.product_in_stock").show();
   }
 };
 
@@ -238,7 +241,7 @@ RefProducts.prototype.switchInStockField = function() {
 $(document).ready(function() {
 
   prd = new RefProducts({
-    allFields : $("#rbo_products\\.product_price").add($("#rbo_products\\.product_price1")).add($("#rbo_products\\.product_in_stock")),
+    allFields : $("#rbo_products\\.product_price").add($("#rbo_products\\.product_price1")),
     tips : $(".validateTips")
   });
   prd.attachProductModule();

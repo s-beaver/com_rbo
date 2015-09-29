@@ -58,10 +58,14 @@
                                 на складе</label>
                             <input type="text" name="rbo_products.product_in_stock" id="rbo_products.product_in_stock"
                                    style="text-align: right; width: 50px"/>&nbsp;
-                            <label for="rbo_products.product_type">Товар/Услуга</label>
-                            <input type="checkbox" name="rbo_products.product_type" id="rbo_products.product_type">
                         </div>
+                <tr>
+                    <td>
+                        <label for="rbo_products.product_type">Услуга</label>
+                        <input type="checkbox" name="rbo_products.product_type" id="rbo_products.product_type">
                     </td>
+                </tr>
+                </td>
                 </tr>
             </table>
         </fieldset>
