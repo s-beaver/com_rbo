@@ -106,13 +106,12 @@ class RbOpers extends RbObject
         $iDisplayStart = $input->getInt('start');
         $iDisplayLength = $input->getInt('length');
         $iDraw = $input->getString('draw');
-        $sSearch = $input->getString('search');
+        $aSearch = $input->get("search", null, "array");
+        $sSearch = null;
+        if (!is_null($aSearch)) {
+            $sSearch = $aSearch["value"];
+        }
         $sDateFilter = $input->getString('date_filter');
-
-        /*$sWhere = array(); $sWhere [] = $db->quoteName('doc_type') . "='" . $doc_type . "'";
-        if (isset ($sSearch) && $sSearch != "") $sWhere [] = $db->quoteName('rc.cust_name') . " LIKE '%" .
-            $sSearch . "%'";*/
-
 
         $query = $db->getQuery(true);
 
@@ -126,11 +125,13 @@ class RbOpers extends RbObject
             $db->quoteName('rbo_cust', 'rc') . ' ON (' . $db->quoteName('so.custId') . ' = ' .
             $db->quoteName('rc.custId') . ')');
 
-/*        $queryCount = clone $query;
-        $queryCount->setQuery();*/
-
         if (isset($sDateFilter) && $sDateFilter != "") {
-            $query->where ("DATE_FORMAT(so.oper_date,'%d.%m.%Y')='$sDateFilter'");
+            $query->where("DATE_FORMAT(so.oper_date,'%d.%m.%Y')='$sDateFilter'");
+        } elseif (!empty ($sSearch)) {
+            $searchAr = preg_split("/[\s,]+/", $sSearch);// split the phrase by any number of commas or space characters
+            foreach ($searchAr as $v) {
+                $query->where("LOWER(so.product_name) LIKE '%" . strtolower($v) . "%'");
+            }
         }
 
         if (isset ($iDisplayStart) && $iDisplayStart != '-1') {
@@ -152,7 +153,7 @@ class RbOpers extends RbObject
         $iRecordsTotal = $db->loadResult();
 
         $res = new stdClass ();
-        $res->draw = (integer) $iDraw;
+        $res->draw = (integer)$iDraw;
         $res->recordsTotal = $iRecordsTotal;
         $res->recordsFiltered = $iRecordsFiltered;
         $res->data = $data_rows_assoc_list;

@@ -26,11 +26,6 @@ h2 {
     padding: .2em;
 }
 
-.oper_totals {
-    color: black;
-    float: left;
-}
-
 .oper_filter {
     color: black;
     float: right;
@@ -38,6 +33,16 @@ h2 {
 
 .oper_filter input {
     width: 100px;
+}
+
+.oper_totals {
+    color: black;
+    float: left;
+}
+
+.filter_instock {
+    color: black;
+    float: right;
 }
 
 .validateTips {

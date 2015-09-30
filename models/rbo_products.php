@@ -86,10 +86,15 @@ class RbOProducts extends RbObject
     static function getProductList()
     {
         $input = JFactory::getApplication()->input;
-        $iDisplayStart = $input->getInt('iDisplayStart');
-        $iDisplayLength = $input->getInt('iDisplayLength');
-        $sEcho = $input->getString('sEcho');
-        $searchSubstr = $input->getString('sSearch');
+        $iDisplayStart = $input->getInt('start');
+        $iDisplayLength = $input->getInt('length');
+        $iDraw = $input->getString('draw');
+        $aSearch = $input->get("search", null, "array");
+        $sSearch = null;
+        if (!is_null($aSearch)) {
+            $sSearch = $aSearch["value"];
+        }
+        $sInStockFilter = $input->getString('filter_instock');
 
         $db = JFactory::getDBO();
         $query = $db->getQuery(true);
@@ -100,8 +105,11 @@ class RbOProducts extends RbObject
         $query->from($db->quoteName($prodRef->table_name, "rp"));
         $query->order($db->quoteName('rp.productId') . " DESC");
 
-        if (!empty ($searchSubstr)) {
-            $searchAr = preg_split("/[\s,]+/", $searchSubstr);// split the phrase by any number of commas or space characters
+        if (!empty($sInStockFilter)) {
+            $query->where($db->quoteName('rp.product_type') . '=0');
+            $query->where($db->quoteName('rp.product_in_stock') . '>0');
+        } elseif (!empty ($sSearch)) {
+            $searchAr = preg_split("/[\s,]+/", $sSearch);// split the phrase by any number of commas or space characters
             foreach ($searchAr as $v) {
                 $query->where("LOWER(product_name) LIKE '%" . strtolower($v) . "%'");
             }
@@ -118,10 +126,10 @@ class RbOProducts extends RbObject
             $iTotalDisplayRecords = $db->getAffectedRows();
 
             $res = new stdClass ();
-            $res->sEcho = $sEcho;
-            $res->iTotalRecords = $iTotalDisplayRecords;
-            $res->iTotalDisplayRecords = $iTotalDisplayRecords;
-            $res->aaData = $data_rows_assoc_list;
+            $res->draw = (integer)$iDraw;
+            $res->recordsTotal = $iTotalDisplayRecords;
+            $res->recordsFiltered = $iTotalDisplayRecords;
+            $res->data = $data_rows_assoc_list;
             echo json_encode($res);
         } catch (Exception $e) {
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
