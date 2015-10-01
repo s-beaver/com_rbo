@@ -12,11 +12,11 @@ if (!defined('_JDEFINES')) {
 }
 
 require_once JPATH_BASE . '/includes/framework.php';
-require_once "models/RboHelper.php";
+require_once "models/RbHelper.php";
 require_once "models/RbDocs.php";
 require_once "models/RbProducts.php";
 require_once "models/RbDocsProducts.php";
-require_once "models/RboCust.php";
+require_once "models/RbCust.php";
 require_once "models/RbOpers.php";
 JLog::addLogger(array('text_file' => 'com_rbo.php'), JLog::ALL, array('com_rbo'));
 
@@ -69,6 +69,13 @@ switch ($cmd) {
     case "doc_delete" : {
         $doc = new RbDocs ();
         $doc->deleteObject();
+        echo $doc->getResponse();
+        break;
+    }
+
+    case "doc_copy" : {
+        $doc = new RbDocs ();
+        $doc->copyDocTo();
         echo $doc->getResponse();
         break;
     }

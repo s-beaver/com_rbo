@@ -21,7 +21,7 @@ class RbObject
     // =================================================================
     public function setTableName($table_name)
     {
-        $this->table_name = RbOConfig::$prefixForDBTables . $table_name . RbOConfig::$suffixForDBTables;
+        $this->table_name = RbConfig::$prefixForDBTables . $table_name . RbConfig::$suffixForDBTables;
     }
 
     // =================================================================

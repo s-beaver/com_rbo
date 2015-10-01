@@ -1,7 +1,7 @@
 <?php
 defined ('_JEXEC') or die ();
 jimport ('joomla.application.component.controller');
-require_once "models/RboHelper.php";
+require_once "models/RbHelper.php";
 class RbOController extends JControllerLegacy {
   private $user;
   public $user_id;

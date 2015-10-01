@@ -1,7 +1,7 @@
 <?php
-require_once "models/RbObject.php";
-require_once "models/RboCust.php";
-require_once "models/RboHelper.php";
+require_once "models/Rbbject.php";
+require_once "models/RbCust.php";
+require_once "models/RbHelper.php";
 
 class RbOpers extends RbObject
 {
