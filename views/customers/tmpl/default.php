@@ -4,8 +4,8 @@
 <head>
     <?php include RBO_PATH . '/views/header.head.links.php' ?>
     <script src="<?php echo JRBO_PATH ?>/library/lib.js"></script>
-    <script src="<?php echo JRBO_PATH ?>/models/js/rboForm.js"></script>
-    <script src="<?php echo JRBO_PATH ?>/models/js/refCustomers.js"></script>
+    <script src="<?php echo JRBO_PATH ?>/models/js/RboForm.js"></script>
+    <script src="<?php echo JRBO_PATH ?>/models/js/RefCustomers.js"></script>
     <link rel="stylesheet" href="<?php echo JRBO_PATH ?>/css/rbo.css"/>
 
     <style>

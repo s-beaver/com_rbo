@@ -344,8 +344,9 @@ RboDoc.prototype.showDocForm = function (i) {
 
     //заполним список товаров/услуг
     self.oTableProducts.fnClearTable();
+    var x;
     if (!IsNull(i.doc_products) && i.doc_products.length > 0) {
-        for (var x = 0; x < i.doc_products.length; x++)
+        for (x = 0; x < i.doc_products.length; x++)
             i.doc_products[x].lineNo = x;
         self.oTableProducts.fnAddData(i.doc_products);
     }
@@ -363,7 +364,7 @@ RboDoc.prototype.showDocForm = function (i) {
     }
 
     if (!IsNull(self.printList) && self.printList.length > 0) {
-        for (var x = 0; x < self.printList.length; x++) {
+        for (x = 0; x < self.printList.length; x++) {
             oBtns[self.printList[x].title] = function (event) {
                 self.showPrintView($(event.target).text(), i.docId);
             };
@@ -454,10 +455,6 @@ RboDoc.prototype.showProductForm = function (x) {// x-номер редакти�
 //===================================================================================
 function RboShipment(o) {
     RboShipment.superclass.constructor.apply(this, arguments);
-    //для временного хранения части реквизитов документа - убрать
-    /*
-     * this.oDoc = { doctId : 0, doc_num : 0, doc_date : 0, doc_status : "" }
-     */
 
 }
 //===================================================================================
@@ -478,11 +475,6 @@ RboShipment.prototype.readDoc = function (docId) {
         },
         url: comPath + "ajax.php?task=doc_read",
         success: function (doc_data) {
-            /*
-             * self.oDoc.doctId = doc_data.docId; self.oDoc.doc_num =
-             * doc_data.doc_num; self.oDoc.doc_date = doc_data.doc_date;
-             * self.oDoc.doc_status = doc_data.doc_status;
-             */
             self.showDocForm(doc_data);
         }
     });
@@ -501,10 +493,6 @@ RboShipment.prototype.createDoc = function () {
         },
         url: comPath + "ajax.php?task=get_doc_num",
         success: function (p) {
-            /*
-             * self.oDoc.doctId = 0; self.oDoc.doc_num = p.new_num; self.oDoc.doc_date =
-             * p.new_date; self.oDoc.doc_status = "";
-             */
             var i = {};
             i.doc_num = p.new_num;
             i.doc_date = p.new_date;
