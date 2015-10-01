@@ -100,7 +100,7 @@ RefProducts.prototype.attachProductModule = function () {
     });
 
     //обработчик нажатия кнопки добавления товара
-    $("#prd_add_btn").click(function (event) {
+    $("#doc_add_btn").click(function (event) {
         self.createProduct();
         return false;
     });

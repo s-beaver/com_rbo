@@ -82,7 +82,7 @@ RefCustomers.prototype.attachCustomerModule = function () {
     });
 
     //обработчик нажатия кнопки добавления
-    $("#cst_add_btn").click(function (event) {
+    $("#doc_add_btn").click(function (event) {
         self.createCustomer();
         return false;
     });
