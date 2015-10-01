@@ -12,18 +12,18 @@ if (!defined('_JDEFINES')) {
 }
 
 require_once JPATH_BASE . '/includes/framework.php';
-require_once "models/rbohelper.php";
-require_once "models/rbo_docs.php";
-require_once "models/rbo_products.php";
-require_once "models/rbo_docs_products.php";
-require_once "models/rbo_cust.php";
-require_once "models/rbo_opers.php";
+require_once "models/RboHelper.php";
+require_once "models/RbDocs.php";
+require_once "models/RbProducts.php";
+require_once "models/RbDocsProducts.php";
+require_once "models/RboCust.php";
+require_once "models/RbOpers.php";
 JLog::addLogger(array('text_file' => 'com_rbo.php'), JLog::ALL, array('com_rbo'));
 
 $app = JFactory::getApplication('site');
 $app->initialise();
 
-RbOHelper::checkAccess();
+RbHelper::checkAccess();
 
 $input = $app->input;
 $cmd = $input->getCmd('task');
@@ -39,42 +39,42 @@ switch ($cmd) {
 
     // ==================================== doc ==========================
     case "get_doc_list" : {
-        $docList = new RbODocs ();
+        $docList = new RbDocs ();
         $docList->getDocList();
         echo $docList->getResponse();
         break;
     }
 
     case "doc_read" : {
-        $doc = new RbODocs ();
+        $doc = new RbDocs ();
         $doc->readObject();
         echo $doc->getResponse();
         break;
     }
 
     case "doc_create" : {
-        $doc = new RbODocs ();
+        $doc = new RbDocs ();
         $doc->createObject();
         echo $doc->getResponse();
         break;
     }
 
     case "doc_update" : {
-        $doc = new RbODocs ();
+        $doc = new RbDocs ();
         $doc->updateObject();
         echo $doc->getResponse();
         break;
     }
 
     case "doc_delete" : {
-        $doc = new RbODocs ();
+        $doc = new RbDocs ();
         $doc->deleteObject();
         echo $doc->getResponse();
         break;
     }
 
     case "get_doc_num" : {
-        $doc = new RbODocs ();
+        $doc = new RbDocs ();
         $doc->getNextDocNumber();
         break;
     }
@@ -117,78 +117,78 @@ switch ($cmd) {
 
     // ==================================== product ==========================
     case "product_search" : {
-        RbOProducts::getProductListForm();
+        RbProducts::getProductListForm();
         break;
     }
 
     case "get_product_list" : {
-        RbOProducts::getProductList();
+        RbProducts::getProductList();
         break;
     }
 
     case "product_read" : {
-        $prd = new RbOProducts ();
+        $prd = new RbProducts ();
         $prd->readObject(true);
         break;
     }
 
     case "product_create" : {
-        $prd = new RbOProducts ();
+        $prd = new RbProducts ();
         $prd->createObject(true);
         break;
     }
 
     case "product_update" : {
-        $prd = new RbOProducts ();
+        $prd = new RbProducts ();
         $prd->updateObject(true);
         break;
     }
 
     case "product_delete" : {
-        $prd = new RbOProducts ();
+        $prd = new RbProducts ();
         $prd->deleteObject(true);
         break;
     }
 
     // ==================================== customer ==========================
     case "cust_search" : {
-        $cust = new RbOCust ();
+        $cust = new RbCust ();
         $cust->getCustListBySubstr();
         break;
     }
 
     case "get_cust_list" : {
-        RbOCust::getCustList();
+        RbCust::getCustList();
         break;
     }
 
     case "cust_read" : {
-        $cst = new RboCust ();
+        $cst = new RbCust ();
         $cst->readObject(true);
         break;
     }
 
     case "cust_create" : {
-        $cst = new RboCust ();
+        $cst = new RbCust ();
         $cst->createObject(true);
         break;
     }
 
     case "cust_update" : {
-        $cst = new RboCust ();
+        $cst = new RbCust ();
         $cst->updateObject(true);
         break;
     }
 
     case "cust_delete" : {
-        $cst = new RboCust ();
+        $cst = new RbCust ();
         $cst->deleteObject(true);
         break;
     }
 
     // ==================================== customer ==========================
     case   "report_in_stock": {
-        RbOProducts::getProductInStock();
+        RbProducts::getProductInStock();
         break;
     }
 

@@ -1,6 +1,6 @@
 <?php
-require_once "models/rbobject.php";
-class RbOCust extends RbObject {
+require_once "models/RbObject.php";
+class RbCust extends RbObject {
   
   // =================================================================
   public function __construct($keyValue) {
@@ -28,7 +28,7 @@ class RbOCust extends RbObject {
     $doc_cust = ( object ) $doc_cust;
     $input = JFactory::getApplication ()->input;
     $input->set ("rbo_cust", $doc_cust);
-    $cust = new RbOCust ($custId);
+    $cust = new RbCust ($custId);
     if ($custId > 0) {
       if (! isset ($doc_cust) || ! isset ($doc_cust->cust_name) || $doc_cust->cust_name == '') return false;
       if ($cust->buffer->_cust_data_changed) {
@@ -88,7 +88,7 @@ class RbOCust extends RbObject {
     $db = JFactory::getDBO ();
     $query = $db->getQuery (true);
   
-    $custRef = new RbOCust();
+    $custRef = new RbCust();
     $query->clear ();
     $query->select ($custRef->getFieldsForSelectClause ());
     $query->from ($db->quoteName ($custRef->table_name,"rc"));

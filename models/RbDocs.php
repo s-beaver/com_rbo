@@ -1,11 +1,11 @@
 <?php
-require_once "models/rbobject.php";
-require_once "models/rbo_docs_products.php";
-require_once "models/rbo_products.php";
-require_once "models/rbo_cust.php";
-require_once "models/rbohelper.php";
+require_once "models/RbObject.php";
+require_once "models/RbDocsProducts.php";
+require_once "models/RbProducts.php";
+require_once "models/RboCust.php";
+require_once "models/RboHelper.php";
 require_once "configuration.php";
-class RbODocs extends RbObject {
+class RbDocs extends RbObject {
   public $readBaseDocument = true;
   
   // =================================================================
@@ -47,26 +47,26 @@ class RbODocs extends RbObject {
     
     if ($this->readBaseDocument) {
       if (! isset ($doc_base)) $doc_base = 0; // иначе объект возъмет из буфера, а там ключ самого себя
-      $doc_base_doc = new RbODocs ($doc_base, false);
+      $doc_base_doc = new RbDocs ($doc_base, false);
       $doc_base_doc->readObject ();
       $this->buffer->doc_base_doc = $doc_base_doc->buffer;
     }
     
-    $prod = new RbODocsProducts ($this->keyValue);
+    $prod = new RbDocsProducts ($this->keyValue);
     $prod->readObject ();
     $this->buffer->doc_products = $prod->buffer;
     
-    $cust = new RbOCust ($custId);
+    $cust = new RbCust ($custId);
     $cust->readObject ();
     $cust->buffer->cust_data = json_decode ($cust->buffer->cust_data);
     $this->buffer->doc_cust = $cust->buffer;
     
-    $firm = RbOConfig::$firms [mb_strtoupper ($this->buffer->doc_firm,"UTF-8")];
+    $firm = RbConfig::$firms [mb_strtoupper ($this->buffer->doc_firm,"UTF-8")];
     if (is_string ($firm ["copyof"]) && strlen ($firm ["copyof"]) > 0) {
-      $firm = RbOConfig::$firms [$firm ["copyof"]];
+      $firm = RbConfig::$firms [$firm ["copyof"]];
     }
     $this->buffer->doc_firm_details = $firm;
-    $this->buffer->doc_manager_details = RbOConfig::$managers [$this->buffer->doc_manager];
+    $this->buffer->doc_manager_details = RbConfig::$managers [$this->buffer->doc_manager];
     $this->response = json_encode ($this->buffer, JSON_UNESCAPED_UNICODE);
   }
   
@@ -80,11 +80,11 @@ class RbODocs extends RbObject {
     $doc_cust ['cust_data'] = json_encode ($doc_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
     
     $this->buffer->modified_by = JFactory::getUser ()->username;
-    $this->buffer->modified_on = RbOHelper::getCurrentTimeForDb ();
+    $this->buffer->modified_on = RbHelper::getCurrentTimeForDb ();
     
     $input = JFactory::getApplication ()->input;
     $input->set ("rbo_cust", $doc_cust);
-    $cust = new RbOCust ($custId);
+    $cust = new RbCust ($custId);
     if ($custId > 0) {
       $cust->updateObject ();
       $response = $response && $cust->response;
@@ -107,7 +107,7 @@ class RbODocs extends RbObject {
         // $pRef ["list_price"] = ;
         
         $input->set ("SS_products", $pRef);
-        $prodRef = new RbOProducts ();
+        $prodRef = new RbProducts ();
         $prodRef->createObject ();
         $p ["productId"] = $prodRef->insertid;
       }
@@ -117,7 +117,7 @@ class RbODocs extends RbObject {
     
     $input = JFactory::getApplication ()->input;
     $input->set ("rbo_docs_products", $doc_products);
-    $prod = new RbODocsProducts ($this->keyValue);
+    $prod = new RbDocsProducts ($this->keyValue);
     $prod->deleteObject ();
     $prod->createObject ();
     $response = $response && $prod->response;
@@ -140,12 +140,12 @@ class RbODocs extends RbObject {
     $doc_cust ['cust_data'] = json_encode ($doc_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
     
     $this->buffer->created_by = JFactory::getUser ()->username;
-    $this->buffer->created_on = RbOHelper::getCurrentTimeForDb ();
+    $this->buffer->created_on = RbHelper::getCurrentTimeForDb ();
     // $this->buffer->doc_type = $this->docType;//надо передавать через буфер
     
     $input = JFactory::getApplication ()->input;
     $input->set ("rbo_cust", $doc_cust);
-    $cust = new RbOCust ($custId);
+    $cust = new RbCust ($custId);
     if ($custId > 0) {
       $cust->updateObject ();
       $response = $response && $cust->response;
@@ -171,7 +171,7 @@ class RbODocs extends RbObject {
         // $pRef ["list_price"] = ;
         
         $input->set ("SS_products", $pRef);
-        $prodRef = new RbOProducts ();
+        $prodRef = new RbProducts ();
         $prodRef->createObject ();
         $p ["productId"] = $prodRef->insertid;
       }
@@ -179,7 +179,7 @@ class RbODocs extends RbObject {
     }
     
     $input->set ("rbo_docs_products", $doc_products);
-    $prod = new RbODocsProducts ($docId);
+    $prod = new RbDocsProducts ($docId);
     $prod->createObject ();
     $response = $response && $prod->response;
     

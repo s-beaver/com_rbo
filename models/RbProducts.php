@@ -1,7 +1,7 @@
 <?php
-require_once "models/rbobject.php";
+require_once "models/RbObject.php";
 
-class RbOProducts extends RbObject
+class RbProducts extends RbObject
 {
 
     // =================================================================
@@ -30,7 +30,7 @@ class RbOProducts extends RbObject
         $prod_data = ( object )$prod_data;
         $input = JFactory::getApplication()->input;
         $input->set("rbo_products", $prod_data);
-        $prodRef = new RbOProducts ($prodId);
+        $prodRef = new RbProducts ($prodId);
         if ($prodId > 0) {
             if (!isset ($prod_data) || !isset ($prod_data->product_name) || $prod_data->product_name == '') return true;
             if ($prodRef->buffer->_product_data_changed) {
@@ -59,7 +59,7 @@ class RbOProducts extends RbObject
         $db = JFactory::getDBO();
         $query = $db->getQuery(true);
 
-        $prodRef = new RbOProducts ();
+        $prodRef = new RbProducts ();
         $query->clear();
         $query->select($prodRef->getFieldsForSelectClause());
         $query->from($db->quoteName($prodRef->table_name));
@@ -99,7 +99,7 @@ class RbOProducts extends RbObject
         $db = JFactory::getDBO();
         $query = $db->getQuery(true);
 
-        $prodRef = new RbOProducts ();
+        $prodRef = new RbProducts ();
         $query->clear();
         $query->select($prodRef->getFieldsForSelectClause());
         $query->from($db->quoteName($prodRef->table_name, "rp"));
@@ -142,7 +142,7 @@ class RbOProducts extends RbObject
         $db = JFactory::getDBO();
         $query = $db->getQuery(true);
 
-        $prodRef = new RbOProducts ();
+        $prodRef = new RbProducts ();
         $query->clear();
         $query->select($prodRef->getFieldsForSelectClause());
         $query->from($db->quoteName($prodRef->table_name, "rp"));
@@ -154,7 +154,7 @@ class RbOProducts extends RbObject
             $db->setQuery($query);
 
             $res = new stdClass ();
-            $res->date = RbOHelper::getCurrentTimeForDb();
+            $res->date = RbHelper::getCurrentTimeForDb();
             $res->products = $db->loadAssocList();
 
             echo json_encode($res);

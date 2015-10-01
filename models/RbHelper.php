@@ -1,5 +1,5 @@
 <?php
-class RbOHelper {
+class RbHelper {
   // =================================================================
   static function checkAccess() {
     $user = JFactory::getUser ();
@@ -36,7 +36,7 @@ class RbOHelper {
     $config = & JFactory::getConfig ();
     $mailer->setSender (
         array ($config->getValue ('config.mailfrom'),$config->getValue ('config.fromname') ));
-    $mailer->addRecipient (RbOConfig::$documentNotifyEMails);
+    $mailer->addRecipient (RbConfig::$documentNotifyEMails);
     $mailer->setSubject ($subj);
     $mailer->setBody ($body);
     $mailer->CharSet = "utf8";

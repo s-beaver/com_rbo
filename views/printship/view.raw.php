@@ -6,7 +6,7 @@ defined('_JEXEC') or die;
 jimport('joomla.application.component.view');
 define ('RBO_PATH', realpath (dirname (__FILE__) . '/../..'));
 require_once RBO_PATH . "/configuration.php";
-define ('JRBO_PATH', str_replace (RbOConfig::$pathRemoveForJsScrips, '', RBO_PATH));
+define ('JRBO_PATH', str_replace (RbConfig::$pathRemoveForJsScrips, '', RBO_PATH));
 
 class RbOViewPrintShip extends JViewLegacy
 {

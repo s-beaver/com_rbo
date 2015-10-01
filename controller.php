@@ -1,7 +1,7 @@
 <?php
 defined ('_JEXEC') or die ();
 jimport ('joomla.application.component.controller');
-require_once "models/rbohelper.php";
+require_once "models/RboHelper.php";
 class RbOController extends JControllerLegacy {
   private $user;
   public $user_id;
@@ -12,7 +12,7 @@ class RbOController extends JControllerLegacy {
     $this->user_id = $this->user->id;
   }
   function display($cachable = false) {
-    RbOHelper::checkAccess ();
+    RbHelper::checkAccess ();
     parent::display ($cachable);
   }
 }

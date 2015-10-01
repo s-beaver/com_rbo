@@ -1,7 +1,7 @@
 <?php
-require_once "models/rbobject.php";
-require_once "models/rbo_cust.php";
-require_once "models/rbohelper.php";
+require_once "models/RbObject.php";
+require_once "models/RboCust.php";
+require_once "models/RboHelper.php";
 
 class RbOpers extends RbObject
 {
@@ -43,7 +43,7 @@ class RbOpers extends RbObject
         parent::readObject();
         $custId = $this->buffer->custId;
 
-        $cust = new RbOCust ($custId);
+        $cust = new RbCust ($custId);
         $cust->readObject();
         $cust->buffer->cust_data = json_decode($cust->buffer->cust_data);
         $this->buffer->oper_cust = $cust->buffer;
@@ -60,14 +60,14 @@ class RbOpers extends RbObject
         $oper_cust ['cust_data'] = json_encode($oper_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
         $productId = $this->buffer->productId;
 
-        $response = $response && RbOCust::updateOrCreateCustomer($custId, $oper_cust);
+        $response = $response && RbCust::updateOrCreateCustomer($custId, $oper_cust);
         $this->buffer->custId = $custId;
 
-        $response = $response && RbOProducts::updateOrCreateProduct($productId, $this->buffer);
+        $response = $response && RbProducts::updateOrCreateProduct($productId, $this->buffer);
         $this->buffer->productId = $productId;
 
         $this->buffer->modified_by = JFactory::getUser()->username;
-        $this->buffer->modified_on = RbOHelper::getCurrentTimeForDb();
+        $this->buffer->modified_on = RbHelper::getCurrentTimeForDb();
 
         parent::updateObject();
 
@@ -83,14 +83,14 @@ class RbOpers extends RbObject
         $oper_cust ['cust_data'] = json_encode($oper_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
         $productId = $this->buffer->productId;
 
-        $response = $response && RbOCust::updateOrCreateCustomer($custId, $oper_cust);
+        $response = $response && RbCust::updateOrCreateCustomer($custId, $oper_cust);
         $this->buffer->custId = $custId;
 
-        $response = $response && RbOProducts::updateOrCreateProduct($productId, $this->buffer);
+        $response = $response && RbProducts::updateOrCreateProduct($productId, $this->buffer);
         $this->buffer->productId = $productId;
 
         $this->buffer->created_by = JFactory::getUser()->username;
-        $this->buffer->created_on = RbOHelper::getCurrentTimeForDb();
+        $this->buffer->created_on = RbHelper::getCurrentTimeForDb();
 
         parent::createObject();
 
