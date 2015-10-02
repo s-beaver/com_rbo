@@ -17,6 +17,7 @@ function RboDoc(o) {
     this.allFields = o.allFields;//перечень элементов jquery, предназначенных для ввода данных и проверяемых на обязательность заполнения
     this.tips = o.tips;
     this.printList = o.printList;//перечень печатных форм документа
+    this.copyToList = o.copyToList;//перечень документов для создания из текущего документа
 
     this.oProduct = new RboProduct();//объект для выбора/редакции товарами
     this.oCust = new RboCust(this);//объект для выбора/редакции контрагента
@@ -193,7 +194,15 @@ RboDoc.prototype.setRW = function (sStatus) {
 };
 
 // ===================================================================================
-RboDoc.prototype.readDoc = function (docId) {
+RboDoc.prototype.readDocFromURLId = function () {
+    var docId = getURLParam("docId");
+    if (Number(docId)>0) {
+        this.readDoc(docId);
+    }
+}
+
+// ===================================================================================
+    RboDoc.prototype.readDoc = function (docId) {
     var self = this;
     $.ajax({
         dataType: 'json',
@@ -258,6 +267,56 @@ RboDoc.prototype.saveDoc = function (docId) {
         success: function (doc_data) {
             $("#doc-form").dialog("close");
             self.oTable.fnDraw();
+        }
+    });
+};
+
+// ===================================================================================
+RboDoc.prototype.copyDoc = function (title, docId) {
+    var self = this;
+    var viewName = "";
+    var docType = "";
+    if (!IsNull(self.copyToList) && self.copyToList.length > 0) {
+        for (var x = 0; x < self.copyToList.length; x++) {
+            if (self.copyToList[x].title == title) {
+                docType = self.copyToList[x].docType;
+                viewName = self.copyToList[x].viewName;
+                break;
+            }
+        }
+    }
+
+    var p = self.apiTableProducts.rows().data();
+    var pAr = [];
+    for (var i = 0; i < p.length; i++)
+        pAr[i] = p[i];
+
+    if (self.oCust.flds.cust_name == "")
+        $("#custId").val("-1");//значит мы сознательно удаляем покупателя из документа
+
+    //проверить, есть ли уже документ, основание которого равно docId
+    $.ajax({
+        dataType: 'json',
+        type: "POST",
+        data: {
+            "rbo_docs": {
+                "docId": null,
+                "doc_type": docType,
+                "doc_num": $("#doc_num").val(),
+                "doc_date": getCurrentDate(),
+                "doc_sum": $("#doc_sum").val(),
+                "doc_base": docId,
+                "doc_status": "",
+                "doc_manager": $("#doc_manager").val(),
+                "custId": $("#custId").val(),
+                "doc_cust": self.oCust.flds,
+                "doc_firm": $("#doc_firm").val(),
+                "doc_products": pAr
+            }
+        },
+        url: comPath + "ajax.php?task=doc_create",
+        success: function (doc_data) {
+            window.open('index.php?option=com_rbo&view='+viewName+'&docid='+docId, '_blank');
         }
     });
 };
@@ -355,11 +414,20 @@ RboDoc.prototype.showDocForm = function (i) {
     var readOnly = this.setRW(i.doc_status);
 
     var oBtns = {};
+
     if (!readOnly) {
         oBtns["Удалить"] = function () {
             Ask("Документ будет удален. Продолжить?", "Удалить документ", "Отмена", function () {
                 self.deleteDoc(i.docId);
             }, null, "#dialog-confirm");
+        }
+    }
+
+    if (!IsNull(self.copyToList) && self.copyToList.length > 0) {
+        for (x = 0; x < self.copyToList.length; x++) {
+            oBtns[self.copyToList[x].title] = function (event) {
+                self.copyDoc($(event.target).text(), i.docId);
+            };
         }
     }
 
@@ -384,23 +452,34 @@ RboDoc.prototype.showDocForm = function (i) {
         buttons: oBtns
     });
 
+    /*var htmlSelectCopyTo = "<select id='dlg_copy_list_select'></select>";
+     $(".ui-dialog-buttonset").html(htmlSelectCopyTo+$(".ui-dialog-buttonset").html());
+     refillSelect("dlg_copy_list_select",{"акт":"создать акт","накл":"создать накладную"});*/
+
+    $("#dlg_copy_list").selectmenu({
+        select: function (event, ui) {
+            if (!IsEmpty($(this).val()))
+                location.href = $(this).val();
+        }
+    });
+
     $("#doc-form").dialog("open");
 };
 
 //===================================================================================
 RboDoc.prototype.showPrintView = function (title, docId) {
     var self = this;
-    var viewname = "";
+    var viewName = "";
     if (!IsNull(self.printList) && self.printList.length > 0) {
         for (var x = 0; x < self.printList.length; x++) {
             if (self.printList[x].title == title) {
-                viewname = self.printList[x].viewname;
+                viewName = self.printList[x].viewName;
                 break;
             }
         }
     }
-    if (viewname != "")
-        window.open('index.php?option=com_rbo&view=' + viewname + '&format=raw&docid=' + docId, '_blank');
+    if (viewName != "")
+        window.open('index.php?option=com_rbo&view=' + viewName + '&format=raw&docid=' + docId, '_blank');
 };
 
 //===================================================================================
