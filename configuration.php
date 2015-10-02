@@ -23,7 +23,7 @@ class RbConfig {
   public static $managers = array ("Аня" => "Меньшенина Анна","Володя" => "Николашвили Владимир",
       "Алексей" => "Вяткин Алексей","Николай" => "Грозных Николай" );
   public static $documentNotifyEMails = array ("s_efremov@mail.ru" );
-  public static $pathRemoveForJsScrips = '/var/www/robik.ru/';
+  public static $pathRemoveForJsScrips = '/var/www/old.robik.ru/';
   public static $prefixForDBTables = '';
   public static $suffixForDBTables = '';
 }
