@@ -8,7 +8,7 @@
 <script src="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
 
 <script src="<?php echo JRBO_PATH?>/library/lib.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/js/printinv.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/js/PrnShip.js"></script>
 
 <style>
 body {
@@ -82,55 +82,26 @@ table, th, td {
   echo $input->getCmd ('docid');
   ?>
   </div>
+
   <table class="table_no_border">
     <tr>
-      <td><img src="<?php echo JRBO_PATH?>/images/logo.jpg" style="width: 54mm;" /></td>
-      <td>Внимание! Оплата данного счета означает согласие с условиями поставки товара. Уведомление об оплате обязательно, в противном случае не гарантируется наличие
-        товара на складе. Товар отпускается по факту прихода денег на р/с Поставщика, самовывозом, при наличии доверенности и паспорта</td>
+      <td style="width: 10%">Поставщик:</td>
+      <td style="width: 90%" id="doc_firm">ххООО Робик.РУхх</td>
+    </tr>
+    <tr>
+      <td style="width: 10%">Покупатель:</td>
+      <td style="width: 90%" id="doc_cust">ххПокупательхх</td>
+    </tr>
+    <tr>
+      <td style="width: 10%">Основание:</td>
+      <td style="width: 90%" id="doc_based_on">ххОснованиехх</td>
     </tr>
   </table>
-  <br>
-
-  <div class="doc_recv">
-    <table style="width: 100%">
-      <tr>
-        <td colspan=2 rowspan=2 id="f_bank">ххБАНКхх</td>
-        <td>БИК</td>
-        <td rowspan=2><span id="f_bik">ххБИКхх</span><br> <span id="f_kch">ххСч.№хх</span></td>
-      </tr>
-      <tr>
-        <td>Сч.№</td>
-      </tr>
-      <tr>
-        <td>ИНН <span id="f_inn">ххИННхх</span>
-        </td>
-        <td>КПП <span id="f_kpp">ххКППхх</span>
-        </td>
-        <td rowspan=2>Сч.№</td>
-        <td rowspan=2 id="f_rch">ххСч.№хх</td>
-      </tr>
-      <tr>
-        <td colspan=2 id="f_name">ххПолучательхх</td>
-      </tr>
-    </table>
-  </div>
 
   <div class="doc_header">
     <div class="doc_num">
-      Счет № <span id="doc_num"></span> от <span id="doc_date"></span>
+      Накладная <span id="doc_num"></span> от <span id="doc_date"></span>
     </div>
-    <div>Счет действителен в течение 3 банковских дней с даты его выставления</div>
-    <hr noshade>
-    <table class="table_no_border">
-      <tr>
-        <td style="width: 10%">Поставщик:</td>
-        <td style="width: 90%" id="doc_firm">ххООО Робик.РУхх</td>
-      </tr>
-      <tr>
-        <td style="width: 10%">Покупатель:</td>
-        <td style="width: 90%" id="doc_cust">ххПокупательхх</td>
-      </tr>
-    </table>
   </div>
 
   <table class="doc_products">
@@ -159,22 +130,21 @@ table, th, td {
     Сумма прописью: <span id="doc_sum_words"></span>. Без НДС.
   </div>
 
-  <div class="doc_condition"></div>
-  <hr noshade>
-  <br>
-
-  <table class="table_no_border doc_sign" id="doc_sign_block">
+  <table class="table_no_border doc_sign">
     <tr>
-      <td>Менеджер</td>
+      <td id="stamp_anchor">Отпустил</td>
       <td>
         <div class="underlined">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
       </td>
-      <td id="doc_manager" class="underlined">ххМенеджерхх</td>
+      <td>Получил</td>
+      <td>
+        <div class="underlined">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+      </td>
     </tr>
   </table>
 
   <!-- img id="img_sign" class="img_sign" src=""/-->
-  <img id="img_stamp" class="img_stamp" src="" />
+  <!-- img id="img_stamp" class="img_stamp" src="" /-->
 
 </body>
 </html>

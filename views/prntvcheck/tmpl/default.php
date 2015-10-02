@@ -8,7 +8,7 @@
 <script src="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
 
 <script src="<?php echo JRBO_PATH?>/library/lib.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/js/printship.js"></script>
+<script src="<?php echo JRBO_PATH?>/models/js/PrnInv.js"></script>
 
 <style>
 body {
@@ -83,25 +83,21 @@ table, th, td {
   ?>
   </div>
 
-  <table class="table_no_border">
-    <tr>
-      <td style="width: 10%">Поставщик:</td>
-      <td style="width: 90%" id="doc_firm">ххООО Робик.РУхх</td>
-    </tr>
-    <tr>
-      <td style="width: 10%">Покупатель:</td>
-      <td style="width: 90%" id="doc_cust">ххПокупательхх</td>
-    </tr>
-    <tr>
-      <td style="width: 10%">Основание:</td>
-      <td style="width: 90%" id="doc_based_on">ххОснованиехх</td>
-    </tr>
-  </table>
-
   <div class="doc_header">
     <div class="doc_num">
-      Накладная <span id="doc_num"></span> от <span id="doc_date"></span>
+      Товарный чек № <span id="doc_num"></span> от <span id="doc_date"></span>
     </div>
+    <hr noshade>
+    <table class="table_no_border">
+      <tr>
+        <td style="width: 10%">Поставщик:</td>
+        <td style="width: 90%" id="doc_firm">ххООО Робик.РУхх</td>
+      </tr>
+      <tr>
+        <td style="width: 10%">Покупатель:</td>
+        <td style="width: 90%" id="doc_cust">ххПокупательхх</td>
+      </tr>
+    </table>
   </div>
 
   <table class="doc_products">
@@ -130,13 +126,13 @@ table, th, td {
     Сумма прописью: <span id="doc_sum_words"></span>. Без НДС.
   </div>
 
-  <table class="table_no_border doc_sign">
+  <div class="doc_condition"></div>
+  <hr noshade>
+  <br>
+
+  <table class="table_no_border doc_sign" id="doc_sign_block">
     <tr>
-      <td id="stamp_anchor">Отпустил</td>
-      <td>
-        <div class="underlined">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-      </td>
-      <td>Получил</td>
+      <td>Менеджер</td>
       <td>
         <div class="underlined">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
       </td>
@@ -144,7 +140,7 @@ table, th, td {
   </table>
 
   <!-- img id="img_sign" class="img_sign" src=""/-->
-  <!-- img id="img_stamp" class="img_stamp" src="" /-->
+  <img id="img_stamp" class="img_stamp" src="" />
 
 </body>
 </html>

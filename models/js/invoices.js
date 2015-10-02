@@ -10,7 +10,7 @@ $(document).ready(function () {
         allFields: $("#doc_num").add($("#doc_date")).add($("#doc_manager")).add($("#doc_firm")).add($("#cedit")),
         tips: $(".validateTips"),
         printList: [
-            {title: "Печатать", viewName: "printinv"}
+            {title: "Печатать", viewName: "PrnInv"}
         ],
         copyToList: [
             {title: "Создать акт", docType: "акт", viewName: "acts"},

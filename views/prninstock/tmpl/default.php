@@ -8,7 +8,7 @@
     <script src="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
 
     <script src="<?php echo JRBO_PATH ?>/library/lib.js"></script>
-    <script src="<?php echo JRBO_PATH ?>/models/js/printinstock.js"></script>
+    <script src="<?php echo JRBO_PATH ?>/models/js/PrnInStock.js"></script>
 
     <style>
         body {

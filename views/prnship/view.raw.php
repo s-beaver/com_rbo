@@ -1,14 +1,12 @@
 <?php
 defined('_JEXEC') or die;
 
-//http://robik.ru/index.php?option=com_rbo&view=printship&format=raw
-
 jimport('joomla.application.component.view');
 define ('RBO_PATH', realpath (dirname (__FILE__) . '/../..'));
 require_once RBO_PATH . "/configuration.php";
 define ('JRBO_PATH', str_replace (RbConfig::$pathRemoveForJsScrips, '', RBO_PATH));
 
-class RbOViewPrintInStock extends JViewLegacy
+class RbOViewPrnShip extends JViewLegacy
 {
 	public function display($tpl = null) 
 	{

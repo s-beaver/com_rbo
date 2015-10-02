@@ -12,7 +12,7 @@
             <option value="/index.php?option=com_rbo&view=opers">Операции</option>
             <option value="/index.php?option=com_rbo&view=products">Справочник - товары</option>
             <option value="/index.php?option=com_rbo&view=customers">Справочник - контрагенты</option>
-            <option value="/index.php?option=com_rbo&view=printinstock&format=raw">Товарные остатки</option>
+            <option value="/index.php?option=com_rbo&view=PrnInStock&format=raw">Товарные остатки</option>
         </select>
     </div>
 

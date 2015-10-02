@@ -10,9 +10,9 @@ $(document).ready(function () {
         allFields: $("#doc_num").add($("#doc_date")).add($("#doc_manager")).add($("#doc_firm")).add($("#cedit")),
         tips: $(".validateTips"),
         printList: [
-            {title: "Печатать ТОРГ-12", viewName: "printtorg12"},
-            {title: "Печатать накл.", viewName: "printship"},
-            {title: "Печатать тов.чек", viewName: "printtovcheck"}
+            {title: "Печатать ТОРГ-12", viewName: "PrnTorg12"},
+            {title: "Печатать накл.", viewName: "PrnShip"},
+            {title: "Печатать тов.чек", viewName: "PrnTvCheck"}
         ],
         statusList: {
             "подписан": "подписан",

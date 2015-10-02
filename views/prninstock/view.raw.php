@@ -6,9 +6,7 @@ define ('RBO_PATH', realpath (dirname (__FILE__) . '/../..'));
 require_once RBO_PATH . "/configuration.php";
 define ('JRBO_PATH', str_replace (RbConfig::$pathRemoveForJsScrips, '', RBO_PATH));
 
-//http://robik.ru/index.php?option=com_rbo&view=printinv&format=raw
-
-class RbOViewPrintInv extends JViewLegacy
+class RbOViewPrnInStock extends JViewLegacy
 {
 	public function display($tpl = null) 
 	{
