@@ -120,7 +120,8 @@ RefCustomers.prototype.readCustomer = function (custId) {
 RefCustomers.prototype.saveCustomer = function () {
     var self = this;
     var oData = getFormData("cst-form", "rbo_cust");
-    oData.cust_data = getFormData("cst-form", "rbo_cust_flds");
+    var cust_data = getFormData("cst-form", "cust_data");
+    oData.rbo_cust.cust_data = JSON.stringify(cust_data.cust_data);
 
     var bValid = true;
     self.allFields.removeClass("ui-state-error");
@@ -175,6 +176,7 @@ RefCustomers.prototype.showCustomerForm = function (i) {
     var self = this;
 
     setFormData("cst-form", "rbo_cust", i);
+    setFormData("cst-form", "cust_data", JSON.parse(i.cust_data));
 
     var rbo_cust_data = i.cust_data;
     setFormData("cst-form", "rbo_cust_flds", rbo_cust_data);

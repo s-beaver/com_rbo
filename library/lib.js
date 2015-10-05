@@ -177,6 +177,7 @@ function Ask(sText, okText, cancelText, fnOk, fnCancel, sElemSelector) {
 
     $(sElemSelector).dialog({
         resizable: false,
+        width: 400,
         height: 180,
         modal: true,
         buttons: bOk

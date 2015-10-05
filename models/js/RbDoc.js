@@ -67,7 +67,7 @@ RbDoc.prototype.attachDocModule = function () {
                 return "<a href='javascript:doc.readDoc(" + source.docId + ")'>" + source.doc_num + " /" + source.doc_date + "</a>";
             }
         }, {
-            "sTitle": "Покупатель",
+            "sTitle": "Контрагент",
             "mData": "doc_cust"
         }, {
             "sTitle": "Сумма",

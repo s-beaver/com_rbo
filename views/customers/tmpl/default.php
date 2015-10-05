@@ -33,13 +33,13 @@
                                style='width: 500px'/></td>
                 </tr>
                 <tr>
-                    <td><label for="rbo_cust_flds.cust_addr">Адрес</label></td>
-                    <td><input type="text" name="rbo_cust_flds.cust_addr" id="rbo_cust_flds.cust_addr" style='width: 500px'/></td>
+                    <td><label for="cust_data.cust_addr">Адрес</label></td>
+                    <td><input type="text" name="cust_data.cust_addr" id="cust_data.cust_addr" style='width: 500px'/></td>
                 </tr>
                 <tr>
-                    <td colspan="2"><label for="rbo_cust_flds.cust_nonds">Без НДС</label><input type="checkbox"
-                                                                                           name="rbo_cust_flds.cust_nonds"
-                                                                                           id="rbo_cust_flds.cust_nonds">
+                    <td colspan="2"><label for="cust_data.cust_nonds">Без НДС</label><input type="checkbox"
+                                                                                           name="cust_data.cust_nonds"
+                                                                                           id="cust_data.cust_nonds">
                         <label for="rbo_cust.cust_phone">&nbsp;Тел.</label> <input
                             type="text" name="rbo_cust.cust_phone" id="rbo_cust.cust_phone" style='width: 200px'/>
                         <label for="rbo_cust.cust_email">&nbsp;@</label> <input type="text" name="rbo_cust.cust_email"
@@ -49,36 +49,36 @@
             </table>
             <table>
                 <tr>
-                    <td colspan="2"><label for="rbo_cust_flds.cust_inn">&nbsp;ИНН</label><input type="text"
-                                                                                           name="rbo_cust_flds.cust_inn"
-                                                                                           id="rbo_cust_flds.cust_inn"
+                    <td colspan="2"><label for="cust_data.cust_inn">&nbsp;ИНН</label><input type="text"
+                                                                                           name="cust_data.cust_inn"
+                                                                                           id="cust_data.cust_inn"
                                                                                            style='width: 150px'/> <label
-                            for="rbo_cust_flds.cust_kpp">&nbsp;КПП</label><input
-                            type="text" name="rbo_cust_flds.cust_kpp" id="rbo_cust_flds.cust_kpp" style='width: 150px'/></td>
+                            for="cust_data.cust_kpp">&nbsp;КПП</label><input
+                            type="text" name="cust_data.cust_kpp" id="cust_data.cust_kpp" style='width: 150px'/></td>
                 </tr>
                 <tr>
-                    <td colspan="2"><label for="rbo_cust_flds.cust_okpo">ОКПО</label><input type="text"
-                                                                                       name="rbo_cust_flds.cust_okpo"
-                                                                                       id="rbo_cust_flds.cust_okpo"
+                    <td colspan="2"><label for="cust_data.cust_okpo">ОКПО</label><input type="text"
+                                                                                       name="cust_data.cust_okpo"
+                                                                                       id="cust_data.cust_okpo"
                                                                                        style='width: 150px'/> <label
-                            for="rbo_cust_flds.cust_ogrn">&nbsp;ОГРН</label>
-                        <input type="text" name="rbo_cust_flds.cust_ogrn" id="rbo_cust_flds.cust_ogrn" style='width: 150px'/></td>
+                            for="cust_data.cust_ogrn">&nbsp;ОГРН</label>
+                        <input type="text" name="cust_data.cust_ogrn" id="cust_data.cust_ogrn" style='width: 150px'/></td>
                 </tr>
                 <tr>
-                    <td><label for="rbo_cust_flds.cust_bank">Банк</label></td>
-                    <td><input type="text" name="rbo_cust_flds.cust_bank" id="rbo_cust_flds.cust_bank" style='width: 500px'/></td>
+                    <td><label for="cust_data.cust_bank">Банк</label></td>
+                    <td><input type="text" name="cust_data.cust_bank" id="cust_data.cust_bank" style='width: 500px'/></td>
                 </tr>
                 <tr>
-                    <td><label for="rbo_cust_flds.cust_bik">БИК</label></td>
-                    <td><input type="text" name="rbo_cust_flds.cust_bik" id="rbo_cust_flds.cust_bik" style='width: 150px'/></td>
+                    <td><label for="cust_data.cust_bik">БИК</label></td>
+                    <td><input type="text" name="cust_data.cust_bik" id="cust_data.cust_bik" style='width: 150px'/></td>
                 </tr>
                 <tr>
-                    <td colspan="2"><label for="rbo_cust_flds.cust_rch">р/сч</label><input type="text"
-                                                                                      name="rbo_cust_flds.cust_rch"
-                                                                                      id="rbo_cust_flds.cust_rch"
+                    <td colspan="2"><label for="cust_data.cust_rch">р/сч</label><input type="text"
+                                                                                      name="cust_data.cust_rch"
+                                                                                      id="cust_data.cust_rch"
                                                                                       style='width: 250px'/> <label
-                            for="rbo_cust_flds.cust_kch">к/сч</label><input
-                            type="text" name="rbo_cust_flds.cust_kch" id="rbo_cust_flds.cust_kch" style='width: 250px'/></td>
+                            for="cust_data.cust_kch">к/сч</label><input
+                            type="text" name="cust_data.cust_kch" id="cust_data.cust_kch" style='width: 250px'/></td>
                 </tr>
             </table>
         </fieldset>
