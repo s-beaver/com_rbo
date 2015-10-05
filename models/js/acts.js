@@ -3,7 +3,7 @@ var doc;
 // ===================================================================================
 $(document).ready(function () {
 
-    doc = new RboShipment({
+    doc = new RbDocSale({
         sDocType: 'акт',
         sDocTypeListTitle: 'Акты',
         sDocTypeTitle: 'Акт',
