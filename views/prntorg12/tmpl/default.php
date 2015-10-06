@@ -73,15 +73,6 @@ sup {
 	border-width: 1px;
 }
 
-.img_stamp {
-	position: absolute;
-	left: 0px;
-	top: 200px;
-	height: 32mm;
-	width: 32mm;
-	overflow: visible;
-	z-index: -1;
-}
 </style>
 
 </head>
@@ -119,11 +110,11 @@ sup {
       <td style="width: 10%">Грузополучатель</td>
       <td id="doc_cust" style="width: 70%; border-bottom: 1px solid">ххПокупательхх</td>
       <td colspan="2" style="width: 10%; border-bottom: 1px solid; text-align: right;">по ОКПО</td>
-      <td id="cust_okpo" style="width: 10%; border: 1px solid;">&nbsp;</td>
+      <td id="cust_okpo" style="width: 10%; border: 1px solid; text-align: center;">хх55774024хх</td>
     </tr>
     <tr>
       <td style="width: 10%">Поставщик</td>
-      <td id="doc_firm" style="width: 70%; border-bottom: 1px solid;" id="doc_firm">ххООО Робик.РУхх</td>
+      <td id="doc_firm" style="width: 70%; border-bottom: 1px solid;">ххООО Робик.РУхх</td>
       <td colspan="2" style="width: 10%; border-bottom: 1px solid; text-align: right;">по ОКПО</td>
       <td id="firm_okpo" style="width: 10%; border: 1px solid; text-align: center;">хх55774024хх</td>
     </tr>
