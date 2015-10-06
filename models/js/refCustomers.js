@@ -174,9 +174,11 @@ RefCustomers.prototype.deleteCustomer = function (custId) {
 // ===================================================================================
 RefCustomers.prototype.showCustomerForm = function (i) {
     var self = this;
-
+    i = NullTo(i, {});
+    i.cust_data = NullTo(i.cust_data, "{}");
     setFormData("cst-form", "rbo_cust", i);
-    setFormData("cst-form", "cust_data", JSON.parse(i.cust_data));
+    if (!IsNull(i.cust_data))
+        setFormData("cst-form", "cust_data", JSON.parse(i.cust_data));
 
     var rbo_cust_data = i.cust_data;
     setFormData("cst-form", "rbo_cust_flds", rbo_cust_data);
