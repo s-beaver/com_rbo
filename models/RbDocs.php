@@ -234,35 +234,36 @@ class RbDocs extends RbObject
         $sEcho = $input->getString('sEcho');
         $doc_type = $input->getString('doc_type');
         $sSearch = $input->getString('sSearch');
-        $sWhere = array();
-        $sWhere [] = $db->quoteName('doc_type') . "='" . $doc_type . "'";
-        if (isset ($sSearch) && $sSearch != "") $sWhere [] = $db->quoteName('rc.cust_name') . " LIKE '%" .
-            $sSearch . "%'";
 
-        $query = $db->getQuery(true);
-
-        $query->clear();
-        $query->select(
-            array("docId", "doc_num", "doc_date", "rc.cust_name doc_cust", "doc_sum", "doc_status",
-                "doc_firm", "doc_manager"));
-        $query->from($db->quoteName('rbo_docs', 'rd'));
-        $query->where($sWhere);
-        $query->order($db->quoteName('rd.docId') . " DESC");
-        $query->leftJoin(
-            $db->quoteName('rbo_cust', 'rc') . ' ON (' . $db->quoteName('rd.custId') . ' = ' .
-            $db->quoteName('rc.custId') . ')');
+        $sWhere = " WHERE doc_type='" . $doc_type . "'";
+        if (isset ($sSearch) && $sSearch != "") {
+            $sWhere .= " AND rc.cust_name LIKE '%" . $sSearch . "%'";
+        }
+        $sSelect = "SELECT docId, doc_num, doc_date, rc.cust_name doc_cust, doc_sum, doc_status, doc_firm, doc_manager ";
+        $sRestOfQuery = " FROM rbo_docs rd LEFT JOIN rbo_cust rc ON rd.custId = rc.custId " .
+            $sWhere . " ORDER BY rd.docId DESC";
 
         if (isset ($_POST ['iDisplayStart']) && $_POST ['iDisplayLength'] != '-1') {
-            $db->setQuery($query, intval($iDisplayStart), intval($iDisplayLength));
+            $db->setQuery($sSelect . $sRestOfQuery, intval($iDisplayStart), intval($iDisplayLength));
         } else {
-            $db->setQuery($query);
+            $db->setQuery($sSelect . $sRestOfQuery);
         }
 
         $data_rows_assoc_list = $db->loadAssocList();
         $iTotalDisplayRecords = $db->getAffectedRows();
 
+        $db->setQuery("SELECT doc_base, docId, doc_num, doc_date, doc_type " .
+            "FROM rbo_docs WHERE doc_base IN (SELECT docId " . $sRestOfQuery . ")");
+        $baseDocs = $db->loadAssocList();
+
         foreach ($data_rows_assoc_list as &$v) {
-            $v ['doc_date'] = JFactory::getDate($v ['doc_date'])->format('d.m.y'); // https://php.net/manual/en/function.date.php
+            $v['doc_date'] = JFactory::getDate($v['doc_date'])->format('d.m.y'); // https://php.net/manual/en/function.date.php
+            $v['childs'] = "";
+            foreach ($baseDocs as $bd) {
+                if ($bd['doc_base']==$v['docId']) {
+                    $v['childs'] .= $bd['doc_type'].$bd['docId']."<br>";
+                }
+            }
         }
 
         $res = new stdClass ();

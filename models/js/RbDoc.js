@@ -82,6 +82,16 @@ RbDoc.prototype.attachDocModule = function () {
             "sClass": "center",
             "mData": "doc_status"
         }, {
+            "sTitle": "Док-ты",
+            "mData": function (source, type, val) {
+                return source.childs;
+            }
+        }, {
+            "sTitle": "Оп.",
+            "mData": function (source, type, val) {
+                return "";
+            }
+        }, {
             "sTitle": "Менеджер",
             "mData": "doc_manager"
         }],
