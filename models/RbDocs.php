@@ -258,10 +258,15 @@ class RbDocs extends RbObject
 
         foreach ($data_rows_assoc_list as &$v) {
             $v['doc_date'] = JFactory::getDate($v['doc_date'])->format('d.m.y'); // https://php.net/manual/en/function.date.php
-            $v['childs'] = "";
+            $v['childs'] = array();
             foreach ($baseDocs as $bd) {
                 if ($bd['doc_base']==$v['docId']) {
-                    $v['childs'] .= $bd['doc_type'].$bd['docId']."<br>";
+                    $childElem = new stdClass ();
+                    $childElem->docId=$bd['docId'];
+                    $childElem->doc_num=$bd['doc_num'];
+                    $childElem->doc_date=JFactory::getDate($bd['doc_date'])->format('d.m'); // https://php.net/manual/en/function.date.php
+                    $childElem->doc_type=$bd['doc_type'];
+                    $v['childs'][] = $childElem;
                 }
             }
         }

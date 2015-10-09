@@ -84,7 +84,13 @@ RbDoc.prototype.attachDocModule = function () {
         }, {
             "sTitle": "Док-ты",
             "mData": function (source, type, val) {
-                return source.childs;
+                var s = "", docText, elem;
+                for (var i = 0; i < source.childs.length; i++) {
+                    elem = source.childs[i];
+                    docText = elem.doc_type + " №" + elem.doc_num + " /" + elem.doc_date;
+                    s += "<a href='javascript:doc.readDoc(" + elem.docId + ")'>" + docText + "</a><br>";
+                }
+                return s;
             }
         }, {
             "sTitle": "Оп.",
@@ -206,13 +212,13 @@ RbDoc.prototype.setRW = function (sStatus) {
 // ===================================================================================
 RbDoc.prototype.readDocFromURLId = function () {
     var docId = getURLParam("docId");
-    if (Number(docId)>0) {
+    if (Number(docId) > 0) {
         this.readDoc(docId);
     }
 }
 
 // ===================================================================================
-    RbDoc.prototype.readDoc = function (docId) {
+RbDoc.prototype.readDoc = function (docId) {
     var self = this;
     $.ajax({
         dataType: 'json',
@@ -326,7 +332,7 @@ RbDoc.prototype.copyDoc = function (title, docId) {
         },
         url: comPath + "ajax.php?task=doc_create",
         success: function (doc_data) {
-            window.open('index.php?option=com_rbo&view='+viewName+'&docid='+docId, '_blank');
+            window.open('index.php?option=com_rbo&view=' + viewName + '&docid=' + docId, '_blank');
         }
     });
 };
