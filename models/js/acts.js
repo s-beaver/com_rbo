@@ -8,7 +8,7 @@ $(document).ready(function () {
         sDocType: 'акт',
         sDocTypeListTitle: 'Акты',
         sDocTypeTitle: 'Акт',
-        allFields: $("#doc_num").add($("#doc_date")).add($("#doc_manager")).add($("#doc_firm")).add($("#cedit")),
+        checkFields: ["doc_num","doc_date","doc_manager","doc_firm"],
         tips: $(".validateTips"),
         printList: [
             {title: "Печатать", viewName: "PrnAct"}

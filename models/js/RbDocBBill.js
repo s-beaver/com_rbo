@@ -6,15 +6,17 @@ $(document).ready(function () {
 
     doc = new RbDoc({
         sDocType: 'B_BIL',
+        docFormPrefix:"b-bill",
         sDocTypeListTitle: 'Накладные (закуп)',
         sDocTypeTitle: 'Накладная (закуп)',
-        allFields: $("#doc_num").add($("#doc_date")).add($("#doc_manager")).add($("#doc_firm")).add($("#cedit")),
+        checkFields: ["doc_num","doc_date","doc_manager","doc_firm"],
         tips: $(".validateTips"),
         statusList: {
             "подписан": "подписан",
             "удален": "удален"
         }
     });
+    doc.attachPageElements();
 
     $("#dialog-confirm").dialog({
         autoOpen: false

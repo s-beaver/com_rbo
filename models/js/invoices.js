@@ -8,7 +8,7 @@ $(document).ready(function () {
         sDocType: 'счет',
         sDocTypeListTitle: 'Счета',
         sDocTypeTitle: 'Счет',
-        allFields: $("#doc_num").add($("#doc_date")).add($("#doc_manager")).add($("#doc_firm")).add($("#cedit")),
+        checkFields: ["doc_num","doc_date","doc_manager","doc_firm"],
         tips: $(".validateTips"),
         printList: [
             {title: "Печатать", viewName: "PrnInv"}
@@ -31,7 +31,7 @@ $(document).ready(function () {
         sDocType: 'накл',
         sDocTypeListTitle: 'Накладные',
         sDocTypeTitle: 'Накладная',
-        allFields: $("#doc_num").add($("#doc_date")).add($("#doc_manager")).add($("#doc_firm")).add($("#cedit")),
+        checkFields: ["doc_num","doc_date","doc_manager","doc_firm"],
         tips: $(".validateTips"),
         printList: [
             {title: "Печатать ТОРГ-12", viewName: "PrnTorg12"},
@@ -50,7 +50,7 @@ $(document).ready(function () {
         sDocType: 'акт',
         sDocTypeListTitle: 'Акты',
         sDocTypeTitle: 'Акт',
-        allFields: $("#doc_num").add($("#doc_date")).add($("#doc_manager")).add($("#doc_firm")).add($("#cedit")),
+        checkFields: ["doc_num","doc_date","doc_manager","doc_firm"],
         tips: $(".validateTips"),
         printList: [
             {title: "Печатать", viewName: "PrnAct"}

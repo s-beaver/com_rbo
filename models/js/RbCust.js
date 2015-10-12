@@ -55,7 +55,7 @@ RboCust.prototype.attachCustomerModule = function () {
     });
 
     //вызов формы выбора документа-основания
-    $("#baseedit").click(function (event) {
+    $("#" + self.parentDoc.docFormPrefix + "\\.baseedit").click(function (event) {
         self.chooseBaseDoc(doc);
         return false;
     });
@@ -295,10 +295,10 @@ RboCust.prototype.chooseBaseDoc = function () {
                         doc_data.doc_base_doc.doc_num = doc_data.doc_num;
                         doc_data.doc_base_doc.doc_date = doc_data.doc_date;
 
-                        doc_data.docId = self.parentDoc.docId;//self.parentDoc.oDoc.docId;
-                        doc_data.doc_num = $("#doc_num").val();//self.parentDoc.oDoc.doc_num;
-                        doc_data.doc_date = $("#doc_date").val();//self.parentDoc.oDoc.doc_date;
-                        doc_data.doc_status = $("#doc_status").val();//self.parentDoc.oDoc.doc_status;
+                        doc_data.docId = self.parentDoc.docId;
+                        doc_data.doc_num = $("#"+self.parentDoc.docFormPrefix+"\\.doc_num").val();
+                        doc_data.doc_date = $("#"+self.parentDoc.docFormPrefix+"\\.doc_date").val();
+                        doc_data.doc_status = $("#"+self.parentDoc.docFormPrefix+"\\.doc_status").val();
                         self.parentDoc.showDocForm(doc_data);
                     }
                 });

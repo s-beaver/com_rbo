@@ -15,7 +15,15 @@ function RbDoc(o) {
     this.sDocType = o.sDocType;
     this.sDocTypeTitle = o.sDocTypeTitle;
     this.sDocTypeListTitle = o.sDocTypeListTitle;
-    this.allFields = o.allFields;//перечень элементов jquery, предназначенных для ввода данных и проверяемых на обязательность заполнения
+    if (IsArray(o.checkFields)) {
+        for (var i=0; i< o.checkFields.length; i++) {
+            if (IsNull(this.checkFields)) {
+                this.checkFields = $("#"+this.docFormPrefix+"\\."+o.checkFields[i]);
+            } else {
+                this.checkFields = this.checkFields.add($("#"+this.docFormPrefix+"\\."+o.checkFields[i]));
+            }
+        }
+    }
     this.tips = o.tips;
     this.printList = o.printList;//перечень печатных форм документа
     this.copyToList = o.copyToList;//перечень документов для создания из текущего документа
@@ -226,13 +234,13 @@ RbDoc.prototype.attachPageElements = function () {
 RbDoc.prototype.setRW = function (sStatus) {//todo проверять из statusList
     var self = this;
     if (sStatus == "выставлен" || sStatus == "оплачен" || sStatus == "удален" || sStatus == "подписан") {
-        this.allFields.attr("disabled", "disabled");
+        this.checkFields.attr("disabled", "disabled");
         $("[id^='"+self.docFormPrefix+"\\.edit_product']").each(function (x, elem) {
             $(this).attr("href", "javascript:;");
         });
         return true;
     } else {
-        this.allFields.removeAttr("disabled");
+        this.checkFields.removeAttr("disabled");
         return false;
     }
 };
@@ -268,7 +276,7 @@ RbDoc.prototype.readDoc = function (docId) {
 RbDoc.prototype.saveDoc = function (docId) {
     var self = this;
     var bValid = true;
-    self.allFields.removeClass("ui-state-error");
+    self.checkFields.removeClass("ui-state-error");
     bValid = bValid && checkNotEmpty($("#"+self.docFormPrefix+"\\.doc_num"), "Номер", self.tips);
     bValid = bValid && checkNotEmpty($("#"+self.docFormPrefix+"\\.doc_date"), "Дата", self.tips);
     bValid = bValid && checkNotEmpty($("#"+self.docFormPrefix+"\\.doc_manager"), "Менеджер", self.tips);
@@ -290,7 +298,7 @@ RbDoc.prototype.saveDoc = function (docId) {
             "doc_num": $("#"+self.docFormPrefix+"\\.doc_num").val(),
             "doc_date": $("#"+self.docFormPrefix+"\\.doc_date").val(),
             "doc_sum": $("#"+self.docFormPrefix+"\\.doc_sum").val(),
-            "doc_base": $("#"+self.docFormPrefix+"\\.doc_baseId").val(),// скрытое поле в форме выбора документа - основания
+            "doc_base": $("#doc_baseId").val(),// скрытое поле в форме выбора документа - основания
             "doc_status": $("#"+self.docFormPrefix+"\\.doc_status").val(),
             "doc_manager": $("#"+self.docFormPrefix+"\\.doc_manager").val(),
             "custId": $("#custId").val(),// скрытое поле в форме выбора клиента
@@ -410,6 +418,7 @@ RbDoc.prototype.deleteDoc = function (docId) {
 // ===================================================================================
 RbDoc.prototype.showDocForm = function (i) {
     var self = this;
+    self.checkFields.removeClass("ui-state-error");
     refillSelect(self.docFormPrefix+"\\.doc_manager", getPeopleList(), true);
     refillSelect(self.docFormPrefix+"\\.doc_firm", getFirmList());
     refillSelect(self.docFormPrefix+"\\.doc_status", self.oStatusList, true);
@@ -424,7 +433,7 @@ RbDoc.prototype.showDocForm = function (i) {
 
     //установим поля документа-основания
     var sDocBase = "";
-    $("#"+self.docFormPrefix+"\\.doc_baseId").val(i.doc_base);
+    $("#doc_baseId").val(i.doc_base);
     if ((i.doc_base > 0) && !IsNull(i.doc_base_doc)) {
         sDocBase = "Счет №" + i.doc_base_doc.doc_num + " от " + i.doc_base_doc.doc_date;
     }

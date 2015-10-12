@@ -6,7 +6,7 @@ function RbOper(o) {
 
     this.oCust = new RboCust();
     this.tips = o.tips;
-    this.allFields = o.allFields;
+    this.checkFields = o.checkFields;
     this.oTable = null;
     this.oTableAPI = null;
 
@@ -189,7 +189,7 @@ RbOper.prototype.saveOper = function () {
     var self = this;
     var bValid = true;
     self.oSavedData = getFormData("oper-form", "rbo_opers");
-    self.allFields.removeClass("ui-state-error");
+    self.checkFields.removeClass("ui-state-error");
     bValid = bValid && checkNotEmpty($("#rbo_opers\\.oper_date"), "Дата", self.tips);
     bValid = bValid && checkNotEmpty($("#rbo_opers\\.oper_type"), "Тип операции", self.tips);
     bValid = bValid && checkNotEmpty($("#rbo_opers\\.oper_firm"), "Фирма", self.tips);

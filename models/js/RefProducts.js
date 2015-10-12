@@ -4,7 +4,7 @@ var prd;
 //===================================================================================
 function RefProducts(o) {
     this.tips = o.tips;
-    this.allFields = o.allFields;
+    this.checkFields = o.checkFields;
 }
 
 //===================================================================================
@@ -144,7 +144,7 @@ RefProducts.prototype.saveProduct = function () {
     var self = this;
     var oData = getFormData("prd-form", "rbo_products");
     var bValid = true;
-    self.allFields.removeClass("ui-state-error");
+    self.checkFields.removeClass("ui-state-error");
     bValid = bValid && checkNotEmpty($("#rbo_products\\.product_price"), "Цена", self.tips);
     bValid = bValid && checkNotEmpty($("#rbo_products\\.product_price1"), "Цена1", self.tips);
     if (oData.rbo_products.product_type == "1")
