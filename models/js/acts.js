@@ -3,7 +3,8 @@ var doc;
 // ===================================================================================
 $(document).ready(function () {
 
-    doc = new RbDocSale({
+    doc = new RbDoc({
+        docFormPrefix:"s-act",
         sDocType: 'акт',
         sDocTypeListTitle: 'Акты',
         sDocTypeTitle: 'Акт',
@@ -17,10 +18,7 @@ $(document).ready(function () {
             "удален": "удален"
         }
     });
-
-    doc.attachDocModule();
-    doc.oProduct.attachProductModule();
-    doc.oCust.attachCustomerModule();
+    doc.attachPageElements();
 
     $("#dialog-confirm").dialog({
         autoOpen: false

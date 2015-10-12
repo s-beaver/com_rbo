@@ -1,5 +1,5 @@
 /**
- * Абстрактный объект JavaScript для работы с документами. Предназначен для
+ * Базовый класс JavaScript для работы с документами. Предназначен для
  * наследования
  *
  * Необходимо: - убрать comPath - например передовать из php при создании
@@ -11,6 +11,7 @@ var comPath = "/components/com_rbo/";
 //===================================================================================
 function RbDoc(o) {
     this.docId = 0;
+    this.docFormPrefix = o.docFormPrefix;
     this.sDocType = o.sDocType;
     this.sDocTypeTitle = o.sDocTypeTitle;
     this.sDocTypeListTitle = o.sDocTypeListTitle;
@@ -19,6 +20,7 @@ function RbDoc(o) {
     this.printList = o.printList;//перечень печатных форм документа
     this.copyToList = o.copyToList;//перечень документов для создания из текущего документа
 
+    this.oTable = o.oTable;
     this.oProduct = new RboProduct();//объект для выбора/редакции товарами
     this.oCust = new RboCust(this);//объект для выбора/редакции контрагента
 
@@ -26,13 +28,18 @@ function RbDoc(o) {
     this.lines_before_update = 0;
 
     this.oStatusList = o.statusList;
+
+    this.attachDocForm();
+    this.oProduct.attachProductModule();
+    this.oCust.attachCustomerModule();
 }
 
 //===================================================================================
-RbDoc.prototype.attachDocModule = function () {
+RbDoc.prototype.attachDocForm = function () {
     var self = this;
     //подключаем форму для редакции документов
-    $("#doc-form").dialog({
+    this.oFormDlg = $("#" + self.docFormPrefix + "\\.doc-form");
+    this.oFormDlg.dialog({
         autoOpen: false,
         height: 550,
         width: 900,
@@ -40,87 +47,7 @@ RbDoc.prototype.attachDocModule = function () {
         resizable: true
     });
 
-    this.oTable = $('#TableDoc').dataTable({
-        "bJQueryUI": true,
-        "bProcessing": true,
-        "bServerSide": true,
-        "tableTools": {
-            "sSwfPath": "/swf/copy_csv_xls_pdf.swf"
-        },
-        "aaSorting": [[1, "desc"]],
-        "sAjaxSource": comPath + "ajax.php?task=get_doc_list&doc_type=" + self.sDocType,
-        "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
-            oSettings.jqXHR = $.ajax({
-                "dataType": 'json',
-                "type": "POST",
-                "data": aoData,
-                "url": sSource,
-                "success": function (json) {
-                    fnCallback(json);
-                }
-            });
-        },
-        "aoColumns": [{
-            "sTitle": "Номер",
-            "sClass": "center",
-            "mData": function (source, type, val) {
-                return "<a href='javascript:doc.readDoc(" + source.docId + ")'>" + source.doc_num + " /" + source.doc_date + "</a>";
-            }
-        }, {
-            "sTitle": "Контрагент",
-            "mData": "doc_cust"
-        }, {
-            "sTitle": "Сумма",
-            "sClass": "center",
-            "mData": "doc_sum"
-        }, {
-            "sTitle": "Фирма",
-            "sClass": "center",
-            "mData": "doc_firm"
-        }, {
-            "sTitle": "Статус",
-            "sClass": "center",
-            "mData": "doc_status"
-        }, {
-            "sTitle": "Док-ты",
-            "mData": function (source, type, val) {
-                var s = "", docText, elem;
-                for (var i = 0; i < source.childs.length; i++) {
-                    elem = source.childs[i];
-                    docText = elem.doc_type + " №" + elem.doc_num + " /" + elem.doc_date;
-                    s += "<a href='javascript:doc.readDoc(" + elem.docId + ")'>" + docText + "</a><br>";
-                }
-                return s;
-            }
-        }, {
-            "sTitle": "Оп.",
-            "mData": function (source, type, val) {
-                return "";
-            }
-        }, {
-            "sTitle": "Менеджер",
-            "mData": "doc_manager"
-        }],
-        "oLanguage": {
-            "sProcessing": "Подождите...",
-            "sLengthMenu": "Показать _MENU_ строк",
-            "sZeroRecords": "Записи отсутствуют.",
-            "sInfo": "Документы с _START_ по _END_ (всего: _TOTAL_)",
-            "sInfoEmpty": "Документов нет",
-            "sInfoFiltered": "(отфильтровано из _MAX_ записей)",
-            "sInfoPostFix": "",
-            "sSearch": "Поиск:",
-            "sUrl": "",
-            "oPaginate": {
-                "sFirst": "В начало",
-                "sPrevious": "Предыдущие",
-                "sNext": "Следующие",
-                "sLast": "В конец"
-            }
-        }
-    });
-
-    this.oTableProducts = $('#TableProducts').dataTable({
+    this.oTableProducts = $('#' + self.docFormPrefix+"\\.products-table").dataTable({
         "bPaginate": false,
         "searching": false,
         "ordering": false,
@@ -170,6 +97,107 @@ RbDoc.prototype.attachDocModule = function () {
 
     this.apiTableProducts = this.oTableProducts.api();
 
+}
+
+//===================================================================================
+RbDoc.prototype.attachPageElements = function () {
+    var self = this;
+    this.oTable = $('#TableDoc').dataTable({
+        "bJQueryUI": true,
+        "bProcessing": true,
+        "bServerSide": true,
+        "tableTools": {
+            "sSwfPath": "/swf/copy_csv_xls_pdf.swf"
+        },
+        "aaSorting": [[1, "desc"]],
+        "sAjaxSource": comPath + "ajax.php?task=get_doc_list&doc_type=" + self.sDocType,
+        "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
+            oSettings.jqXHR = $.ajax({
+                "dataType": 'json',
+                "type": "POST",
+                "data": aoData,
+                "url": sSource,
+                "success": function (json) {
+                    fnCallback(json);
+                }
+            });
+        },
+        "aoColumns": [{
+            "sTitle": "Номер",
+            "sClass": "center",
+            "mData": function (source, type, val) {
+                return "<a href='javascript:doc.readDoc(" + source.docId + ")'>" + source.doc_num + " /" + source.doc_date + "</a>";
+            }
+        }, {
+            "sTitle": "Контрагент",
+            "mData": "doc_cust"
+        }, {
+            "sTitle": "Сумма",
+            "sClass": "center",
+            "mData": "doc_sum"
+        }, {
+            "sTitle": "Фирма",
+            "sClass": "center",
+            "mData": "doc_firm"
+        }, {
+            "sTitle": "Статус",
+            "sClass": "center",
+            "mData": "doc_status"
+        }, {
+            "sTitle": "Док-ты",
+            "mData": function (source, type, val) {
+                var s = "", docText, elem;
+                for (var i = 0; i < source.childs.length; i++) {
+                    elem = source.childs[i];
+                    docText = elem.doc_type + " №" + elem.doc_num + " /" + elem.doc_date;
+                    switch (elem.doc_type) {
+                        case "акт":
+                        {
+                            s += "<a href='javascript:docSAct.readDoc(" + elem.docId + ")'>" + docText + "</a><br>";
+                            break;
+                        }
+                        case "накл":
+                        {
+                            s += "<a href='javascript:docSBill.readDoc(" + elem.docId + ")'>" + docText + "</a><br>";
+                            break;
+                        }
+                        default:
+                        {
+                            s += docText + "<br>";
+                        }
+                    }
+
+                }
+                return s;
+            }
+        }, {
+            "sTitle": "Оп.",
+            "mData": function (source, type, val) {
+                return "";
+            }
+        }, {
+            "sTitle": "Менеджер",
+            "mData": "doc_manager"
+        }],
+        "oLanguage": {
+            "sProcessing": "Подождите...",
+            "sLengthMenu": "Показать _MENU_ строк",
+            "sZeroRecords": "Записи отсутствуют.",
+            "sInfo": "Документы с _START_ по _END_ (всего: _TOTAL_)",
+            "sInfoEmpty": "Документов нет",
+            "sInfoFiltered": "(отфильтровано из _MAX_ записей)",
+            "sInfoPostFix": "",
+            "sSearch": "Поиск:",
+            "sUrl": "",
+            "oPaginate": {
+                "sFirst": "В начало",
+                "sPrevious": "Предыдущие",
+                "sNext": "Следующие",
+                "sLast": "В конец"
+            }
+        }
+    });
+
     $("#header_doclist_choose_list h2").html(this.sDocTypeListTitle);
 
     //подключаем меню перехода в другой раздел
@@ -180,7 +208,6 @@ RbDoc.prototype.attachDocModule = function () {
         }
     });
 
-
     //обработчик нажатия кнопки добавления документа
     $("#doc_add_btn").click(function (event) {
         self.createDoc();
@@ -188,7 +215,7 @@ RbDoc.prototype.attachDocModule = function () {
     });
 
     //обработчик нажатия кнопки добавления товара в документ
-    $("#prod_add_btn").click(function (event) {
+    $("#"+self.docFormPrefix+"\\.prod_add_btn").click(function (event) {
         self.showProductForm();
         return false;
     });
@@ -196,10 +223,11 @@ RbDoc.prototype.attachDocModule = function () {
 };
 
 // ===================================================================================
-RbDoc.prototype.setRW = function (sStatus) {
+RbDoc.prototype.setRW = function (sStatus) {//todo проверять из statusList
+    var self = this;
     if (sStatus == "выставлен" || sStatus == "оплачен" || sStatus == "удален" || sStatus == "подписан") {
         this.allFields.attr("disabled", "disabled");
-        $("[id^='edit_product']").each(function (x, elem) {
+        $("[id^='"+self.docFormPrefix+"\\.edit_product']").each(function (x, elem) {
             $(this).attr("href", "javascript:;");
         });
         return true;
@@ -241,9 +269,9 @@ RbDoc.prototype.saveDoc = function (docId) {
     var self = this;
     var bValid = true;
     self.allFields.removeClass("ui-state-error");
-    bValid = bValid && checkNotEmpty($("#doc_num"), "Номер", self.tips);
-    bValid = bValid && checkNotEmpty($("#doc_date"), "Дата", self.tips);
-    bValid = bValid && checkNotEmpty($("#doc_manager"), "Менеджер", self.tips);
+    bValid = bValid && checkNotEmpty($("#"+self.docFormPrefix+"\\.doc_num"), "Номер", self.tips);
+    bValid = bValid && checkNotEmpty($("#"+self.docFormPrefix+"\\.doc_date"), "Дата", self.tips);
+    bValid = bValid && checkNotEmpty($("#"+self.docFormPrefix+"\\.doc_manager"), "Менеджер", self.tips);
     var p = self.apiTableProducts.rows().data();
     var pAr = [];
     for (var i = 0; i < p.length; i++)
@@ -259,15 +287,15 @@ RbDoc.prototype.saveDoc = function (docId) {
         "rbo_docs": {
             "docId": docId,
             "doc_type": self.sDocType,
-            "doc_num": $("#doc_num").val(),
-            "doc_date": $("#doc_date").val(),
-            "doc_sum": $("#doc_sum").val(),
-            "doc_base": $("#doc_baseId").val(),// скрытое поле в форме выбора документа - основания
-            "doc_status": $("#doc_status").val(),
-            "doc_manager": $("#doc_manager").val(),
-            "custId": $("#custId").val(),// скрытое поле в форме выбора клиента
+            "doc_num": $("#"+self.docFormPrefix+"\\.doc_num").val(),
+            "doc_date": $("#"+self.docFormPrefix+"\\.doc_date").val(),
+            "doc_sum": $("#"+self.docFormPrefix+"\\.doc_sum").val(),
+            "doc_base": $("#"+self.docFormPrefix+"\\.doc_baseId").val(),// скрытое поле в форме выбора документа - основания
+            "doc_status": $("#"+self.docFormPrefix+"\\.doc_status").val(),
+            "doc_manager": $("#"+self.docFormPrefix+"\\.doc_manager").val(),
+            "custId": $("#"+self.docFormPrefix+"\\.custId").val(),// скрытое поле в форме выбора клиента
             "doc_cust": self.oCust.flds,
-            "doc_firm": $("#doc_firm").val(),
+            "doc_firm": $("#"+self.docFormPrefix+"\\.doc_firm").val(),
             "doc_products": pAr
         }
     };
@@ -281,7 +309,7 @@ RbDoc.prototype.saveDoc = function (docId) {
         data: oData,
         url: comPath + "ajax.php?task=" + taskCmd,
         success: function (doc_data) {
-            $("#doc-form").dialog("close");
+            self.oFormDlg.dialog("close");
             self.oTable.fnDraw();
         }
     });
@@ -310,7 +338,7 @@ RbDoc.prototype.copyDoc = function (title, docId) {
     if (self.oCust.flds.cust_name == "")
         $("#custId").val("-1");//значит мы сознательно удаляем покупателя из документа
 
-    //проверить, есть ли уже документ, основание которого равно docId
+    //todo проверить, есть ли уже документ, основание которого равно docId
     $.ajax({
         dataType: 'json',
         type: "POST",
@@ -318,15 +346,15 @@ RbDoc.prototype.copyDoc = function (title, docId) {
             "rbo_docs": {
                 "docId": null,
                 "doc_type": docType,
-                "doc_num": $("#doc_num").val(),
+                "doc_num": $("#"+self.docFormPrefix+"\\.doc_num").val(),
                 "doc_date": getCurrentDate(),
-                "doc_sum": $("#doc_sum").val(),
+                "doc_sum": $("#"+self.docFormPrefix+"\\.doc_sum").val(),
                 "doc_base": docId,
                 "doc_status": "",
-                "doc_manager": $("#doc_manager").val(),
-                "custId": $("#custId").val(),
+                "doc_manager": $("#"+self.docFormPrefix+"\\.doc_manager").val(),
+                "custId": $("#"+self.docFormPrefix+"\\.custId").val(),
                 "doc_cust": self.oCust.flds,
-                "doc_firm": $("#doc_firm").val(),
+                "doc_firm": $("#"+self.docFormPrefix+"\\.doc_firm").val(),
                 "doc_products": pAr
             }
         },
@@ -376,46 +404,46 @@ RbDoc.prototype.deleteDoc = function (docId) {
         }
     });
 
-    $("#doc-form").dialog("close");
+    self.oFormDlg.dialog("close");
 };
 
 // ===================================================================================
 RbDoc.prototype.showDocForm = function (i) {
     var self = this;
-    refillSelect("doc_manager", getPeopleList(), true);
-    refillSelect("doc_firm", getFirmList());
-    refillSelect("doc_status", self.oStatusList, true);
+    refillSelect(self.docFormPrefix+"\\.doc_manager", getPeopleList(), true);
+    refillSelect(self.docFormPrefix+"\\.doc_firm", getFirmList());
+    refillSelect(self.docFormPrefix+"\\.doc_status", self.oStatusList, true);
 
     self.docId = i.docId;
 
     //установим базовые реквизиты документа
-    $("#doc_num").val(i.doc_num);
-    $("#doc_date").val(i.doc_date);
-    $("#doc_sum").val(i.doc_sum);
-    $("#doc_status").val(i.doc_status);
+    $("#"+self.docFormPrefix+"\\.doc_num").val(i.doc_num);
+    $("#"+self.docFormPrefix+"\\.doc_date").val(i.doc_date);
+    $("#"+self.docFormPrefix+"\\.doc_sum").val(i.doc_sum);
+    $("#"+self.docFormPrefix+"\\.doc_status").val(i.doc_status);
 
     //установим поля документа-основания
     var sDocBase = "";
-    $("#doc_baseId").val(i.doc_base);
+    $("#"+self.docFormPrefix+"\\.doc_baseId").val(i.doc_base);
     if ((i.doc_base > 0) && !IsNull(i.doc_base_doc)) {
         sDocBase = "Счет №" + i.doc_base_doc.doc_num + " от " + i.doc_base_doc.doc_date;
     }
-    $("#doc_base").val(sDocBase);
+    $("#"+self.docFormPrefix+"\\.doc_base").val(sDocBase);
 
     //укажем менеджера
-    $('#doc_manager option:selected').each(function () {
+    $('#'+self.docFormPrefix+'\\.doc_manager option:selected').each(function () {
         this.selected = false;
     });
     if (!IsEmpty(i.doc_manager))
-        $("#doc_manager option:contains('" + i.doc_manager + "')").prop("selected", "selected");
+        $("#"+self.docFormPrefix+"\\.doc_manager option:contains('" + i.doc_manager + "')").prop("selected", "selected");
 
     //установим поля контрагента
     self.oCust.setCustFlds('saved', i.doc_cust);
 
     //установим фирму
     if (!IsNull(i.doc_firm))
-        $("#doc_firm option:contains('" + i.doc_firm.toUpperCase() + "')").prop("selected", "selected");
-    $("#doc_rem").val(i.doc_rem);
+        $("#"+self.docFormPrefix+"\\.doc_firm option:contains('" + i.doc_firm.toUpperCase() + "')").prop("selected", "selected");
+    $("#"+self.docFormPrefix+"\\.doc_rem").val(i.doc_rem);
 
     //заполним список товаров/услуг
     self.oTableProducts.fnClearTable();
@@ -460,17 +488,13 @@ RbDoc.prototype.showDocForm = function (i) {
     };
 
     oBtns["Отмена"] = function () {
-        $("#doc-form").dialog("close");
+        self.oFormDlg.dialog("close");
     };
 
-    $("#doc-form").dialog({
-        title: self.sDocTypeTitle + " №" + $('#doc_num').val(),
+    self.oFormDlg.dialog({
+        title: self.sDocTypeTitle + " №" + $('#'+self.docFormPrefix+'\\.doc_num').val(),
         buttons: oBtns
     });
-
-    /*var htmlSelectCopyTo = "<select id='dlg_copy_list_select'></select>";
-     $(".ui-dialog-buttonset").html(htmlSelectCopyTo+$(".ui-dialog-buttonset").html());
-     refillSelect("dlg_copy_list_select",{"акт":"создать акт","накл":"создать накладную"});*/
 
     $("#dlg_copy_list").selectmenu({
         select: function (event, ui) {
@@ -479,7 +503,7 @@ RbDoc.prototype.showDocForm = function (i) {
         }
     });
 
-    $("#doc-form").dialog("open");
+    self.oFormDlg.dialog("open");
 };
 
 //===================================================================================
@@ -524,7 +548,7 @@ RbDoc.prototype.showProductForm = function (x) {// x-номер редактир
                 for (var x = 0; x < pAll.length; x++) {
                     iSum += Number(pAll[x].product_sum);
                 }
-                $('#doc_sum').val(iSum);
+                $('#'+self.docFormPrefix+'\\.doc_sum').val(iSum);
             }
         },
 
@@ -541,7 +565,7 @@ RbDoc.prototype.showProductForm = function (x) {// x-номер редактир
             for (var x = 0; x < pAll.length; x++) {
                 iSum += Number(pAll[x].product_sum);
             }
-            $('#doc_sum').val(iSum);
+            $('#'+self.docFormPrefix+'\\.doc_sum').val(iSum);
         }
     });
 

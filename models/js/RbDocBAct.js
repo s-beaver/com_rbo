@@ -16,10 +16,6 @@ $(document).ready(function () {
         }
     });
 
-    doc.attachDocModule();
-    doc.oProduct.attachProductModule();
-    doc.oCust.attachCustomerModule();
-
     $("#dialog-confirm").dialog({
         autoOpen: false
     });
