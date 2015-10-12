@@ -293,7 +293,7 @@ RbDoc.prototype.saveDoc = function (docId) {
             "doc_base": $("#"+self.docFormPrefix+"\\.doc_baseId").val(),// скрытое поле в форме выбора документа - основания
             "doc_status": $("#"+self.docFormPrefix+"\\.doc_status").val(),
             "doc_manager": $("#"+self.docFormPrefix+"\\.doc_manager").val(),
-            "custId": $("#"+self.docFormPrefix+"\\.custId").val(),// скрытое поле в форме выбора клиента
+            "custId": $("#custId").val(),// скрытое поле в форме выбора клиента
             "doc_cust": self.oCust.flds,
             "doc_firm": $("#"+self.docFormPrefix+"\\.doc_firm").val(),
             "doc_products": pAr
@@ -352,7 +352,7 @@ RbDoc.prototype.copyDoc = function (title, docId) {
                 "doc_base": docId,
                 "doc_status": "",
                 "doc_manager": $("#"+self.docFormPrefix+"\\.doc_manager").val(),
-                "custId": $("#"+self.docFormPrefix+"\\.custId").val(),
+                "custId": $("#custId").val(),
                 "doc_cust": self.oCust.flds,
                 "doc_firm": $("#"+self.docFormPrefix+"\\.doc_firm").val(),
                 "doc_products": pAr

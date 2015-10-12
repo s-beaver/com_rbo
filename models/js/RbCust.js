@@ -12,7 +12,7 @@ function RboCust(parentDoc) {
     this.arSearchedCust = []; // массив объектов содержащих поля покупателя
     this.bInputMode = 'select';
     this.parentDoc = parentDoc;
-    this.parentCustField = $("#" + parentDoc.docFormPrefix + "\\.doc_cust");
+    this.parentCustField = $("#" + this.parentDoc.docFormPrefix + "\\.doc_cust");
 }
 
 //===================================================================================
@@ -37,7 +37,7 @@ RboCust.prototype.attachCustomerModule = function () {
     });
 
     //нажатие кнопки выбора контрагента
-    $("#cedit").click(function (event) {
+    $("#" + self.parentDoc.docFormPrefix + "\\.cedit").click(function (event) {
         self.chooseCustomer();
         return false;
     });
