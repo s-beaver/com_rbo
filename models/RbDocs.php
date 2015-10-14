@@ -142,11 +142,13 @@ class RbDocs extends RbObject
         $response = true;
         $custId = $this->buffer->custId;
         $doc_products = $this->buffer->doc_products;
-        $doc_cust = $this->buffer->doc_cust;
+        $doc_cust = (array)$this->buffer->doc_cust;
         $doc_cust ['cust_data'] = json_encode($doc_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
 
         $this->buffer->created_by = JFactory::getUser()->username;
         $this->buffer->created_on = RbHelper::getCurrentTimeForDb();
+        $this->buffer->modified_by = null;
+        $this->buffer->modified_on = null;
         // $this->buffer->doc_type = $this->docType;//надо передавать через буфер
         if (empty($this->buffer->doc_num)) $this->buffer->doc_num = $this->getNextDocNumber(true);
         if (empty($this->buffer->doc_date)) $this->buffer->doc_date = RbHelper::getCurrentTimeForDb();
@@ -169,6 +171,7 @@ class RbDocs extends RbObject
 
         $docId = $this->insertid;
         foreach ($doc_products as &$p) {
+            $p = (array) $p;
             if (!($p ["productId"] > 0)) { // создадим новый товар в справочнике
                 $pRef = array();
                 $pRef ["productId"] = $p ["productId"];
@@ -216,12 +219,18 @@ class RbDocs extends RbObject
     }
 
     // =================================================================
-    public function copyDocTo($newDocType)
+    /* На входе требуется ключ документа откуда копируются данные и тип нового документа */
+    public function copyDocTo()
     {
         $response = true;
+        $this->keyValue = $this->buffer->doc_base;
+        $doc_type = $this->buffer->doc_type;
         $this->readObject();
-        $this->buffer->doc_type = "акт";//надо передавать через буфер
         $this->buffer->docId = null;
+        $this->buffer->doc_base = $this->keyValue;
+        $this->buffer->doc_num = null;
+        $this->buffer->doc_date = null;
+        $this->buffer->doc_type = $doc_type;
         $this->createObject();
         $this->response = $this->response && $response;
     }

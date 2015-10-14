@@ -342,14 +342,6 @@ RbDoc.prototype.copyDoc = function (docId) {
         var docType = self.copyToList[x].docType;
         var viewName = self.copyToList[x].viewName;
 
-        var p = self.apiTableProducts.rows().data();
-        var pAr = [];
-        for (var i = 0; i < p.length; i++)
-            pAr[i] = p[i];
-
-        if (self.oCust.flds.cust_name == "")
-            $("#custId").val("-1");//значит мы сознательно удаляем покупателя из документа
-
         //todo проверить, есть ли уже документ, основание которого равно docId
         $.ajax({
             dataType: 'json',
@@ -357,18 +349,10 @@ RbDoc.prototype.copyDoc = function (docId) {
             data: {
                 "rbo_docs": {
                     "doc_type": docType,
-                    "doc_date": getCurrentDate(),
-                    "doc_sum": $("#" + self.docFormPrefix + "\\.doc_sum").val(),
-                    "doc_base": docId,
-                    "doc_status": "",
-                    "doc_manager": $("#" + self.docFormPrefix + "\\.doc_manager").val(),
-                    "custId": $("#custId").val(),
-                    "doc_cust": self.oCust.flds,
-                    "doc_firm": $("#" + self.docFormPrefix + "\\.doc_firm").val(),
-                    "doc_products": pAr
+                    "doc_base": docId
                 }
             },
-            url: comPath + "ajax.php?task=doc_create",
+            url: comPath + "ajax.php?task=doc_copy",
             success: function (doc_data) {
                 self.oTable.fnDraw();
             }
