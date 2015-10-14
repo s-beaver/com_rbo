@@ -16,11 +16,11 @@ function RbDoc(o) {
     this.sDocTypeTitle = o.sDocTypeTitle;
     this.sDocTypeListTitle = o.sDocTypeListTitle;
     if (IsArray(o.checkFields)) {
-        for (var i=0; i< o.checkFields.length; i++) {
+        for (var i = 0; i < o.checkFields.length; i++) {
             if (IsNull(this.checkFields)) {
-                this.checkFields = $("#"+this.docFormPrefix+"\\."+o.checkFields[i]);
+                this.checkFields = $("#" + this.docFormPrefix + "\\." + o.checkFields[i]);
             } else {
-                this.checkFields = this.checkFields.add($("#"+this.docFormPrefix+"\\."+o.checkFields[i]));
+                this.checkFields = this.checkFields.add($("#" + this.docFormPrefix + "\\." + o.checkFields[i]));
             }
         }
     }
@@ -55,7 +55,7 @@ RbDoc.prototype.attachDocForm = function () {
         resizable: true
     });
 
-    this.oTableProducts = $('#' + self.docFormPrefix+"\\.products-table").dataTable({
+    this.oTableProducts = $('#' + self.docFormPrefix + "\\.products-table").dataTable({
         "bPaginate": false,
         "searching": false,
         "ordering": false,
@@ -81,7 +81,7 @@ RbDoc.prototype.attachDocForm = function () {
             "sTitle": "Ред.",
             "sClass": "center",
             "mData": function (source, type, val) {
-                return "<a id='edit_product' href='javascript:doc.showProductForm(" + source.lineNo + ")'>" + "<img src='" + comPath + "images/icon-32-edit-on.png'/></a>";
+                return "<a id='edit_product' href='javascript:doc.showProductForm(" + source.lineNo + ")'><img src='" + comPath + "images/icon-32-edit-on.png'/></a>";
             }
         }],
         "oLanguage": {
@@ -155,6 +155,8 @@ RbDoc.prototype.attachPageElements = function () {
             "sTitle": "Док-ты",
             "mData": function (source, type, val) {
                 var s = "", docText, elem;
+                s += "<div style='display: table-cell; vertical-align: middle'><a href='javascript:doc.copyDoc(" + source.docId + ")'><img src='" + comPath + "images/icon-16-new.png'/></a></div>";
+                s += "<div style='display: table-cell'>";
                 for (var i = 0; i < source.childs.length; i++) {
                     elem = source.childs[i];
                     docText = elem.doc_type + " №" + elem.doc_num + " /" + elem.doc_date;
@@ -176,9 +178,10 @@ RbDoc.prototype.attachPageElements = function () {
                     }
 
                 }
+                s += "</div>";
                 return s;
             }
-        }, {
+        },  {
             "sTitle": "Оп.",
             "mData": function (source, type, val) {
                 return "";
@@ -223,7 +226,7 @@ RbDoc.prototype.attachPageElements = function () {
     });
 
     //обработчик нажатия кнопки добавления товара в документ
-    $("#"+self.docFormPrefix+"\\.prod_add_btn").click(function (event) {
+    $("#" + self.docFormPrefix + "\\.prod_add_btn").click(function (event) {
         self.showProductForm();
         return false;
     });
@@ -235,7 +238,7 @@ RbDoc.prototype.setRW = function (sStatus) {//todo проверять из statu
     var self = this;
     if (sStatus == "выставлен" || sStatus == "оплачен" || sStatus == "удален" || sStatus == "подписан") {
         this.checkFields.attr("disabled", "disabled");
-        $("[id^='"+self.docFormPrefix+"\\.edit_product']").each(function (x, elem) {
+        $("[id^='" + self.docFormPrefix + "\\.edit_product']").each(function (x, elem) {
             $(this).attr("href", "javascript:;");
         });
         return true;
@@ -277,9 +280,9 @@ RbDoc.prototype.saveDoc = function (docId) {
     var self = this;
     var bValid = true;
     self.checkFields.removeClass("ui-state-error");
-    bValid = bValid && checkNotEmpty($("#"+self.docFormPrefix+"\\.doc_num"), "Номер", self.tips);
-    bValid = bValid && checkNotEmpty($("#"+self.docFormPrefix+"\\.doc_date"), "Дата", self.tips);
-    bValid = bValid && checkNotEmpty($("#"+self.docFormPrefix+"\\.doc_manager"), "Менеджер", self.tips);
+    //bValid = bValid && checkNotEmpty($("#"+self.docFormPrefix+"\\.doc_num"), "Номер", self.tips);
+    //bValid = bValid && checkNotEmpty($("#"+self.docFormPrefix+"\\.doc_date"), "Дата", self.tips);
+    bValid = bValid && checkNotEmpty($("#" + self.docFormPrefix + "\\.doc_manager"), "Менеджер", self.tips);
     var p = self.apiTableProducts.rows().data();
     var pAr = [];
     for (var i = 0; i < p.length; i++)
@@ -295,15 +298,15 @@ RbDoc.prototype.saveDoc = function (docId) {
         "rbo_docs": {
             "docId": docId,
             "doc_type": self.sDocType,
-            "doc_num": $("#"+self.docFormPrefix+"\\.doc_num").val(),
-            "doc_date": $("#"+self.docFormPrefix+"\\.doc_date").val(),
-            "doc_sum": $("#"+self.docFormPrefix+"\\.doc_sum").val(),
+            "doc_num": $("#" + self.docFormPrefix + "\\.doc_num").val(),
+            "doc_date": $("#" + self.docFormPrefix + "\\.doc_date").val(),
+            "doc_sum": $("#" + self.docFormPrefix + "\\.doc_sum").val(),
             "doc_base": $("#doc_baseId").val(),// скрытое поле в форме выбора документа - основания
-            "doc_status": $("#"+self.docFormPrefix+"\\.doc_status").val(),
-            "doc_manager": $("#"+self.docFormPrefix+"\\.doc_manager").val(),
+            "doc_status": $("#" + self.docFormPrefix + "\\.doc_status").val(),
+            "doc_manager": $("#" + self.docFormPrefix + "\\.doc_manager").val(),
             "custId": $("#custId").val(),// скрытое поле в форме выбора клиента
             "doc_cust": self.oCust.flds,
-            "doc_firm": $("#"+self.docFormPrefix+"\\.doc_firm").val(),
+            "doc_firm": $("#" + self.docFormPrefix + "\\.doc_firm").val(),
             "doc_products": pAr
         }
     };
@@ -324,74 +327,77 @@ RbDoc.prototype.saveDoc = function (docId) {
 };
 
 // ===================================================================================
-RbDoc.prototype.copyDoc = function (title, docId) {
+RbDoc.prototype.copyDoc = function (docId) {
     var self = this;
-    var viewName = "";
-    var docType = "";
+    var sText = "";
+
     if (!IsNull(self.copyToList) && self.copyToList.length > 0) {
         for (var x = 0; x < self.copyToList.length; x++) {
-            if (self.copyToList[x].title == title) {
-                docType = self.copyToList[x].docType;
-                viewName = self.copyToList[x].viewName;
-                break;
-            }
+            sText += "<p><input "+(x==0?"checked":"")+" name='copyDocByChoose' id='copyDocByChoose" + x + "' type='radio' value='" + x + "'>" + self.copyToList[x].title + "</p>";
         }
-    }
+    } else return;
 
-    var p = self.apiTableProducts.rows().data();
-    var pAr = [];
-    for (var i = 0; i < p.length; i++)
-        pAr[i] = p[i];
+    Ask(sText, "Создать документ", "Отмена", function () {
+        var x = Number($(":radio[name=copyDocByChoose]").filter(":checked").val());
+        var docType = self.copyToList[x].docType;
+        var viewName = self.copyToList[x].viewName;
 
-    if (self.oCust.flds.cust_name == "")
-        $("#custId").val("-1");//значит мы сознательно удаляем покупателя из документа
+        var p = self.apiTableProducts.rows().data();
+        var pAr = [];
+        for (var i = 0; i < p.length; i++)
+            pAr[i] = p[i];
 
-    //todo проверить, есть ли уже документ, основание которого равно docId
-    $.ajax({
-        dataType: 'json',
-        type: "POST",
-        data: {
-            "rbo_docs": {
-                "docId": null,
-                "doc_type": docType,
-                "doc_num": $("#"+self.docFormPrefix+"\\.doc_num").val(),
-                "doc_date": getCurrentDate(),
-                "doc_sum": $("#"+self.docFormPrefix+"\\.doc_sum").val(),
-                "doc_base": docId,
-                "doc_status": "",
-                "doc_manager": $("#"+self.docFormPrefix+"\\.doc_manager").val(),
-                "custId": $("#custId").val(),
-                "doc_cust": self.oCust.flds,
-                "doc_firm": $("#"+self.docFormPrefix+"\\.doc_firm").val(),
-                "doc_products": pAr
+        if (self.oCust.flds.cust_name == "")
+            $("#custId").val("-1");//значит мы сознательно удаляем покупателя из документа
+
+        //todo проверить, есть ли уже документ, основание которого равно docId
+        $.ajax({
+            dataType: 'json',
+            type: "POST",
+            data: {
+                "rbo_docs": {
+                    "doc_type": docType,
+                    "doc_date": getCurrentDate(),
+                    "doc_sum": $("#" + self.docFormPrefix + "\\.doc_sum").val(),
+                    "doc_base": docId,
+                    "doc_status": "",
+                    "doc_manager": $("#" + self.docFormPrefix + "\\.doc_manager").val(),
+                    "custId": $("#custId").val(),
+                    "doc_cust": self.oCust.flds,
+                    "doc_firm": $("#" + self.docFormPrefix + "\\.doc_firm").val(),
+                    "doc_products": pAr
+                }
+            },
+            url: comPath + "ajax.php?task=doc_create",
+            success: function (doc_data) {
+                self.oTable.fnDraw();
             }
-        },
-        url: comPath + "ajax.php?task=doc_create",
-        success: function (doc_data) {
-            window.open('index.php?option=com_rbo&view=' + viewName + '&docid=' + docId, '_blank');
-        }
-    });
+        });
+
+    }, null, "#dialog-confirm");
+
 };
 
 // ===================================================================================
 RbDoc.prototype.createDoc = function () {
-    var self = this;
-    $.ajax({
-        dataType: 'json',
-        type: "POST",
-        data: {
-            "rbo_docs": {
-                "doc_type": self.sDocType
-            }
-        },
-        url: comPath + "ajax.php?task=get_doc_num",
-        success: function (p) {
-            var i = {};
-            i.doc_num = p.new_num;
-            i.doc_date = p.new_date;
-            self.showDocForm(i);
-        }
-    });
+    this.showDocForm({});
+    /*    var self = this;
+     $.ajax({
+     dataType: 'json',
+     type: "POST",
+     data: {
+     "rbo_docs": {
+     "doc_type": self.sDocType
+     }
+     },
+     url: comPath + "ajax.php?task=get_doc_num",
+     success: function (p) {
+     var i = {};
+     i.doc_num = p.new_num;
+     i.doc_date = p.new_date;
+     self.showDocForm(i);
+     }
+     });*/
 };
 
 // ===================================================================================
@@ -419,17 +425,17 @@ RbDoc.prototype.deleteDoc = function (docId) {
 RbDoc.prototype.showDocForm = function (i) {
     var self = this;
     self.checkFields.removeClass("ui-state-error");
-    refillSelect(self.docFormPrefix+"\\.doc_manager", getPeopleList(), true);
-    refillSelect(self.docFormPrefix+"\\.doc_firm", getFirmList());
-    refillSelect(self.docFormPrefix+"\\.doc_status", self.oStatusList, true);
+    refillSelect(self.docFormPrefix + "\\.doc_manager", getPeopleList(), true);
+    refillSelect(self.docFormPrefix + "\\.doc_firm", getFirmList());
+    refillSelect(self.docFormPrefix + "\\.doc_status", self.oStatusList, true);
 
     self.docId = i.docId;
 
     //установим базовые реквизиты документа
-    $("#"+self.docFormPrefix+"\\.doc_num").val(i.doc_num);
-    $("#"+self.docFormPrefix+"\\.doc_date").val(i.doc_date);
-    $("#"+self.docFormPrefix+"\\.doc_sum").val(i.doc_sum);
-    $("#"+self.docFormPrefix+"\\.doc_status").val(i.doc_status);
+    $("#" + self.docFormPrefix + "\\.doc_num").val(i.doc_num);
+    $("#" + self.docFormPrefix + "\\.doc_date").val(i.doc_date);
+    $("#" + self.docFormPrefix + "\\.doc_sum").val(i.doc_sum);
+    $("#" + self.docFormPrefix + "\\.doc_status").val(i.doc_status);
 
     //установим поля документа-основания
     var sDocBase = "";
@@ -437,22 +443,22 @@ RbDoc.prototype.showDocForm = function (i) {
     if ((i.doc_base > 0) && !IsNull(i.doc_base_doc)) {
         sDocBase = "Счет №" + i.doc_base_doc.doc_num + " от " + i.doc_base_doc.doc_date;
     }
-    $("#"+self.docFormPrefix+"\\.doc_base").val(sDocBase);
+    $("#" + self.docFormPrefix + "\\.doc_base").val(sDocBase);
 
     //укажем менеджера
-    $('#'+self.docFormPrefix+'\\.doc_manager option:selected').each(function () {
+    $('#' + self.docFormPrefix + '\\.doc_manager option:selected').each(function () {
         this.selected = false;
     });
     if (!IsEmpty(i.doc_manager))
-        $("#"+self.docFormPrefix+"\\.doc_manager option:contains('" + i.doc_manager + "')").prop("selected", "selected");
+        $("#" + self.docFormPrefix + "\\.doc_manager option:contains('" + i.doc_manager + "')").prop("selected", "selected");
 
     //установим поля контрагента
     self.oCust.setCustFlds('saved', i.doc_cust);
 
     //установим фирму
     if (!IsNull(i.doc_firm))
-        $("#"+self.docFormPrefix+"\\.doc_firm option:contains('" + i.doc_firm.toUpperCase() + "')").prop("selected", "selected");
-    $("#"+self.docFormPrefix+"\\.doc_rem").val(i.doc_rem);
+        $("#" + self.docFormPrefix + "\\.doc_firm option:contains('" + i.doc_firm.toUpperCase() + "')").prop("selected", "selected");
+    $("#" + self.docFormPrefix + "\\.doc_rem").val(i.doc_rem);
 
     //заполним список товаров/услуг
     self.oTableProducts.fnClearTable();
@@ -476,14 +482,6 @@ RbDoc.prototype.showDocForm = function (i) {
         }
     }
 
-    if (!IsNull(self.copyToList) && self.copyToList.length > 0) {
-        for (x = 0; x < self.copyToList.length; x++) {
-            oBtns[self.copyToList[x].title] = function (event) {
-                self.copyDoc($(event.target).text(), i.docId);
-            };
-        }
-    }
-
     if (!IsNull(self.printList) && self.printList.length > 0) {
         for (x = 0; x < self.printList.length; x++) {
             oBtns[self.printList[x].title] = function (event) {
@@ -501,7 +499,7 @@ RbDoc.prototype.showDocForm = function (i) {
     };
 
     self.oFormDlg.dialog({
-        title: self.sDocTypeTitle + " №" + $('#'+self.docFormPrefix+'\\.doc_num').val(),
+        title: self.sDocTypeTitle + " №" + $('#' + self.docFormPrefix + '\\.doc_num').val(),
         buttons: oBtns
     });
 
@@ -557,7 +555,7 @@ RbDoc.prototype.showProductForm = function (x) {// x-номер редактир
                 for (var x = 0; x < pAll.length; x++) {
                     iSum += Number(pAll[x].product_sum);
                 }
-                $('#'+self.docFormPrefix+'\\.doc_sum').val(iSum);
+                $('#' + self.docFormPrefix + '\\.doc_sum').val(iSum);
             }
         },
 
@@ -574,7 +572,7 @@ RbDoc.prototype.showProductForm = function (x) {// x-номер редактир
             for (var x = 0; x < pAll.length; x++) {
                 iSum += Number(pAll[x].product_sum);
             }
-            $('#'+self.docFormPrefix+'\\.doc_sum').val(iSum);
+            $('#' + self.docFormPrefix + '\\.doc_sum').val(iSum);
         }
     });
 

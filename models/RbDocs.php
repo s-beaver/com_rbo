@@ -148,6 +148,8 @@ class RbDocs extends RbObject
         $this->buffer->created_by = JFactory::getUser()->username;
         $this->buffer->created_on = RbHelper::getCurrentTimeForDb();
         // $this->buffer->doc_type = $this->docType;//надо передавать через буфер
+        if (empty($this->buffer->doc_num)) $this->buffer->doc_num = $this->getNextDocNumber(true);
+        if (empty($this->buffer->doc_date)) $this->buffer->doc_date = RbHelper::getCurrentTimeForDb();
 
         $input = JFactory::getApplication()->input;
         $input->set("rbo_cust", $doc_cust);
@@ -189,7 +191,8 @@ class RbDocs extends RbObject
         $prod->createObject();
         $response = $response && $prod->response;
 
-        $this->response = $this->response && $response;
+        if ($this->response && $response)
+            $this->response = $docId;
     }
 
     // =================================================================
@@ -253,19 +256,19 @@ class RbDocs extends RbObject
         $iTotalDisplayRecords = $db->getAffectedRows();
 
         $db->setQuery("SELECT doc_base, docId, doc_num, doc_date, doc_type " .
-            "FROM rbo_docs WHERE doc_base IN (SELECT docId " . $sRestOfQuery . ")");
+            "FROM rbo_docs WHERE doc_base IN (SELECT docId " . $sRestOfQuery . ") AND doc_status!='удален'");
         $baseDocs = $db->loadAssocList();
 
         foreach ($data_rows_assoc_list as &$v) {
             $v['doc_date'] = JFactory::getDate($v['doc_date'])->format('d.m.y'); // https://php.net/manual/en/function.date.php
             $v['childs'] = array();
             foreach ($baseDocs as $bd) {
-                if ($bd['doc_base']==$v['docId']) {
+                if ($bd['doc_base'] == $v['docId']) {
                     $childElem = new stdClass ();
-                    $childElem->docId=$bd['docId'];
-                    $childElem->doc_num=$bd['doc_num'];
-                    $childElem->doc_date=JFactory::getDate($bd['doc_date'])->format('d.m'); // https://php.net/manual/en/function.date.php
-                    $childElem->doc_type=$bd['doc_type'];
+                    $childElem->docId = $bd['docId'];
+                    $childElem->doc_num = $bd['doc_num'];
+                    $childElem->doc_date = JFactory::getDate($bd['doc_date'])->format('d.m'); // https://php.net/manual/en/function.date.php
+                    $childElem->doc_type = $bd['doc_type'];
                     $v['childs'][] = $childElem;
                 }
             }
@@ -280,7 +283,7 @@ class RbDocs extends RbObject
     }
 
     // =================================================================
-    function getNextDocNumber()
+    function getNextDocNumber($returnResult = false)
     {
         $currentTime = new JDate ();
         $year = $currentTime->format('Y', false);
@@ -297,7 +300,10 @@ class RbDocs extends RbObject
             $res = new stdClass ();
             $res->new_num = $newNumber + 1;
             $res->new_date = $currentTime->format('d.m.Y', true);
-            echo json_encode($res);
+            if ($returnResult)
+                return $res->new_num;
+            else
+                echo json_encode($res);
         } catch (Exception $e) {
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
         }
