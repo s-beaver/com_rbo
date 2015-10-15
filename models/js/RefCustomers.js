@@ -8,7 +8,15 @@ var cst;
 //===================================================================================
 function RefCustomers(o) {
     this.tips = o.tips;
-    this.checkFields = o.checkFields;
+    if (IsArray(o.checkFields)) {
+        for (var i = 0; i < o.checkFields.length; i++) {
+            if (IsNull(this.checkFields)) {
+                this.checkFields = $("#" + this.docFormPrefix + "\\." + o.checkFields[i]);
+            } else {
+                this.checkFields = this.checkFields.add($("#" + this.docFormPrefix + "\\." + o.checkFields[i]));
+            }
+        }
+    }
 }
 
 //===================================================================================
@@ -215,7 +223,7 @@ RefCustomers.prototype.showCustomerForm = function (i) {
 $(document).ready(function () {
 
     cst = new RefCustomers({
-        allFields: $("#rbo_cust\\.cust_name").add($("#rbo_cust\\.cust_fullname")),
+        checkFields: ["cust_name","cust_fullname"],
         tips: $(".validateTips")
     });
     cst.attachCustomerModule();

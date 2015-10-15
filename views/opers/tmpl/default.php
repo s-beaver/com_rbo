@@ -17,8 +17,8 @@
 <body>
   <?php include RBO_PATH.'/views/header.doclist.php'?>
 
-  <div id="oper-form" title="Операция">
-    <form id="oper-form-form" method="post" action="">
+  <div id="rbo_opers.oper-form" title="Операция">
+    <form id="rbo_opers.oper-form-form" method="post" action="">
       <fieldset style='padding: 0'>
         <table style='width: 100%'>
           <tr>
@@ -41,9 +41,9 @@
           <tr>
             <td>
               <div style="float: right">
-                <label for="doc_cust">Покупатель</label>
-                <input disabled type="text" name="doc_cust" id="doc_cust" style='width: 450px' />
-                <button id="cedit">..</button>
+                <label for="rbo_opers.doc_cust">Покупатель</label>
+                <input disabled type="text" name="rbo_opers.doc_cust" id="rbo_opers.doc_cust" style='width: 450px' />
+                <button id="rbo_opers.cedit">..</button>
                 <label for="rbo_opers.oper_firm">Фирма</label>
                 <select id="rbo_opers.oper_firm" name="rbo_opers.oper_firm" style="width: 120px">
                 </select>

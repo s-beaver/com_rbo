@@ -111,6 +111,7 @@ RbDoc.prototype.attachDocForm = function () {
 RbDoc.prototype.attachPageElements = function () {
     var self = this;
     this.oTable = $('#TableDoc').dataTable({
+        "aLengthMenu": [50, 100, 200],
         "bJQueryUI": true,
         "bProcessing": true,
         "bServerSide": true,

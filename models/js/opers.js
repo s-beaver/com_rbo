@@ -3,10 +3,18 @@ var oper;
 
 //===================================================================================
 function RbOper(o) {
-
-    this.oCust = new RboCust();
+    this.docFormPrefix = "rbo_opers";
+    this.oCust = new RboCust(this);
     this.tips = o.tips;
-    this.checkFields = o.checkFields;
+    if (IsArray(o.checkFields)) {
+        for (var i = 0; i < o.checkFields.length; i++) {
+            if (IsNull(this.checkFields)) {
+                this.checkFields = $("#" + this.docFormPrefix + "\\." + o.checkFields[i]);
+            } else {
+                this.checkFields = this.checkFields.add($("#" + this.docFormPrefix + "\\." + o.checkFields[i]));
+            }
+        }
+    }
     this.oTable = null;
     this.oTableAPI = null;
 
@@ -18,14 +26,14 @@ function RbOper(o) {
     this.saleTotal = 0;
     this.purchTotal = 0;
     this.expTotals = 0;
-
 }
 
 //===================================================================================
 RbOper.prototype.attachOperModule = function () {
     var self = this;
     //подключаем форму для редакции документов
-    $("#oper-form").dialog({
+    self.oFormDlg = $("#" + self.docFormPrefix + "\\.oper-form");
+    self.oFormDlg.dialog({
         autoOpen: false,
         height: 450,
         width: 900,
@@ -188,7 +196,7 @@ RbOper.prototype.readOper = function (operId) {
 RbOper.prototype.saveOper = function () {
     var self = this;
     var bValid = true;
-    self.oSavedData = getFormData("oper-form", "rbo_opers");
+    self.oSavedData = getFormData(self.docFormPrefix + "\\.oper-form", "rbo_opers");
     self.checkFields.removeClass("ui-state-error");
     bValid = bValid && checkNotEmpty($("#rbo_opers\\.oper_date"), "Дата", self.tips);
     bValid = bValid && checkNotEmpty($("#rbo_opers\\.oper_type"), "Тип операции", self.tips);
@@ -212,7 +220,7 @@ RbOper.prototype.saveOper = function () {
         data: self.oSavedData,
         url: comPath + "ajax.php?task=" + taskCmd,
         success: function (doc_data) {
-            $("#oper-form").dialog("close");
+            self.oFormDlg.dialog("close");
             self.oTable.fnDraw();
         }
     });
@@ -257,7 +265,7 @@ RbOper.prototype.deleteOper = function (operId) {
         }
     });
 
-    $("#oper-form").dialog("close");
+    self.oFormDlg.dialog("close");
 };
 
 // ===================================================================================
@@ -268,7 +276,7 @@ RbOper.prototype.showOperForm = function (i) {
     refillSelect("rbo_opers\\.oper_firm", getFirmList());
     refillSelect("rbo_opers\\.oper_type", getOperTypeList());
 
-    setFormData("oper-form", "rbo_opers", i);
+    setFormData(self.docFormPrefix + "\\.oper-form", "rbo_opers", i);
 
     var pId = $('#rbo_opers\\.productId').val();
     if (!(pId > 0)) self.productSearchOff();
@@ -283,7 +291,7 @@ RbOper.prototype.showOperForm = function (i) {
         oBtns["Удалить"] = function () {
             Ask("Операция будет удалена. Продолжить?", "Удалить операцию", "Отмена", function () {
                 self.deleteOper(i.operId);
-                $("#oper-form").dialog("close");
+                self.oFormDlg.dialog("close");
             }, null, "#dialog-confirm");
         }
     }
@@ -293,15 +301,15 @@ RbOper.prototype.showOperForm = function (i) {
     };
 
     oBtns["Отмена"] = function () {
-        $("#oper-form").dialog("close");
+        self.oFormDlg.dialog("close");
     };
 
-    $("#oper-form").dialog({
+    self.oFormDlg.dialog({
         title: NullTo(i.oper_type, "") + " #" + NullTo(i.operId, "новая"),
         buttons: oBtns
     });
 
-    $("#oper-form").dialog("open");
+    self.oFormDlg.dialog("open");
 };
 
 //===================================================================================
@@ -380,7 +388,7 @@ RbOper.prototype.calcTotals = function () {
 $(document).ready(function () {
 
     oper = new RbOper({
-        allFields: $("#rbo_opers\\.oper_date").add($("#rbo_opers\\.oper_type")).add($("#rbo_opers\\.oper_firm")).add($("#rbo_opers\\.oper_manager")),
+        checkFields: ["oper_date","oper_type","oper_firm","oper_manager"],
         tips: $(".validateTips")
     });
     oper.attachOperModule();

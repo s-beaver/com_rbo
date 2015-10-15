@@ -37,6 +37,10 @@ function getFormData(formName, objPrefix) {
                     o[objPrefix][s] = $(this).val();
                 break;
 
+            case "BUTTON": {
+                break;
+            }
+
             default:
                 o[objPrefix][s] = $(this).html();
         }
@@ -88,6 +92,10 @@ function setFormData(formName, objPrefix, o) {
                 } else
                     $('#' + sIdDot + ' option:first').prop("selected", "selected");
                 break;
+
+            case "BUTTON": {
+                break;
+            }
 
             default:
                 $(this).html(o[s]);

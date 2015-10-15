@@ -4,7 +4,15 @@ var prd;
 //===================================================================================
 function RefProducts(o) {
     this.tips = o.tips;
-    this.checkFields = o.checkFields;
+    if (IsArray(o.checkFields)) {
+        for (var i = 0; i < o.checkFields.length; i++) {
+            if (IsNull(this.checkFields)) {
+                this.checkFields = $("#" + this.docFormPrefix + "\\." + o.checkFields[i]);
+            } else {
+                this.checkFields = this.checkFields.add($("#" + this.docFormPrefix + "\\." + o.checkFields[i]));
+            }
+        }
+    }
 }
 
 //===================================================================================
@@ -244,7 +252,7 @@ RefProducts.prototype.switchInStockField = function () {
 $(document).ready(function () {
 
     prd = new RefProducts({
-        allFields: $("#rbo_products\\.product_price").add($("#rbo_products\\.product_price1")),
+        checkFields: ["product_price","product_price1"],
         tips: $(".validateTips")
     });
     prd.attachProductModule();
