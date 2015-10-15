@@ -42,62 +42,47 @@ RbOper.prototype.attachOperModule = function () {
     });
 
     self.oTable = $('#TableOper').dataTable({
-        jQueryUI: true,
-        processing: true,
-        serverSide: true,
-        lengthMenu: [50, 100, 200],
-        dom: '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"l<"oper_filter">fr>t<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"<"oper_totals">p>',
-        ajax: {
-            type: "POST",
-            url: comPath + "ajax.php?task=get_oper_list"
+        "jQueryUI": true,
+        "processing": true,
+        "serverSide": true,
+        "lengthMenu": [50, 100, 200],
+        "dom": '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"l<"oper_filter">fr>t<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"<"oper_totals">p>',
+        "ajax": {
+            "type": "POST",
+            "url": comPath + "ajax.php?task=get_oper_list"
         },
-        columns: [{
-            title: "Ключ",
-            className: "center",
-            data: function (source, type, val) {
+        "columns": [{
+            "title": "Ключ",
+            "className": "center",
+            "data": function (source, type, val) {
                 return "<a href='javascript:oper.readOper(" + source.operId + ")'>#" + source.operId + "</a>";
             }
         }, {
-            title: "Дата",
-            data: "oper_date"
+            "title": "Дата",
+            "data": "oper_date"
         }, {
-            title: "Операция",
-            data: "oper_type"
+            "title": "Операция",
+            "data": "oper_type"
         }, {
-            title: "Покупатель",
-            data: "cust_name"
+            "title": "Покупатель",
+            "data": "cust_name"
         }, {
-            title: "Сумма",
-            className: "center",
-            data: "oper_sum"
+            "title": "Сумма",
+            "className": "center",
+            "data": "oper_sum"
         }, {
-            title: "Товар/услуга",
-            className: "left",
-            data: "product_name"
+            "title": "Товар/услуга",
+            "className": "left",
+            "data": "product_name"
         }, {
-            title: "Фирма",
-            className: "center",
-            data: "oper_firm"
+            "title": "Фирма",
+            "className": "center",
+            "data": "oper_firm"
         }, {
-            title: "Менеджер",
-            data: "oper_manager"
+            "title": "Менеджер",
+            "data": "oper_manager"
         }],
-        language: {
-            processing: "Подождите...",
-            lengthMenu: "Показать _MENU_ строк",
-            zeroRecords: "Записи отсутствуют.",
-            info: "Операции с _START_ по _END_ (всего: _TOTAL_)",
-            infoEmpty: "Операций нет",
-            infoFiltered: "(отфильтровано из _MAX_ записей)",
-            infoPostFix: "",
-            search: "Поиск:",
-            paginate: {
-                first: "В начало",
-                previous: "Предыдущие",
-                next: "Следующие",
-                last: "В конец"
-            }
-        }
+        language: dataTablesLanguage
     });
     self.oTableAPI = self.oTable.api();
 

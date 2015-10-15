@@ -80,11 +80,15 @@ class RbCust extends RbObject {
   // =================================================================
   static function getCustList() {
     $input = JFactory::getApplication ()->input;
-    $iDisplayStart = $input->getInt ('iDisplayStart');
-    $iDisplayLength = $input->getInt ('iDisplayLength');
-    $sEcho = $input->getString ('sEcho');
-    $searchSubstr = $input->getString ('sSearch');
-  
+    $iDisplayStart = $input->getInt('start');
+    $iDisplayLength = $input->getInt('length');
+    $iDraw = $input->getString('draw');
+    $aSearch = $input->get("search", null, "array");
+    $searchSubstr = null;
+    if (!is_null($aSearch)) {
+      $searchSubstr = $aSearch["value"];
+    }
+
     $db = JFactory::getDBO ();
     $query = $db->getQuery (true);
   
@@ -112,10 +116,10 @@ class RbCust extends RbObject {
       $iTotalDisplayRecords = $db->getAffectedRows ();
   
       $res = new stdClass ();
-      $res->sEcho = $sEcho;
-      $res->iTotalRecords = $iTotalDisplayRecords;
-      $res->iTotalDisplayRecords = $iTotalDisplayRecords;
-      $res->aaData = $data_rows_assoc_list;
+      $res->draw = (integer)$iDraw;
+      $res->recordsTotal = $iTotalDisplayRecords;
+      $res->recordsFiltered = $iTotalDisplayRecords;
+      $res->data = $data_rows_assoc_list;
       echo json_encode ($res);
     } catch ( Exception $e ) {
       JLog::add (get_class () . ":" . $e->getMessage (), JLog::ERROR, 'com_rbo');

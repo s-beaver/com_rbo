@@ -241,11 +241,15 @@ class RbDocs extends RbObject
         $db = JFactory::getDBO();
 
         $input = JFactory::getApplication()->input;
-        $iDisplayStart = $input->getInt('iDisplayStart');
-        $iDisplayLength = $input->getInt('iDisplayLength');
-        $sEcho = $input->getString('sEcho');
+        $iDisplayStart = $input->getInt('start');
+        $iDisplayLength = $input->getInt('length');
+        $iDraw = $input->getString('draw');
         $doc_type = $input->getString('doc_type');
-        $sSearch = $input->getString('sSearch');
+        $aSearch = $input->get("search", null, "array");
+        $sSearch = null;
+        if (!is_null($aSearch)) {
+            $sSearch = $aSearch["value"];
+        }
 
         $sWhere = " WHERE doc_type='" . $doc_type . "'";
         if (isset ($sSearch) && $sSearch != "") {
@@ -255,7 +259,7 @@ class RbDocs extends RbObject
         $sRestOfQuery = " FROM rbo_docs rd LEFT JOIN rbo_cust rc ON rd.custId = rc.custId " .
             $sWhere . " ORDER BY rd.docId DESC";
 
-        if (isset ($_POST ['iDisplayStart']) && $_POST ['iDisplayLength'] != '-1') {
+        if (isset ($iDisplayStart) && $iDisplayStart != '-1') {
             $db->setQuery($sSelect . $sRestOfQuery, intval($iDisplayStart), intval($iDisplayLength));
         } else {
             $db->setQuery($sSelect . $sRestOfQuery);
@@ -284,10 +288,10 @@ class RbDocs extends RbObject
         }
 
         $res = new stdClass ();
-        $res->sEcho = $sEcho;
-        $res->iTotalRecords = $iTotalDisplayRecords;
-        $res->iTotalDisplayRecords = $iTotalDisplayRecords;
-        $res->aaData = $data_rows_assoc_list;
+        $res->draw = (integer)$iDraw;
+        $res->recordsTotal = $iTotalDisplayRecords;
+        $res->recordsFiltered = $iTotalDisplayRecords;
+        $res->data = $data_rows_assoc_list;
         $this->response = json_encode($res);
     }
 

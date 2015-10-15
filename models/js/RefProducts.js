@@ -28,63 +28,48 @@ RefProducts.prototype.attachProductModule = function () {
     });
 
     self.oTable = $('#TableProduct').dataTable({
-        jQueryUI: true,
-        processing: true,
-        serverSide: true,
-        lengthMenu: [50, 100, 200],
-        dom: '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"l<"filter_instock">fr>t<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"p>',
-        ajax: {
-            type: "POST",
-            url: comPath + "ajax.php?task=get_product_list"
+        "jQueryUI": true,
+        "processing": true,
+        "serverSide": true,
+        "lengthMenu": [50, 100, 200],
+        "dom": '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"l<"filter_instock">fr>t<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"p>',
+        "ajax": {
+            "type": "POST",
+            "url": comPath + "ajax.php?task=get_product_list"
         },
-        columns: [{
-            title: "Ключ",
-            className: "center",
-            data: function (source, type, val) {
+        "columns": [{
+            "title": "Ключ",
+            "className": "center",
+            "data":function (source, type, val) {
                 return "<a href='javascript:prd.readProduct(" + source.productId + ")'>#" + source.productId + "</a>";
             }
         }, {
-            title: "Наименование",
-            data: "product_name"
+            "title": "Наименование",
+            "data":"product_name"
         }, {
-            title: "Код",
-            data: "product_code"
+            "title": "Код",
+            "data":"product_code"
         }, {
-            title: "Категория",
-            className: "center",
-            data: "categoryId"
+            "title": "Категория",
+            "className": "center",
+            "data":"categoryId"
         }, {
-            title: "К-во",
-            className: "center",
+            "title": "К-во",
+            "className": "center",
             data://"product_in_stock"
                 function (source, type, val) {
                     return source.product_type == '1' ? "услуга" : source.product_in_stock;
                 }
         }, {
-            title: "Цена",
-            className: "center",
-            data: "product_price"
+            "title": "Цена",
+            "className": "center",
+            "data":"product_price"
         }, {
-            title: "Цена опт.",
-            className: "center",
-            data: "product_price1"
+            "title": "Цена опт.",
+            "className": "center",
+            "data":"product_price1"
         }],
-        language: {
-            processing: "Подождите...",
-            lengthMenu: "Показать _MENU_ строк",
-            zeroRecords: "Записи отсутствуют.",
-            info: "Операции с _START_ по _END_ (всего: _TOTAL_)",
-            infoEmpty: "Операций нет",
-            infoFiltered: "(отфильтровано из _MAX_ записей)",
-            infoPostFix: "",
-            search: "Поиск:",
-            paginate: {
-                first: "В начало",
-                previous: "Предыдущие",
-                next: "Следующие",
-                last: "В конец"
-            }
-        }
+        language: dataTablesLanguage
     });
     self.oTableAPI = self.oTable.api();
 
@@ -230,7 +215,7 @@ RefProducts.prototype.showProductForm = function (i) {
     };
 
     $("#prd-form").dialog({
-        title: "#" + NullTo(i.productId, "новая"),
+        "title": "#" + NullTo(i.productId, "новая"),
         buttons: oBtns
     });
 

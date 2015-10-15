@@ -32,51 +32,28 @@ RefCustomers.prototype.attachCustomerModule = function () {
     });
 
     self.oTable = $('#TableCustomer').dataTable({
-        "bJQueryUI": true,
-        "bProcessing": true,
-        "bServerSide": true,
-        "sAjaxSource": comPath + "ajax.php?task=get_cust_list",
-        "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
-            oSettings.jqXHR = $.ajax({
-                "dataType": 'json',
-                "type": "POST",
-                "data": aoData,
-                "url": sSource,
-                "success": function (json) {
-                    fnCallback(json);
-                }
-            });
+        "jQueryUI": true,
+        "processing": true,
+        "serverSide": true,
+        "lengthMenu": [50, 100, 200],
+        "ajax": {
+            "type": "POST",
+            "url": comPath + "ajax.php?task=get_cust_list"
         },
-        "aoColumns": [{
-            "sTitle": "Ключ",
-            "sClass": "center",
-            "mData": function (source, type, val) {
+        "columns": [{
+            "title": "Ключ",
+            "className": "center",
+            "data": function (source, type, val) {
                 return "<a href='javascript:cst.readCustomer(" + source.custId + ")'>#" + source.custId + "</a>";
             }
         }, {
-            "sTitle": "Название",
-            "mData": "cust_name"
+            "title": "Название",
+            "data": "cust_name"
         }, {
-            "sTitle": "Название полное",
-            "mData": "cust_fullname"
+            "title": "Название полное",
+            "data": "cust_fullname"
         }],
-        "oLanguage": {
-            "sProcessing": "Подождите...",
-            "sLengthMenu": "Показать _MENU_ строк",
-            "sZeroRecords": "Записи отсутствуют.",
-            "sInfo": "Записи с _START_ по _END_ (всего: _TOTAL_)",
-            "sInfoEmpty": "Записей нет",
-            "sInfoFiltered": "(отфильтровано из _MAX_ записей)",
-            "sInfoPostFix": "",
-            "sSearch": "Поиск:",
-            "sUrl": "",
-            "oPaginate": {
-                "sFirst": "В начало",
-                "sPrevious": "Предыдущие",
-                "sNext": "Следующие",
-                "sLast": "В конец"
-            }
-        }
+        "language": dataTablesLanguage
     });
 
     $("#header_doclist_choose_list h2").html("Справочник - контрагенты");

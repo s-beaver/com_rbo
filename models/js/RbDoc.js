@@ -56,51 +56,35 @@ RbDoc.prototype.attachDocForm = function () {
     });
 
     this.oTableProducts = $('#' + self.docFormPrefix + "\\.products-table").dataTable({
-        "bPaginate": false,
+        "paging": false,
         "searching": false,
         "ordering": false,
-        "aoColumns": [{
-            "sTitle": "Код",
-            "mData": "product_code"
+        "columns": [{
+            "title": "Код",
+            "data": "product_code"
         }, {
-            "sTitle": "Наименование",
-            "mData": "product_name"
+            "title": "Наименование",
+            "data": "product_name"
         }, {
-            "sTitle": "Цена",
-            "sClass": "center",
-            "mData": "product_price"
+            "title": "Цена",
+            "className": "center",
+            "data": "product_price"
         }, {
-            "sTitle": "К-во",
-            "sClass": "center",
-            "mData": "product_cnt"
+            "title": "К-во",
+            "className": "center",
+            "data": "product_cnt"
         }, {
-            "sTitle": "Сумма",
-            "sClass": "center",
-            "mData": "product_sum"
+            "title": "Сумма",
+            "className": "center",
+            "data": "product_sum"
         }, {
-            "sTitle": "Ред.",
-            "sClass": "center",
-            "mData": function (source, type, val) {
+            "title": "Ред.",
+            "className": "center",
+            "data": function (source, type, val) {
                 return "<a id='edit_product' href='javascript:doc.showProductForm(" + source.lineNo + ")'><img src='" + comPath + "images/icon-32-edit-on.png'/></a>";
             }
         }],
-        "oLanguage": {
-            "sProcessing": "Подождите...",
-            "sLengthMenu": "Показать _MENU_ строк",
-            "sZeroRecords": "Записи отсутствуют.",
-            "sInfo": "Строки с _START_ по _END_ (всего: _TOTAL_)",
-            "sInfoEmpty": "Строк нет",
-            "sInfoFiltered": "(отфильтровано из _MAX_ записей)",
-            "sInfoPostFix": "",
-            "sSearch": "Поиск:",
-            "sUrl": "",
-            "oPaginate": {
-                "sFirst": "В начало",
-                "sPrevious": "Предыдущие",
-                "sNext": "Следующие",
-                "sLast": "В конец"
-            }
-        }
+        "language": dataTablesLanguage
     });
 
     this.apiTableProducts = this.oTableProducts.api();
@@ -111,50 +95,38 @@ RbDoc.prototype.attachDocForm = function () {
 RbDoc.prototype.attachPageElements = function () {
     var self = this;
     this.oTable = $('#TableDoc').dataTable({
-        "aLengthMenu": [50, 100, 200],
-        "bJQueryUI": true,
-        "bProcessing": true,
-        "bServerSide": true,
-        "tableTools": {
-            "sSwfPath": "/swf/copy_csv_xls_pdf.swf"
+        "jQueryUI": true,
+        "processing": true,
+        "serverSide": true,
+        "lengthMenu": [50, 100, 200],
+        "ajax": {
+            type: "POST",
+            url: comPath + "ajax.php?task=get_doc_list&doc_type=" + self.sDocType
         },
-        "aaSorting": [[1, "desc"]],
-        "sAjaxSource": comPath + "ajax.php?task=get_doc_list&doc_type=" + self.sDocType,
-        "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
-            oSettings.jqXHR = $.ajax({
-                "dataType": 'json',
-                "type": "POST",
-                "data": aoData,
-                "url": sSource,
-                "success": function (json) {
-                    fnCallback(json);
-                }
-            });
-        },
-        "aoColumns": [{
-            "sTitle": "Номер",
-            "sClass": "center",
-            "mData": function (source, type, val) {
+        "columns": [{
+            "title": "Номер",
+            "className": "center",
+            "data": function (source, type, val) {
                 return "<a href='javascript:doc.readDoc(" + source.docId + ")'>" + source.doc_num + " /" + source.doc_date + "</a>";
             }
         }, {
-            "sTitle": "Контрагент",
-            "mData": "doc_cust"
+            "title": "Контрагент",
+            "data": "doc_cust"
         }, {
-            "sTitle": "Сумма",
-            "sClass": "center",
-            "mData": "doc_sum"
+            "title": "Сумма",
+            "className": "center",
+            "data": "doc_sum"
         }, {
-            "sTitle": "Фирма",
-            "sClass": "center",
-            "mData": "doc_firm"
+            "title": "Фирма",
+            "className": "center",
+            "data": "doc_firm"
         }, {
-            "sTitle": "Статус",
-            "sClass": "center",
-            "mData": "doc_status"
+            "title": "Статус",
+            "className": "center",
+            "data": "doc_status"
         }, {
-            "sTitle": "Док-ты",
-            "mData": function (source, type, val) {
+            "title": "Док-ты",
+            "data": function (source, type, val) {
                 var s = "", docText, elem;
                 s += "<div style='display: table-cell; vertical-align: middle'><a href='javascript:doc.copyDoc(" + source.docId + ")'><img src='" + comPath + "images/icon-16-new.png'/></a></div>";
                 s += "<div style='display: table-cell'>";
@@ -183,31 +155,15 @@ RbDoc.prototype.attachPageElements = function () {
                 return s;
             }
         },  {
-            "sTitle": "Оп.",
-            "mData": function (source, type, val) {
+            "title": "Оп.",
+            "data": function (source, type, val) {
                 return "";
             }
         }, {
-            "sTitle": "Менеджер",
-            "mData": "doc_manager"
+            "title": "Менеджер",
+            "data": "doc_manager"
         }],
-        "oLanguage": {
-            "sProcessing": "Подождите...",
-            "sLengthMenu": "Показать _MENU_ строк",
-            "sZeroRecords": "Записи отсутствуют.",
-            "sInfo": "Документы с _START_ по _END_ (всего: _TOTAL_)",
-            "sInfoEmpty": "Документов нет",
-            "sInfoFiltered": "(отфильтровано из _MAX_ записей)",
-            "sInfoPostFix": "",
-            "sSearch": "Поиск:",
-            "sUrl": "",
-            "oPaginate": {
-                "sFirst": "В начало",
-                "sPrevious": "Предыдущие",
-                "sNext": "Следующие",
-                "sLast": "В конец"
-            }
-        }
+        "oLanguage": dataTablesLanguage
     });
 
     $("#header_doclist_choose_list h2").html(this.sDocTypeListTitle);
