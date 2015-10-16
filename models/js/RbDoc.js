@@ -163,7 +163,7 @@ RbDoc.prototype.attachPageElements = function () {
             "title": "Менеджер",
             "data": "doc_manager"
         }],
-        "oLanguage": dataTablesLanguage
+        "language": dataTablesLanguage
     });
 
     $("#header_doclist_choose_list h2").html(this.sDocTypeListTitle);

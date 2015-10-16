@@ -259,14 +259,16 @@ class RbDocs extends RbObject
         $sRestOfQuery = " FROM rbo_docs rd LEFT JOIN rbo_cust rc ON rd.custId = rc.custId " .
             $sWhere . " ORDER BY rd.docId DESC";
 
-        if (isset ($iDisplayStart) && $iDisplayStart != '-1') {
+        if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
             $db->setQuery($sSelect . $sRestOfQuery, intval($iDisplayStart), intval($iDisplayLength));
         } else {
             $db->setQuery($sSelect . $sRestOfQuery);
         }
 
         $data_rows_assoc_list = $db->loadAssocList();
-        $iTotalDisplayRecords = $db->getAffectedRows();
+
+        $db->setQuery('SELECT count(*) FROM rbo_docs rd '.$sWhere);
+        $iRecordsTotal = $db->loadResult();
 
         $db->setQuery("SELECT doc_base, docId, doc_num, doc_date, doc_type " .
             "FROM rbo_docs WHERE doc_base IN (SELECT docId " . $sRestOfQuery . ") AND doc_status!='удален'");
@@ -289,8 +291,8 @@ class RbDocs extends RbObject
 
         $res = new stdClass ();
         $res->draw = (integer)$iDraw;
-        $res->recordsTotal = $iTotalDisplayRecords;
-        $res->recordsFiltered = $iTotalDisplayRecords;
+        $res->recordsTotal = $iRecordsTotal;
+        $res->recordsFiltered = $iRecordsTotal;
         $res->data = $data_rows_assoc_list;
         $this->response = json_encode($res);
     }

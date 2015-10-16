@@ -97,14 +97,16 @@ class RbCust extends RbObject {
     $query->select ($custRef->getFieldsForSelectClause ());
     $query->from ($db->quoteName ($custRef->table_name,"rc"));
     $query->order ($db->quoteName ('rc.custId') . " DESC");
-  
+
+    $where = array();
     if (! empty ($searchSubstr)) {
       $searchAr = preg_split ("/[\s,]+/", $searchSubstr);// split the phrase by any number of commas or space characters
       foreach ( $searchAr as $v ) {
-        $query->where ("LOWER(cust_name) LIKE '%" . strtolower ($v) . "%'");
+        $where[] = "LOWER(cust_name) LIKE '%" . strtolower ($v) . "%'";
       }
     }
-  
+    if (count($where)>0) $query->where($where);
+
     try {
       if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
         $db->setQuery ($query, intval ($iDisplayStart), intval ($iDisplayLength));
@@ -113,12 +115,18 @@ class RbCust extends RbObject {
       }
   
       $data_rows_assoc_list = $db->loadAssocList ();
-      $iTotalDisplayRecords = $db->getAffectedRows ();
-  
+
+      $query->clear();
+      $query->select('count(*)');
+      $query->from ($db->quoteName ($custRef->table_name,"rc"));
+      if (count($where)>0) $query->where($where);
+      $db->setQuery($query);
+      $iRecordsTotal = $db->loadResult();
+
       $res = new stdClass ();
       $res->draw = (integer)$iDraw;
-      $res->recordsTotal = $iTotalDisplayRecords;
-      $res->recordsFiltered = $iTotalDisplayRecords;
+      $res->recordsTotal = $iRecordsTotal;
+      $res->recordsFiltered = $iRecordsTotal;
       $res->data = $data_rows_assoc_list;
       echo json_encode ($res);
     } catch ( Exception $e ) {

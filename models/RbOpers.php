@@ -125,22 +125,23 @@ class RbOpers extends RbObject
             $db->quoteName('rbo_cust', 'rc') . ' ON (' . $db->quoteName('so.custId') . ' = ' .
             $db->quoteName('rc.custId') . ')');
 
+        $where = array();
         if (isset($sDateFilter) && $sDateFilter != "") {
-            $query->where("DATE_FORMAT(so.oper_date,'%d.%m.%Y')='$sDateFilter'");
+            $where[] = "DATE_FORMAT(so.oper_date,'%d.%m.%Y')='$sDateFilter'";
         } elseif (!empty ($sSearch)) {
             $searchAr = preg_split("/[\s,]+/", $sSearch);// split the phrase by any number of commas or space characters
             foreach ($searchAr as $v) {
-                $query->where("LOWER(so.product_name) LIKE '%" . strtolower($v) . "%'");
+                $where[] = "LOWER(so.product_name) LIKE '%" . strtolower($v) . "%'";
             }
         }
+        if (count($where)>0) $query->where($where);
 
-        if (isset ($iDisplayStart) && $iDisplayStart != '-1') {
+        if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
             $db->setQuery($query, intval($iDisplayStart), intval($iDisplayLength));//$query->setQuery instead in joomla 3
         } else {
             $db->setQuery($query);
         }
         $data_rows_assoc_list = $db->loadAssocList();
-        $iRecordsFiltered = $db->getAffectedRows();
 
         foreach ($data_rows_assoc_list as &$v) {
             $v ['doc_date'] = JFactory::getDate($v ['doc_date'])->format('d.m.y'); // https://php.net/manual/en/function.date.php
@@ -149,8 +150,10 @@ class RbOpers extends RbObject
         $query->clear();
         $query->select('count(*)');
         $query->from($db->quoteName($this->table_name, 'so'));
+        if (count($where)>0) $query->where($where);
         $db->setQuery($query);
         $iRecordsTotal = $db->loadResult();
+        $iRecordsFiltered = $iRecordsTotal;
 
         $res = new stdClass ();
         $res->draw = (integer)$iDraw;

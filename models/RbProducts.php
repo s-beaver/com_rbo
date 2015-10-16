@@ -105,15 +105,17 @@ class RbProducts extends RbObject
         $query->from($db->quoteName($prodRef->table_name, "rp"));
         $query->order($db->quoteName('rp.productId') . " DESC");
 
+        $where = array();
         if (!empty($sInStockFilter)) {
-            $query->where($db->quoteName('rp.product_type') . '=0');
-            $query->where($db->quoteName('rp.product_in_stock') . '>0');
+            $where[] = $db->quoteName('rp.product_type') . '=0';
+            $where[] = $db->quoteName('rp.product_in_stock') . '>0';
         } elseif (!empty ($sSearch)) {
             $searchAr = preg_split("/[\s,]+/", $sSearch);// split the phrase by any number of commas or space characters
             foreach ($searchAr as $v) {
-                $query->where("LOWER(product_name) LIKE '%" . strtolower($v) . "%'");
+                $where[] = "LOWER(product_name) LIKE '%" . strtolower($v) . "%'";
             }
         }
+        if (count($where)>0) $query->where($where);
 
         try {
             if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
@@ -123,12 +125,18 @@ class RbProducts extends RbObject
             }
 
             $data_rows_assoc_list = $db->loadAssocList();
-            $iTotalDisplayRecords = $db->getAffectedRows();
+
+            $query->clear();
+            $query->select('count(*)');
+            $query->from($db->quoteName($prodRef->table_name, "rp"));
+            if (count($where)>0) $query->where($where);
+            $db->setQuery($query);
+            $iRecordsTotal = $db->loadResult();
 
             $res = new stdClass ();
             $res->draw = (integer)$iDraw;
-            $res->recordsTotal = $iTotalDisplayRecords;
-            $res->recordsFiltered = $iTotalDisplayRecords;
+            $res->recordsTotal = $iRecordsTotal;
+            $res->recordsFiltered = $iRecordsTotal;
             $res->data = $data_rows_assoc_list;
             echo json_encode($res);
         } catch (Exception $e) {
