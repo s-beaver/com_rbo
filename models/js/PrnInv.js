@@ -1,5 +1,4 @@
 'use strict';
-var comPath = "/components/com_rbo/";
 // ===================================================================================
 function readDocument(docId) {
   $.ajax({
