@@ -86,7 +86,7 @@ RboProduct.prototype.showProductForm = function(o) {
   $("#prod_name option:first").prop("selected", "selected");
   $("#prod_price").val(o.pData.product_price);
   $("#prod_cnt").val(o.pData.product_cnt);
-  $("#prod_sum").val(o.pData.product_sum);
+  $("#prod_sum").val(o.pData.oper_sum);
 
   $("#product-form").dialog({
     title : "Позиция - " + NullTo(o.pData.product_code, ""),
@@ -116,7 +116,7 @@ RboProduct.prototype.showProductForm = function(o) {
         }
         p.product_price = $("#prod_price").val();
         p.product_cnt = $("#prod_cnt").val();
-        p.product_sum = $("#prod_sum").val();
+        p.oper_sum = $("#prod_sum").val();
         o.fnSave(p);
         $("#product-form").dialog("close");
       },

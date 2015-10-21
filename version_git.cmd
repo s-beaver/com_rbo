@@ -1,2 +1,2 @@
-echo last version deployed > .version
+echo version > .version
 git describe --tags --long >> .version

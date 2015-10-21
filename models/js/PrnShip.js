@@ -69,7 +69,7 @@ function fillInvoicePrintForm(i) {
           + "</td>";
       sPr += "<td style='text-align: right'>" + i.doc_products[x].product_price
           + ",00</td>";
-      sPr += "<td style='text-align: right'>" + i.doc_products[x].product_sum
+      sPr += "<td style='text-align: right'>" + i.doc_products[x].oper_sum
           + ",00</td>";
       sPr += "</tr>";
       iCntSum += Number(i.doc_products[x].product_cnt);

@@ -75,7 +75,7 @@ RbDoc.prototype.attachDocForm = function () {
         }, {
             "title": "Сумма",
             "className": "center",
-            "data": "product_sum"
+            "data": "oper_sum"
         }, {
             "title": "Ред.",
             "className": "center",
@@ -408,6 +408,7 @@ RbDoc.prototype.showDocForm = function (i) {
             i.doc_products[x].lineNo = x;
         self.oTableProducts.fnAddData(i.doc_products);
     }
+    self.apiTableProducts.columns.adjust().draw();
 
     //установим документ в правильное состояние RW
     var readOnly = this.setRW(i.doc_status);
@@ -493,7 +494,7 @@ RbDoc.prototype.showProductForm = function (x) {// x-номер редактир
                 var pAll = self.oTableProducts.fnGetData();
                 var iSum = 0;
                 for (var x = 0; x < pAll.length; x++) {
-                    iSum += Number(pAll[x].product_sum);
+                    iSum += Number(pAll[x].oper_sum);
                 }
                 $('#' + self.docFormPrefix + '\\.doc_sum').val(iSum);
             }
@@ -510,7 +511,7 @@ RbDoc.prototype.showProductForm = function (x) {// x-номер редактир
             var pAll = self.oTableProducts.fnGetData();
             var iSum = 0;
             for (var x = 0; x < pAll.length; x++) {
-                iSum += Number(pAll[x].product_sum);
+                iSum += Number(pAll[x].oper_sum);
             }
             $('#' + self.docFormPrefix + '\\.doc_sum').val(iSum);
         }

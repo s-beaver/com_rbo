@@ -70,10 +70,10 @@ function fillInvoicePrintForm(i) {
       sPr += "<td style='text-align: left'>-</td>";// масса брутто
       sPr += "<td style='text-align: center'>" + i.doc_products[x].product_cnt + "</td>";
       sPr += "<td style='text-align: right'>" + i.doc_products[x].product_price + ",00</td>";
-      sPr += "<td style='text-align: right'>" + i.doc_products[x].product_sum + ",00</td>";
+      sPr += "<td style='text-align: right'>" + i.doc_products[x].oper_sum + ",00</td>";
       sPr += "<td style='text-align: left'>Без НДС</td>";// ставка НДС
       sPr += "<td style='text-align: center'>0,00</td>";// сумма НДС
-      sPr += "<td style='text-align: right'>" + i.doc_products[x].product_sum + ",00</td>";// сумма с НДС
+      sPr += "<td style='text-align: right'>" + i.doc_products[x].oper_sum + ",00</td>";// сумма с НДС
       sPr += "</tr>";
       iCntSum += Number(i.doc_products[x].product_cnt);
     }

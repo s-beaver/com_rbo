@@ -121,7 +121,7 @@ class RbDocs extends RbObject
         parent::updateObject();
 
         $input = JFactory::getApplication()->input;
-        $input->set("rbo_docs_products", $doc_products);
+        $input->set("rbo_opers", $doc_products);
         $prod = new RbDocsProducts ($this->keyValue);
         $prod->deleteObject();
         $prod->createObject();
@@ -189,7 +189,7 @@ class RbDocs extends RbObject
             $p ["docId"] = $docId;
         }
 
-        $input->set("rbo_docs_products", $doc_products);
+        $input->set("rbo_opers", $doc_products);
         $prod = new RbDocsProducts ($docId);
         $prod->createObject();
         $response = $response && $prod->response;

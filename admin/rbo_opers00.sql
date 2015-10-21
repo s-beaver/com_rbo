@@ -1,0 +1,4 @@
+SET NAMES 'utf8';
+
+ALTER TABLE rbo_opers
+  ADD COLUMN docId INT(11) DEFAULT NULL AFTER custId;

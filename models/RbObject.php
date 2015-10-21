@@ -147,6 +147,14 @@ class RbObject
                     }
                     break;
                 }
+                case "boolean": {
+                    if (is_null($value) || empty($value)) {
+                        $setAr [] = $db->quoteName($key) . "=NULL";
+                    } else {
+                        if ((boolean)$value) $setAr [] = "true"; else $setAr [] = "false";
+                    }
+                    break;
+                }
                 default : {
                     $setAr [] = $db->quoteName($key) . "=$value";
                 }
@@ -181,6 +189,10 @@ class RbObject
                 case "numeric" : {
                     if ($buffer->{$fldname} == "") $buffer->{$fldname} = 0;
                     $flds_vals [] = $buffer->{$fldname};
+                    break;
+                }
+                case "boolean" : {
+                    if ((boolean)$buffer->{$fldname}) $flds_vals [] = "true"; else $flds_vals[] = "false";
                     break;
                 }
                 default : {
