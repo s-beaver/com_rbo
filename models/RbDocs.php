@@ -105,12 +105,12 @@ class RbDocs extends RbObject
                 $pRef = array();
                 $pRef ["productId"] = $p ["productId"];
                 $pRef ["product_code"] = $p ["product_code"];
-                $pRef ["name"] = $p ["product_name"];
-                $pRef ["price"] = $p ["product_price"];
+                $pRef ["product_name"] = $p ["product_name"];
+                $pRef ["product_price"] = $p ["product_price"];
                 // $pRef ["categoryID"] = ;
                 // $pRef ["list_price"] = ;
 
-                $input->set("SS_products", $pRef);
+                $input->set("rbo_products", $pRef);
                 $prodRef = new RbProducts ();
                 $prodRef->createObject();
                 $p ["productId"] = $prodRef->insertid;
@@ -169,17 +169,17 @@ class RbDocs extends RbObject
 
         $docId = $this->insertid;
         foreach ($doc_products as &$p) {
-            $p = (array) $p;
+            $p = (array)$p;
             if (!($p ["productId"] > 0)) { // создадим новый товар в справочнике
                 $pRef = array();
                 $pRef ["productId"] = $p ["productId"];
                 $pRef ["product_code"] = $p ["product_code"];
-                $pRef ["name"] = $p ["product_name"];
-                $pRef ["price"] = $p ["product_price"];
+                $pRef ["product_name"] = $p ["product_name"];
+                $pRef ["product_price"] = $p ["product_price"];
                 // $pRef ["categoryID"] = ;
                 // $pRef ["list_price"] = ;
 
-                $input->set("SS_products", $pRef);
+                $input->set("rbo_products", $pRef);
                 $prodRef = new RbProducts ();
                 $prodRef->createObject();
                 $p ["productId"] = $prodRef->insertid;
@@ -234,15 +234,25 @@ class RbDocs extends RbObject
     }
 
     // =================================================================
+    public function SetOpersFromDocByStatus()
+    {
+        if ($this->buffer)
+        $this->flds ["oper_type"] = array("type" => "string");
+        $this->flds ["oper_date"] = array("type" => "date");
+        $this->flds ["oper_sum"] = array("type" => "numeric");
+
+    }
+
+    // =================================================================
     public function getDocList()
     {
         $db = JFactory::getDBO();
 
         $input = JFactory::getApplication()->input;
-        $iDisplayStart = $input->getInt('start',-1);
-        $iDisplayLength = $input->getInt('length',-1);
-        $iDraw = $input->getString('draw',1);
-        $doc_type = $input->getString('doc_type',"");
+        $iDisplayStart = $input->getInt('start', -1);
+        $iDisplayLength = $input->getInt('length', -1);
+        $iDraw = $input->getString('draw', 1);
+        $doc_type = $input->getString('doc_type', "");
         $aSearch = $input->get("search", null, "array");
         $sSearch = null;
         if (!is_null($aSearch)) {
@@ -265,7 +275,7 @@ class RbDocs extends RbObject
 
         $data_rows_assoc_list = $db->loadAssocList();
 
-        $db->setQuery('SELECT count(*) FROM rbo_docs rd '.$sWhere);
+        $db->setQuery('SELECT count(*) FROM rbo_docs rd ' . $sWhere);
         $iRecordsTotal = $db->loadResult();
 
         $db->setQuery("SELECT doc_base, docId, doc_num, doc_date, doc_type " .
