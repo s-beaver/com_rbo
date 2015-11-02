@@ -88,7 +88,7 @@ RbDoc.prototype.attachDocForm = function () {
 
     this.apiTableProducts = this.oTableProducts.api();
 
-}
+};
 
 //===================================================================================
 RbDoc.prototype.attachPageElements = function () {
@@ -210,7 +210,7 @@ RbDoc.prototype.readDocFromURLId = function () {
     if (Number(docId) > 0) {
         this.readDoc(docId);
     }
-}
+};
 
 // ===================================================================================
 RbDoc.prototype.readDoc = function (docId) {

@@ -53,7 +53,7 @@ class RbProducts extends RbObject
     static function getProductListForm()
     {
         $input = JFactory::getApplication()->input;
-        $searchSubstr = $input->getString('search');
+        $searchSubstr = $input->getString('search',"");
         if (!is_string($searchSubstr) || strlen($searchSubstr) < 2) return;
 
         $db = JFactory::getDBO();
@@ -86,15 +86,15 @@ class RbProducts extends RbObject
     static function getProductList()
     {
         $input = JFactory::getApplication()->input;
-        $iDisplayStart = $input->getInt('start');
-        $iDisplayLength = $input->getInt('length');
-        $iDraw = $input->getString('draw');
+        $iDisplayStart = $input->getInt('start',-1);
+        $iDisplayLength = $input->getInt('length',-1);
+        $iDraw = $input->getString('draw',1);
         $aSearch = $input->get("search", null, "array");
         $sSearch = null;
         if (!is_null($aSearch)) {
             $sSearch = $aSearch["value"];
         }
-        $sInStockFilter = $input->getString('filter_instock');
+        $sInStockFilter = $input->getString('filter_instock',-1);
 
         $db = JFactory::getDBO();
         $query = $db->getQuery(true);
@@ -106,7 +106,7 @@ class RbProducts extends RbObject
         $query->order($db->quoteName('rp.productId') . " DESC");
 
         $where = array();
-        if (!empty($sInStockFilter)) {
+        if ($sInStockFilter!=-1) {
             $where[] = $db->quoteName('rp.product_type') . '=0';
             $where[] = $db->quoteName('rp.product_in_stock') . '>0';
         } elseif (!empty ($sSearch)) {

@@ -94,7 +94,6 @@ class RbDocs extends RbObject
             $cust->updateObject();
             $response = $response && $cust->response;
         } elseif ($custId == -1) {
-            $custId = 0;
             $this->buffer->custId = 0;
         } else {
             $cust->createObject();
@@ -160,7 +159,6 @@ class RbDocs extends RbObject
             $cust->updateObject();
             $response = $response && $cust->response;
         } elseif ($custId == -1) {
-            $custId = 0;
             $this->buffer->custId = 0;
         } else {
             $cust->createObject();
@@ -210,12 +208,12 @@ class RbDocs extends RbObject
             $query->where($this->getWhereClause());
             $db->setQuery($query);
             $result = $db->execute();
+            $this->response = $result;
         } catch (Exception $e) {
             JLog::add(
                 get_class() . ":" . $e->getMessage() . " buffer=" . print_r($this->buffer, true),
                 JLog::ERROR, 'com_rbo');
         }
-        $this->response = $result;
     }
 
     // =================================================================
@@ -241,10 +239,10 @@ class RbDocs extends RbObject
         $db = JFactory::getDBO();
 
         $input = JFactory::getApplication()->input;
-        $iDisplayStart = $input->getInt('start');
-        $iDisplayLength = $input->getInt('length');
-        $iDraw = $input->getString('draw');
-        $doc_type = $input->getString('doc_type');
+        $iDisplayStart = $input->getInt('start',-1);
+        $iDisplayLength = $input->getInt('length',-1);
+        $iDraw = $input->getString('draw',1);
+        $doc_type = $input->getString('doc_type',"");
         $aSearch = $input->get("search", null, "array");
         $sSearch = null;
         if (!is_null($aSearch)) {
@@ -322,6 +320,7 @@ class RbDocs extends RbObject
         } catch (Exception $e) {
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
         }
+        return "";
     }
 
     // =================================================================

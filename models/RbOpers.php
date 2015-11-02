@@ -103,15 +103,15 @@ class RbOpers extends RbObject
         $db = JFactory::getDBO();
 
         $input = JFactory::getApplication()->input;
-        $iDisplayStart = $input->getInt('start');
-        $iDisplayLength = $input->getInt('length');
-        $iDraw = $input->getString('draw');
+        $iDisplayStart = $input->getInt('start',-1);
+        $iDisplayLength = $input->getInt('length',-1);
+        $iDraw = $input->getString('draw',1);
         $aSearch = $input->get("search", null, "array");
         $sSearch = null;
         if (!is_null($aSearch)) {
             $sSearch = $aSearch["value"];
         }
-        $sDateFilter = $input->getString('date_filter');
+        $sDateFilter = $input->getString('date_filter',"");
 
         $query = $db->getQuery(true);
 
