@@ -48,8 +48,7 @@ class RbDocsProducts extends RbObject
         $this->flds ["product_name"] = array("type" => "string");
         $this->flds ["product_cnt"] = array("type" => "numeric");
         $this->flds ["product_price"] = array("type" => "numeric");
-        $this->flds ["oper_sum"] = array("type" => "numeric", "read_only" => true,
-            "formula" => "product_cnt*product_price");
+        $this->flds ["oper_sum"] = array("type" => "numeric");
         $this->flds ["product_uom"] = array("type" => "string", "read_only" => true,
             "formula" => "'шт.'");
 

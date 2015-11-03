@@ -126,6 +126,7 @@ class RbOpers extends RbObject
             $db->quoteName('rc.custId') . ')');
 
         $where = array();
+        $where[] = "so.oper_date>0";
         if (isset($sDateFilter) && $sDateFilter != "") {
             $where[] = "DATE_FORMAT(so.oper_date,'%d.%m.%Y')='$sDateFilter'";
         } elseif (!empty ($sSearch)) {

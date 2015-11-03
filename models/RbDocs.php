@@ -107,8 +107,6 @@ class RbDocs extends RbObject
                 $pRef ["product_code"] = $p ["product_code"];
                 $pRef ["product_name"] = $p ["product_name"];
                 $pRef ["product_price"] = $p ["product_price"];
-                // $pRef ["categoryID"] = ;
-                // $pRef ["list_price"] = ;
 
                 $input->set("rbo_products", $pRef);
                 $prodRef = new RbProducts ();
@@ -116,6 +114,7 @@ class RbDocs extends RbObject
                 $p ["productId"] = $prodRef->insertid;
             }
             $p ["docId"] = $this->keyValue;
+            $this->setOpersFromDocByStatus($p);
         }
         parent::updateObject();
 
@@ -176,8 +175,6 @@ class RbDocs extends RbObject
                 $pRef ["product_code"] = $p ["product_code"];
                 $pRef ["product_name"] = $p ["product_name"];
                 $pRef ["product_price"] = $p ["product_price"];
-                // $pRef ["categoryID"] = ;
-                // $pRef ["list_price"] = ;
 
                 $input->set("rbo_products", $pRef);
                 $prodRef = new RbProducts ();
@@ -185,6 +182,7 @@ class RbDocs extends RbObject
                 $p ["productId"] = $prodRef->insertid;
             }
             $p ["docId"] = $docId;
+            $this->setOpersFromDocByStatus($p);
         }
 
         $input->set("rbo_opers", $doc_products);
@@ -229,17 +227,39 @@ class RbDocs extends RbObject
         $this->buffer->doc_num = null;
         $this->buffer->doc_date = null;
         $this->buffer->doc_type = $doc_type;
+        $this->buffer->doc_status = "";
         $this->createObject();
         $this->response = $this->response && $response;
     }
 
     // =================================================================
-    public function SetOpersFromDocByStatus()
+    public function setOpersFromDocByStatus(&$product)
     {
-        if ($this->buffer)
-        $this->flds ["oper_type"] = array("type" => "string");
-        $this->flds ["oper_date"] = array("type" => "date");
-        $this->flds ["oper_sum"] = array("type" => "numeric");
+        if (strtotime($this->buffer->doc_date)<strtotime('1 November 2015')) return;
+
+        if ($this->buffer->doc_status == "подписан") {
+            switch ($this->buffer->doc_type) {
+                case "акт":
+                case "накл": {
+                    $product["oper_type"] = "продажа";
+                    break;
+                }
+                case "B-ACT":
+                case "B-BILL": {
+                    $product["oper_type"] = "закуп";
+                    break;
+                }
+                default:
+                    return;
+            }
+            $product["oper_date"] = $this->buffer->doc_date;
+            //$product["oper_sum"] = (integer)$product["product_price"]*(integer)$product["product_cnt"];
+            $product["custId"] = $this->buffer->custId;
+            $product["oper_firm"] = $this->buffer->doc_firm;
+            $product["oper_manager"] = $this->buffer->doc_manager;
+        } else {
+            $product["oper_date"] = null;
+        }
 
     }
 
