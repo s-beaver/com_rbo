@@ -68,8 +68,8 @@ table, th, td {
 	position: absolute;
 	left: 0px;
 	top: 200px;
-	height: 32mm;
-	width: 32mm;
+	height: 42mm;
+	width: 42mm;
 	overflow: visible;
 	z-index: -1;
 }
