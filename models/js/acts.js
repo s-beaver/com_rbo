@@ -1,10 +1,10 @@
-var doc;
+var s_act;
 
 // ===================================================================================
 $(document).ready(function () {
 
-    doc = new RbDoc({
-        docFormPrefix:"s-act",
+    s_act = new RbDoc({
+        docFormPrefix:"s_act",
         sDocType: 'акт',
         sDocTypeListTitle: 'Акты',
         sDocTypeTitle: 'Акт',
@@ -18,7 +18,7 @@ $(document).ready(function () {
             "удален": "удален"
         }
     });
-    doc.attachPageElements();
+    s_act.attachPageElements();
 
     $("#dialog-confirm").dialog({
         autoOpen: false
@@ -29,5 +29,5 @@ $(document).ready(function () {
         dateFormat: "dd.mm.yy"
     });
 
-    doc.readDocFromURLId();
+    s_act.readDocFromURLId();
 });

@@ -156,7 +156,7 @@ RefProducts.prototype.saveProduct = function () {
         url: comPath + "ajax.php?task=" + taskCmd,
         success: function (data) {
             $("#prd-form").dialog("close");
-            self.oTable.fnDraw();
+            self.oTable.draw();
         }
     });
 };
@@ -180,7 +180,7 @@ RefProducts.prototype.deleteProduct = function (productId) {
         },
         url: comPath + "ajax.php?task=product_delete",
         success: function (data) {
-            self.oTable.fnDraw();
+            self.oTable.draw();
         }
     });
 

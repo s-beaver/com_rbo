@@ -1,9 +1,9 @@
-var doc, docSAct, docSBill;
+var inv, s_act, s_bill;
 
 // ===================================================================================
 $(document).ready(function () {
 
-    doc = new RbDoc({
+    inv = new RbDoc({
         docFormPrefix:"inv",
         sDocType: 'счет',
         sDocTypeListTitle: 'Счета',
@@ -23,11 +23,11 @@ $(document).ready(function () {
             "удален": "удален"
         }
     });
-    doc.attachPageElements();
+    inv.attachPageElements();
 
-    docSBill = new RbDoc({
-        docFormPrefix:"s-bill",
-        oTable:doc.oTable,
+    s_bill = new RbDoc({
+        docFormPrefix:"s_bill",
+        oTable:inv.oTable,
         sDocType: 'накл',
         sDocTypeListTitle: 'Накладные',
         sDocTypeTitle: 'Накладная',
@@ -44,9 +44,9 @@ $(document).ready(function () {
         }
     });
 
-    docSAct = new RbDoc({
-        docFormPrefix:"s-act",
-        oTable:doc.oTable,
+    s_act = new RbDoc({
+        docFormPrefix:"s_act",
+        oTable:inv.oTable,
         sDocType: 'акт',
         sDocTypeListTitle: 'Акты',
         sDocTypeTitle: 'Акт',
@@ -72,5 +72,5 @@ $(document).ready(function () {
         dateFormat: "dd.mm.yy"
     });
 
-    doc.readDocFromURLId();
+    inv.readDocFromURLId();
 });

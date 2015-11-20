@@ -28,6 +28,9 @@ function RbDoc(o) {
     this.copyToList = o.copyToList;//перечень документов для создания из текущего документа
 
     this.oTable = o.oTable;
+    if (!IsNull(this.oTable)) {
+        this.oTableAPI = this.oTable.api();
+    }
     this.oProduct = new RboProduct();//объект для выбора/редакции товарами
     this.oCust = new RboCust(this);//объект для выбора/редакции контрагента
 
@@ -80,13 +83,19 @@ RbDoc.prototype.attachDocForm = function () {
             "title": "Ред.",
             "className": "center",
             "data": function (source, type, val) {
-                return "<a id='edit_product' href='javascript:doc.showProductForm(" + source.lineNo + ")'><img src='" + comPath + "images/icon-32-edit-on.png'/></a>";
+                return "<a id='edit_product' href='javascript:" + self.docFormPrefix + ".showProductForm(" + source.lineNo + ")'><img src='" + comPath + "images/icon-32-edit-on.png'/></a>";
             }
         }],
         "language": dataTablesLanguage
     });
 
     this.apiTableProducts = this.oTableProducts.api();
+
+    //обработчик нажатия кнопки добавления товара в документ
+    $("#" + self.docFormPrefix + "\\.prod_add_btn").click(function (event) {
+        self.showProductForm();
+        return false;
+    });
 
 };
 
@@ -106,7 +115,7 @@ RbDoc.prototype.attachPageElements = function () {
             "title": "Номер",
             "className": "center",
             "data": function (source, type, val) {
-                return "<a href='javascript:doc.readDoc(" + source.docId + ")'>" + source.doc_num + " /" + source.doc_date + "</a>";
+                return "<a href='javascript:" + self.docFormPrefix + ".readDoc(" + source.docId + ")'>" + source.doc_num + " /" + source.doc_date + "</a>";
             }
         }, {
             "title": "Контрагент",
@@ -127,7 +136,7 @@ RbDoc.prototype.attachPageElements = function () {
             "title": "Док-ты",
             "data": function (source, type, val) {
                 var s = "", docText, elem;
-                s += "<div style='display: table-cell; vertical-align: middle'><a href='javascript:doc.copyDoc(" + source.docId + ")'><img src='" + comPath + "images/icon-16-new.png'/></a></div>";
+                s += "<div style='display: table-cell; vertical-align: middle'><a href='javascript:" + self.docFormPrefix + ".copyDoc(" + source.docId + ")'><img src='" + comPath + "images/icon-16-new.png'/></a></div>";
                 s += "<div style='display: table-cell'>";
                 for (var i = 0; i < source.childs.length; i++) {
                     elem = source.childs[i];
@@ -135,12 +144,12 @@ RbDoc.prototype.attachPageElements = function () {
                     switch (elem.doc_type) {
                         case "акт":
                         {
-                            s += "<a href='javascript:docSAct.readDoc(" + elem.docId + ")'>" + docText + "</a><br>";
+                            s += "<a href='javascript:s_act.readDoc(" + elem.docId + ")'>" + docText + "</a><br>";
                             break;
                         }
                         case "накл":
                         {
-                            s += "<a href='javascript:docSBill.readDoc(" + elem.docId + ")'>" + docText + "</a><br>";
+                            s += "<a href='javascript:s_bill.readDoc(" + elem.docId + ")'>" + docText + "</a><br>";
                             break;
                         }
                         default:
@@ -153,7 +162,7 @@ RbDoc.prototype.attachPageElements = function () {
                 s += "</div>";
                 return s;
             }
-        },  {
+        }, {
             "title": "Оп.",
             "data": function (source, type, val) {
                 return "";
@@ -164,6 +173,7 @@ RbDoc.prototype.attachPageElements = function () {
         }],
         "language": dataTablesLanguage
     });
+    this.oTableAPI = this.oTable.api();
 
     $("#header_doclist_choose_list h2").html(this.sDocTypeListTitle);
 
@@ -178,12 +188,6 @@ RbDoc.prototype.attachPageElements = function () {
     //обработчик нажатия кнопки добавления документа
     $("#doc_add_btn").click(function (event) {
         self.createDoc();
-        return false;
-    });
-
-    //обработчик нажатия кнопки добавления товара в документ
-    $("#" + self.docFormPrefix + "\\.prod_add_btn").click(function (event) {
-        self.showProductForm();
         return false;
     });
 
@@ -277,7 +281,7 @@ RbDoc.prototype.saveDoc = function (docId) {
         url: comPath + "ajax.php?task=" + taskCmd,
         success: function (doc_data) {
             self.oFormDlg.dialog("close");
-            self.oTable.fnDraw();
+            self.oTableAPI.draw();
         }
     });
 };
@@ -289,7 +293,7 @@ RbDoc.prototype.copyDoc = function (docId) {
 
     if (!IsNull(self.copyToList) && self.copyToList.length > 0) {
         for (var x = 0; x < self.copyToList.length; x++) {
-            sText += "<p><input "+(x==0?"checked":"")+" name='copyDocByChoose' id='copyDocByChoose" + x + "' type='radio' value='" + x + "'>" + self.copyToList[x].title + "</p>";
+            sText += "<p><input " + (x == 0 ? "checked" : "") + " name='copyDocByChoose' id='copyDocByChoose" + x + "' type='radio' value='" + x + "'>" + self.copyToList[x].title + "</p>";
         }
     } else return;
 
@@ -310,7 +314,7 @@ RbDoc.prototype.copyDoc = function (docId) {
             },
             url: comPath + "ajax.php?task=doc_copy",
             success: function (doc_data) {
-                self.oTable.fnDraw();
+                self.oTableAPI.draw();
             }
         });
 
@@ -354,7 +358,7 @@ RbDoc.prototype.deleteDoc = function (docId) {
         },
         url: comPath + "ajax.php?task=doc_delete",
         success: function (doc_data) {
-            self.oTable.fnDraw();
+            self.oTableAPI.draw();
         }
     });
 
@@ -401,12 +405,12 @@ RbDoc.prototype.showDocForm = function (i) {
     $("#" + self.docFormPrefix + "\\.doc_rem").val(i.doc_rem);
 
     //заполним список товаров/услуг
-    self.oTableProducts.fnClearTable();
+    self.apiTableProducts.clear();
     var x;
     if (!IsNull(i.doc_products) && i.doc_products.length > 0) {
         for (x = 0; x < i.doc_products.length; x++)
             i.doc_products[x].lineNo = x;
-        self.oTableProducts.fnAddData(i.doc_products);
+        self.apiTableProducts.rows.add(i.doc_products);
     }
     self.apiTableProducts.columns.adjust().draw();
 
@@ -478,20 +482,23 @@ RbDoc.prototype.custSearch = function () {
 // ===================================================================================
 RbDoc.prototype.showProductForm = function (x) {// x-номер редактируемой строки, x=null-добавляем
     var self = this;
-    self.editing_lineNo = x;
 
-    var p = self.oTableProducts.fnGetData(x);
-    if (IsNull(p))
+    if (IsNull(x)) {
+        self.editing_lineNo = -1;
+        var p = {};
         self.lines_before_update = 0;
-    else
-        self.lines_before_update = p.length;
+    } else {
+        self.editing_lineNo = x;
+        var p = self.apiTableProducts.row(x).data();
+        self.lines_before_update = self.apiTableProducts.rows().data().length;
+    }
 
     self.oProduct.showProductForm({
         pData: p,
         fnDelete: function () {
             if (self.editing_lineNo >= 0) {
-                self.oTableProducts.fnDeleteRow(self.editing_lineNo);
-                var pAll = self.oTableProducts.fnGetData();
+                self.apiTableProducts.row(self.editing_lineNo).remove().draw();
+                var pAll = self.apiTableProducts.rows().data();
                 var iSum = 0;
                 for (var x = 0; x < pAll.length; x++) {
                     iSum += Number(pAll[x].oper_sum);
@@ -503,12 +510,12 @@ RbDoc.prototype.showProductForm = function (x) {// x-номер редактир
         fnSave: function (pObj) {
             if (self.editing_lineNo >= 0) {
                 pObj.lineNo = self.editing_lineNo;
-                self.oTableProducts.fnUpdate(pObj, pObj.lineNo);
+                self.apiTableProducts.row(pObj.lineNo).data(pObj).draw();
             } else {
                 pObj.lineNo = self.lines_before_update;
-                self.oTableProducts.fnAddData(pObj);
+                self.apiTableProducts.row.add(pObj).draw();
             }
-            var pAll = self.oTableProducts.fnGetData();
+            var pAll = self.apiTableProducts.rows().data();
             var iSum = 0;
             for (var x = 0; x < pAll.length; x++) {
                 iSum += Number(pAll[x].oper_sum);

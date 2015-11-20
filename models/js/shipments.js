@@ -1,10 +1,10 @@
-var doc;
+var s_bill;
 
 // ===================================================================================
 $(document).ready(function () {
 
-    doc = new RbDoc({
-        docFormPrefix:"s-bill",
+    s_bill = new RbDoc({
+        docFormPrefix:"s_bill",
         sDocType: 'накл',
         sDocTypeListTitle: 'Накладные',
         sDocTypeTitle: 'Накладная',
@@ -20,7 +20,7 @@ $(document).ready(function () {
             "удален": "удален"
         }
     });
-    doc.attachPageElements();
+    s_bill.attachPageElements();
 
     $("#dialog-confirm").dialog({
         autoOpen: false
@@ -31,5 +31,5 @@ $(document).ready(function () {
         dateFormat: "dd.mm.yy"
     });
 
-    doc.readDocFromURLId();
+    s_bill.readDocFromURLId();
 });

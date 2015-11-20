@@ -125,7 +125,7 @@ RefCustomers.prototype.saveCustomer = function () {
         url: comPath + "ajax.php?task=" + taskCmd,
         success: function (data) {
             $("#cst-form").dialog("close");
-            self.oTable.fnDraw();
+            self.oTable.draw();
         }
     });
 };
@@ -149,7 +149,7 @@ RefCustomers.prototype.deleteCustomer = function (custId) {
         },
         url: comPath + "ajax.php?task=cust_delete",
         success: function (data) {
-            self.oTable.fnDraw();
+            self.oTable.draw();
         }
     });
 

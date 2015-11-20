@@ -206,7 +206,7 @@ RbOper.prototype.saveOper = function () {
         url: comPath + "ajax.php?task=" + taskCmd,
         success: function (doc_data) {
             self.oFormDlg.dialog("close");
-            self.oTable.fnDraw();
+            self.oTableAPI.draw();
         }
     });
 };
@@ -246,7 +246,7 @@ RbOper.prototype.deleteOper = function (operId) {
         },
         url: comPath + "ajax.php?task=oper_delete",
         success: function (oper_data) {
-            self.oTable.fnDraw();
+            self.oTableAPI.draw();
         }
     });
 
