@@ -3,18 +3,18 @@ var monthAr = new Array("", "январь", "февраль", "март", "ап�
 var monthAr1 = new Array("", "января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря");
 var dataTablesLanguage = {
     processing: "Подождите...",
-        lengthMenu: "Показать _MENU_ строк",
-        zeroRecords: "Записи отсутствуют.",
-        info: "Операции с _START_ по _END_ (всего: _TOTAL_)",
-        infoEmpty: "Операций нет",
-        infoFiltered: "(отфильтровано из _MAX_ записей)",
-        infoPostFix: "",
-        search: "Поиск:",
-        paginate: {
+    lengthMenu: "Показать _MENU_ строк",
+    zeroRecords: "Записи отсутствуют.",
+    info: "Операции с _START_ по _END_ (всего: _TOTAL_)",
+    infoEmpty: "Операций нет",
+    infoFiltered: "(отфильтровано из _MAX_ записей)",
+    infoPostFix: "",
+    search: "Поиск:",
+    paginate: {
         first: "В начало",
-            previous: "Предыдущие",
-            next: "Следующие",
-            last: "В конец"
+        previous: "Предыдущие",
+        next: "Следующие",
+        last: "В конец"
     }
 };
 
@@ -183,6 +183,7 @@ function checkRegexp(o, regexp, n, tips) {
  */
 // ===================================================================================
 function Ask(sText, okText, cancelText, fnOk, fnCancel, sElemSelector) {
+    var sTitle = "Подтверждение";
     $(sElemSelector).html(sText);
     var bOk = {};
     bOk[okText] = function (arg) {
@@ -191,9 +192,33 @@ function Ask(sText, okText, cancelText, fnOk, fnCancel, sElemSelector) {
     };
     bOk[cancelText] = function () {
         $(sElemSelector).dialog("close");
-    }
+        fnCancel(arg);
+    };
 
     $(sElemSelector).dialog({
+        title: sTitle,
+        resizable: false,
+        width: 400,
+        height: 180,
+        modal: true,
+        buttons: bOk
+    });
+
+    $(sElemSelector).dialog("open");
+}
+
+// ===================================================================================
+function Msg(sText, okText, fnOk, sElemSelector, sTitle) {
+    sTitle = NullTo(sTitle, "");
+    $(sElemSelector).html(sText);
+    var bOk = {};
+    bOk[okText] = function (arg) {
+        $(sElemSelector).dialog("close");
+        fnOk(arg);
+    };
+
+    $(sElemSelector).dialog({
+        title: sTitle,
         resizable: false,
         width: 400,
         height: 180,

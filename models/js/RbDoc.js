@@ -61,11 +61,11 @@ RbDoc.prototype.attachDocForm = function () {
         "paging": false,
         "searching": false,
         "ordering": false,
-        "autoWidth" : true,
+        "autoWidth": true,
         "columns": [{
             "title": "Код",
             "data": "product_code",
-            "width" : "5%"
+            "width": "5%"
         }, {
             "title": "Наименование",
             "data": "product_name"
@@ -282,8 +282,15 @@ RbDoc.prototype.saveDoc = function (docId) {
         data: oData,
         url: comPath + "ajax.php?task=" + taskCmd,
         success: function (doc_data) {
-            self.oFormDlg.dialog("close");
-            self.oTableAPI.draw();
+            if (doc_data.docId > 0) {
+                self.oFormDlg.dialog("close");
+                self.oTableAPI.draw();
+            } else {
+                Msg(doc_data.error, "Ок", null, "#dialog-confirm", "Ошибка");
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert("Статус: " + textStatus + " Ошибка: " + errorThrown)
         }
     });
 };
@@ -316,7 +323,14 @@ RbDoc.prototype.copyDoc = function (docId) {
             },
             url: comPath + "ajax.php?task=doc_copy",
             success: function (doc_data) {
-                self.oTableAPI.draw();
+                if (doc_data.docId > 0) {
+                    self.oTableAPI.draw();
+                } else {
+                    Msg(doc_data.error, "Ок", null, "#dialog-confirm", "Ошибка");
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert("Статус: " + textStatus + " Ошибка: " + errorThrown)
             }
         });
 

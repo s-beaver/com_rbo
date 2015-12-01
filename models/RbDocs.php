@@ -164,6 +164,13 @@ class RbDocs extends RbObject
             $this->buffer->custId = $cust->insertid;
         }
 
+        if ($this->duplicateExists($this->buffer->doc_num)) {
+            $res = new stdClass ();
+            $res->error = "Документ с таким номером уже существует";
+            $res->docId = -1;
+            $this->response = json_encode($res);
+            return;
+        }
         parent::createObject();
 
         $docId = $this->insertid;
@@ -190,8 +197,11 @@ class RbDocs extends RbObject
         $prod->createObject();
         $response = $response && $prod->response;
 
-        if ($this->response && $response)
-            $this->response = $docId;
+        if ($this->response && $response) {
+            $res = new stdClass ();
+            $res->docId = $docId;
+            $this->response = json_encode($res);
+        }
     }
 
     // =================================================================
@@ -224,7 +234,10 @@ class RbDocs extends RbObject
         $this->readObject();
         $this->buffer->docId = null;
         $this->buffer->doc_base = $this->keyValue;
-        $this->buffer->doc_num = null;
+        if (!RbConfig::$continuousNumbering) {
+            $this->buffer->doc_num = null;
+        }
+
         $this->buffer->doc_date = null;
         $this->buffer->doc_type = $doc_type;
         $this->buffer->doc_status = "";
@@ -235,7 +248,7 @@ class RbDocs extends RbObject
     // =================================================================
     public function setOpersFromDocByStatus(&$product)
     {
-        if (strtotime($this->buffer->doc_date)<strtotime('1 November 2015')) return;
+        if (strtotime($this->buffer->doc_date) < strtotime('1 November 2015')) return;
 
         if ($this->buffer->doc_status == "подписан") {
             switch ($this->buffer->doc_type) {
@@ -336,21 +349,49 @@ class RbDocs extends RbObject
             $query = $db->getQuery(true);
             $query->select("MAX(doc_num)");
             $query->from("rbo_docs");
-            $query->where("doc_type='" . $this->buffer->doc_type . "'");
+            if (!RbConfig::$continuousNumbering) {
+                $query->where("doc_type='" . $this->buffer->doc_type . "'");
+            }
             $query->where("DATE_FORMAT(doc_date,'%Y')=$year");
             $db->setQuery($query);
             $newNumber = $db->loadResult();
+            if (is_null($newNumber)) $newNumber = 0;
             $res = new stdClass ();
             $res->new_num = $newNumber + 1;
             $res->new_date = $currentTime->format('d.m.Y', true);
             if ($returnResult)
-                return $res->new_num;
+                return $res->new_num;//todo все ответы преобразовать в json
             else
                 echo json_encode($res);
         } catch (Exception $e) {
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
         }
         return "";
+    }
+
+    // =================================================================
+    function duplicateExists($docNum)
+    {
+        if (is_null($docNum)) return false;
+        $currentTime = new JDate ();
+        $year = $currentTime->format('Y', false);
+
+        try {
+            $db = JFactory::getDBO();
+            $query = $db->getQuery(true);
+            $query->select("docId");
+            $query->from("rbo_docs");
+            $query->where("doc_type='" . $this->buffer->doc_type . "'");//здесь не нужно проверять $continuousNumbering
+            $query->where("DATE_FORMAT(doc_date,'%Y')=$year");
+            $query->where("doc_num=$docNum");
+            $db->setQuery($query);
+            $docId = $db->loadResult();
+            if ($docId > 0) return true;
+            return false;
+        } catch (Exception $e) {
+            JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
+        }
+        return true;
     }
 
     // =================================================================

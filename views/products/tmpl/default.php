@@ -72,7 +72,7 @@
     </form>
 </div>
 
-<?php include RBO_PATH . '/views/form.del-doc.php' ?>
+<?php include RBO_PATH . '/views/form.dialog-confirm.php' ?>
 
 <table id="TableProduct" class="display compact"></table>
 

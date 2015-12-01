@@ -65,7 +65,7 @@
 
   <?php include RBO_PATH.'/views/form.base-doc.php'?>
 
-  <?php include RBO_PATH.'/views/form.del-doc.php'?>
+  <?php include RBO_PATH . '/views/form.dialog-confirm.php' ?>
 
   <table id="TableDoc" class="display compact"></table>
 
