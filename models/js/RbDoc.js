@@ -61,9 +61,11 @@ RbDoc.prototype.attachDocForm = function () {
         "paging": false,
         "searching": false,
         "ordering": false,
+        "autoWidth" : true,
         "columns": [{
             "title": "Код",
-            "data": "product_code"
+            "data": "product_code",
+            "width" : "5%"
         }, {
             "title": "Наименование",
             "data": "product_name"

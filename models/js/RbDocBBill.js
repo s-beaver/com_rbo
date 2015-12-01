@@ -1,12 +1,12 @@
 /* Скрипт формы для работы с входящими накладными */
-var doc;
+var b_bill;
 
 // ===================================================================================
 $(document).ready(function () {
 
-    doc = new RbDoc({
+    b_bill = new RbDoc({
         sDocType: 'B_BIL',
-        docFormPrefix:"b-bill",
+        docFormPrefix:"b_bill",
         sDocTypeListTitle: 'Накладные (закуп)',
         sDocTypeTitle: 'Накладная (закуп)',
         checkFields: ["doc_num","doc_date","doc_manager","doc_firm"],
@@ -16,7 +16,7 @@ $(document).ready(function () {
             "удален": "удален"
         }
     });
-    doc.attachPageElements();
+    b_bill.attachPageElements();
 
     $("#dialog-confirm").dialog({
         autoOpen: false
@@ -27,5 +27,5 @@ $(document).ready(function () {
         dateFormat: "dd.mm.yy"
     });
 
-    doc.readDocFromURLId();
+    b_bill.readDocFromURLId();
 });

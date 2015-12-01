@@ -1,12 +1,12 @@
 /* Скрипт формы для работы с входящими актами*/
-var doc;
+var b_act;
 
 // ===================================================================================
 $(document).ready(function () {
 
-    doc = new RbDoc({
+    b_act = new RbDoc({
         sDocType: 'B_ACT',
-        docFormPrefix:"b-act",
+        docFormPrefix:"b_act",
         sDocTypeListTitle: 'Акты (входящие)',
         sDocTypeTitle: 'Акт (входящий)',
         checkFields: ["doc_num","doc_date","doc_manager","doc_firm"],
@@ -16,7 +16,7 @@ $(document).ready(function () {
             "удален": "удален"
         }
     });
-    doc.attachPageElements();
+    b_act.attachPageElements();
 
     $("#dialog-confirm").dialog({
         autoOpen: false
@@ -27,5 +27,5 @@ $(document).ready(function () {
         dateFormat: "dd.mm.yy"
     });
 
-    doc.readDocFromURLId();
+    b_act.readDocFromURLId();
 });
