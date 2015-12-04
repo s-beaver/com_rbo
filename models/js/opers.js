@@ -6,12 +6,18 @@ function RbOper(o) {
     this.docFormPrefix = "rbo_opers";
     this.oCust = new RboCust(this);
     this.tips = o.tips;
+    var prefixedFldName = "";
     if (IsArray(o.checkFields)) {
         for (var i = 0; i < o.checkFields.length; i++) {
-            if (IsNull(this.checkFields)) {
-                this.checkFields = $("#" + this.docFormPrefix + "\\." + o.checkFields[i]);
+            if (o.checkFields[i].substring(0, 2) == "\\.") {
+                prefixedFldName = "#" + this.docFormPrefix + o.checkFields[i];
             } else {
-                this.checkFields = this.checkFields.add($("#" + this.docFormPrefix + "\\." + o.checkFields[i]));
+                prefixedFldName = "#" + o.checkFields[i];
+            }
+            if (IsNull(this.checkFields)) {
+                this.checkFields = $(prefixedFldName);
+            } else {
+                this.checkFields = this.checkFields.add(prefixedFldName);
             }
         }
     }
@@ -158,7 +164,14 @@ RbOper.prototype.attachOperModule = function () {
 
 //===================================================================================
 RbOper.prototype.setRW = function (oData) {
-    return false;
+    var self = this;
+    if (IsNull(oData.docId)) {
+        this.checkFields.removeAttr("disabled");
+        return false;
+    } else {
+        this.checkFields.attr("disabled", "disabled");
+        return true;
+    }
 };
 
 //===================================================================================
@@ -256,43 +269,45 @@ RbOper.prototype.deleteOper = function (operId) {
 };
 
 // ===================================================================================
-RbOper.prototype.showOperForm = function (i) {
+RbOper.prototype.showOperForm = function (oper_data) {
     var self = this;
 
     refillSelect("rbo_opers\\.oper_manager", getPeopleList());
     refillSelect("rbo_opers\\.oper_firm", getFirmList());
     refillSelect("rbo_opers\\.oper_type", getOperTypeList());
 
-    setFormData(self.docFormPrefix + "\\.oper-form", "rbo_opers", i);
+    setFormData(self.docFormPrefix + "\\.oper-form", "rbo_opers", oper_data);
 
     var pId = $('#rbo_opers\\.productId').val();
     if (!(pId > 0)) self.productSearchOff();
 
     //установим поля контрагента
-    self.oCust.setCustFlds('saved', i.oper_cust);
+    self.oCust.setCustFlds('saved', oper_data.oper_cust);
 
-    var readOnly = this.setRW(i);
+    var readOnly = this.setRW(oper_data);
 
     var oBtns = {};
     if (!readOnly) {
         oBtns["Удалить"] = function () {
             Ask("Операция будет удалена. Продолжить?", "Удалить операцию", "Отмена", function () {
-                self.deleteOper(i.operId);
+                self.deleteOper(oper_data.operId);
                 self.oFormDlg.dialog("close");
             }, null, "#dialog-confirm");
         }
     }
 
-    oBtns["Сохранить"] = function () {
-        self.saveOper();
-    };
+    if (!readOnly) {
+        oBtns["Сохранить"] = function () {
+            self.saveOper();
+        };
+    }
 
     oBtns["Отмена"] = function () {
         self.oFormDlg.dialog("close");
     };
 
     self.oFormDlg.dialog({
-        title: NullTo(i.oper_type, "") + " #" + NullTo(i.operId, "новая"),
+        title: NullTo(oper_data.oper_type, "") + " #" + NullTo(oper_data.operId, "новая"),
         buttons: oBtns
     });
 
@@ -357,7 +372,9 @@ RbOper.prototype.calcSum = function () {
 RbOper.prototype.calcTotals = function () {
     var self = this;
     var oData = self.oTableAPI.data();
-    self.saleTotal = 0; self.purchTotal = 0; self.expTotals = 0;
+    self.saleTotal = 0;
+    self.purchTotal = 0;
+    self.expTotals = 0;
     for (var i = 0; i < oData.length; i++) {
         if (oData[i].oper_type.indexOf("продажа") >= 0) {
             self.saleTotal += Number(oData[i].oper_sum);
@@ -375,7 +392,9 @@ RbOper.prototype.calcTotals = function () {
 $(document).ready(function () {
 
     oper = new RbOper({
-        checkFields: ["oper_date","oper_type","oper_firm","oper_manager"],
+        checkFields: ["prod_search_off_btn","\\.oper_date", "\\.oper_type", "\\.oper_firm", "\\.oper_manager","\\.oper_sum", "\\.oper_rem",
+            "prod_search","prod_search_btn","\\.cedit",
+            "\\.product_name", "\\.product_price", "\\.product_cnt"],
         tips: $(".validateTips")
     });
     oper.attachOperModule();

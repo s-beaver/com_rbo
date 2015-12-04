@@ -382,26 +382,26 @@ RbDoc.prototype.deleteDoc = function (docId) {
 };
 
 // ===================================================================================
-RbDoc.prototype.showDocForm = function (i) {
+RbDoc.prototype.showDocForm = function (doc_data) {
     var self = this;
     self.checkFields.removeClass("ui-state-error");
     refillSelect(self.docFormPrefix + "\\.doc_manager", getPeopleList(), true);
     refillSelect(self.docFormPrefix + "\\.doc_firm", getFirmList());
     refillSelect(self.docFormPrefix + "\\.doc_status", self.oStatusList, true);
 
-    self.docId = i.docId;
+    self.docId = doc_data.docId;
 
     //установим базовые реквизиты документа
-    $("#" + self.docFormPrefix + "\\.doc_num").val(i.doc_num);
-    $("#" + self.docFormPrefix + "\\.doc_date").val(i.doc_date);
-    $("#" + self.docFormPrefix + "\\.doc_sum").val(i.doc_sum);
-    $("#" + self.docFormPrefix + "\\.doc_status").val(i.doc_status);
+    $("#" + self.docFormPrefix + "\\.doc_num").val(doc_data.doc_num);
+    $("#" + self.docFormPrefix + "\\.doc_date").val(doc_data.doc_date);
+    $("#" + self.docFormPrefix + "\\.doc_sum").val(doc_data.doc_sum);
+    $("#" + self.docFormPrefix + "\\.doc_status").val(doc_data.doc_status);
 
     //установим поля документа-основания
     var sDocBase = "";
-    $("#doc_baseId").val(i.doc_base);
-    if ((i.doc_base > 0) && !IsNull(i.doc_base_doc)) {
-        sDocBase = "Счет №" + i.doc_base_doc.doc_num + " от " + i.doc_base_doc.doc_date;
+    $("#doc_baseId").val(doc_data.doc_base);
+    if ((doc_data.doc_base > 0) && !IsNull(doc_data.doc_base_doc)) {
+        sDocBase = "Счет №" + doc_data.doc_base_doc.doc_num + " от " + doc_data.doc_base_doc.doc_date;
     }
     $("#" + self.docFormPrefix + "\\.doc_base").val(sDocBase);
 
@@ -409,36 +409,36 @@ RbDoc.prototype.showDocForm = function (i) {
     $('#' + self.docFormPrefix + '\\.doc_manager option:selected').each(function () {
         this.selected = false;
     });
-    if (!IsEmpty(i.doc_manager))
-        $("#" + self.docFormPrefix + "\\.doc_manager option:contains('" + i.doc_manager + "')").prop("selected", "selected");
+    if (!IsEmpty(doc_data.doc_manager))
+        $("#" + self.docFormPrefix + "\\.doc_manager option:contains('" + doc_data.doc_manager + "')").prop("selected", "selected");
 
     //установим поля контрагента
-    self.oCust.setCustFlds('saved', i.doc_cust);
+    self.oCust.setCustFlds('saved', doc_data.doc_cust);
 
     //установим фирму
-    if (!IsNull(i.doc_firm))
-        $("#" + self.docFormPrefix + "\\.doc_firm option:contains('" + i.doc_firm.toUpperCase() + "')").prop("selected", "selected");
-    $("#" + self.docFormPrefix + "\\.doc_rem").val(i.doc_rem);
+    if (!IsNull(doc_data.doc_firm))
+        $("#" + self.docFormPrefix + "\\.doc_firm option:contains('" + doc_data.doc_firm.toUpperCase() + "')").prop("selected", "selected");
+    $("#" + self.docFormPrefix + "\\.doc_rem").val(doc_data.doc_rem);
 
     //заполним список товаров/услуг
     self.apiTableProducts.clear();
     var x;
-    if (!IsNull(i.doc_products) && i.doc_products.length > 0) {
-        for (x = 0; x < i.doc_products.length; x++)
-            i.doc_products[x].lineNo = x;
-        self.apiTableProducts.rows.add(i.doc_products);
+    if (!IsNull(doc_data.doc_products) && doc_data.doc_products.length > 0) {
+        for (x = 0; x < doc_data.doc_products.length; x++)
+            doc_data.doc_products[x].lineNo = x;
+        self.apiTableProducts.rows.add(doc_data.doc_products);
     }
     self.apiTableProducts.columns.adjust().draw();
 
     //установим документ в правильное состояние RW
-    var readOnly = this.setRW(i.doc_status);
+    var readOnly = this.setRW(doc_data.doc_status);
 
     var oBtns = {};
 
     if (!readOnly) {
         oBtns["Удалить"] = function () {
             Ask("Документ будет удален. Продолжить?", "Удалить документ", "Отмена", function () {
-                self.deleteDoc(i.docId);
+                self.deleteDoc(doc_data.docId);
             }, null, "#dialog-confirm");
         }
     }
@@ -446,13 +446,13 @@ RbDoc.prototype.showDocForm = function (i) {
     if (!IsNull(self.printList) && self.printList.length > 0) {
         for (x = 0; x < self.printList.length; x++) {
             oBtns[self.printList[x].title] = function (event) {
-                self.showPrintView($(event.target).text(), i.docId);
+                self.showPrintView($(event.target).text(), doc_data.docId);
             };
         }
     }
 
     oBtns["Сохранить"] = function () {
-        self.saveDoc(i.docId);
+        self.saveDoc(doc_data.docId);
     };
 
     oBtns["Отмена"] = function () {

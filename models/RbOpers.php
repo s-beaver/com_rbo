@@ -18,6 +18,7 @@ class RbOpers extends RbObject
         $this->flds ["oper_type"] = array("type" => "string");
         $this->flds ["oper_date"] = array("type" => "date");
         $this->flds ["custId"] = array("type" => "numeric");
+        $this->flds ["docId"] = array("type" => "numeric");
         $this->flds ["oper_firm"] = array("type" => "string");
         $this->flds ["productId"] = array("type" => "numeric");
         $this->flds ["product_code"] = array("type" => "string");
