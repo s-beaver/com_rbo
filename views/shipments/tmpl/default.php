@@ -30,6 +30,6 @@
 
   <table id="TableDoc" class="display compact"></table>
 
-  <!--div class="toolbar">!RbO!</div-->
+  <div class="version"><?php echo RbHelper::getVersion()?></div>
 </body>
 </html>

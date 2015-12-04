@@ -99,12 +99,17 @@ RbOper.prototype.attachOperModule = function () {
         $("div.oper_totals").html("Продажа=" + self.saleTotal + " Закуп=" + self.purchTotal + " Затраты=" + self.expTotals);
     });
 
-    $("div.oper_filter").html('&nbsp;Укажите дату:&nbsp;<input type="text" id="oper_filter_date">');
+    //добавляем фильтры и их обработчики
+    $("div.oper_filter").html('&nbsp;Укажите дату:&nbsp;<input type="text" id="oper_filter_date">&nbsp;Укажите тип:&nbsp;<select id="oper_filter_type"></select>');
     $("#oper_filter_date").datepicker({
         showButtonPanel: true,
         dateFormat: "dd.mm.yy"
     }).change(function (event) {
-        self.oTableAPI.ajax.url(comPath + "ajax.php?task=get_oper_list&date_filter=" + $(this).val()).load();
+        self.oTableAPI.ajax.url(comPath + "ajax.php?task=get_oper_list&date_filter=" + $("#oper_filter_date").val()+"&type_filter=" + $("#oper_filter_type").val()).load();
+    });
+    refillSelect("oper_filter_type", getOperTypeList(), true);
+    $("#oper_filter_type").change(function (event) {
+        self.oTableAPI.ajax.url(comPath + "ajax.php?task=get_oper_list&date_filter=" + $("#oper_filter_date").val()+"&type_filter=" + $("#oper_filter_type").val()).load();
     });
 
     $("#header_doclist_choose_list h2").html("Операции");
@@ -392,8 +397,8 @@ RbOper.prototype.calcTotals = function () {
 $(document).ready(function () {
 
     oper = new RbOper({
-        checkFields: ["prod_search_off_btn","\\.oper_date", "\\.oper_type", "\\.oper_firm", "\\.oper_manager","\\.oper_sum", "\\.oper_rem",
-            "prod_search","prod_search_btn","\\.cedit",
+        checkFields: ["prod_search_off_btn", "\\.oper_date", "\\.oper_type", "\\.oper_firm", "\\.oper_manager", "\\.oper_sum", "\\.oper_rem",
+            "prod_search", "prod_search_btn", "\\.cedit",
             "\\.product_name", "\\.product_price", "\\.product_cnt"],
         tips: $(".validateTips")
     });

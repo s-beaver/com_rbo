@@ -113,6 +113,7 @@ class RbOpers extends RbObject
             $sSearch = $aSearch["value"];
         }
         $sDateFilter = $input->getString('date_filter', "");
+        $sTypeFilter = $input->getString('type_filter', "");
 
         $query = $db->getQuery(true);
 
@@ -127,10 +128,14 @@ class RbOpers extends RbObject
             $db->quoteName('rc.custId') . ')');
 
         $query->where("so.oper_date>0");
-        $where = array();
         if (isset($sDateFilter) && $sDateFilter != "") {
-            $where[] = "DATE_FORMAT(so.oper_date,'%d.%m.%Y')='$sDateFilter'";
-        } elseif (!empty ($sSearch)) {
+            $query->where("DATE_FORMAT(so.oper_date,'%d.%m.%Y')='$sDateFilter'");
+        }
+        if (isset($sTypeFilter) && $sTypeFilter != "") {
+            $query->where("so.oper_type='$sTypeFilter'");
+        }
+        $where = array();
+        if (!empty ($sSearch)) {
             $searchAr = preg_split("/[\s,]+/", $sSearch);// split the phrase by any number of commas or space characters
             foreach ($searchAr as $v) {
                 $where[] = "LOWER(so.product_name) LIKE '%" . strtolower($v) . "%'";
@@ -139,7 +144,7 @@ class RbOpers extends RbObject
         }
         if (count($where) > 0) {
             $cond = implode(" OR ", $where);
-            $query->where("(".$cond.")");
+            $query->where("(" . $cond . ")");
         }
 
         if (isset ($iDisplayStart) && $iDisplayLength != '-1') {

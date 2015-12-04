@@ -105,6 +105,14 @@ function setFormData(formName, objPrefix, o) {
 }
 
 //===================================================================================
+/**
+ * Заполнение тэга select из массива или объекта
+ * @param selectId - id тэга select
+ * @param o - массив или объект. Если передается массив, то value совпадает с названием элемента,
+ * если же передается объект, то value берется из названия свойства объекта
+ * @param bAddEmptyLine - добавляется или нет пустой элемент сверху списка
+ * @return null
+ */
 function refillSelect(selectId, o, bAddEmptyLine) {
     bAddEmptyLine = NullTo(bAddEmptyLine, false);
     $('#' + selectId + ' option').remove();
