@@ -72,8 +72,10 @@ RbOper.prototype.attachOperModule = function () {
             "data": "oper_sum"
         }, {
             "title": "Товар/услуга",
-            "className": "left",
             "data": "product_name"
+        }, {
+            "title": "Прим.",
+            "data": "oper_rem"
         }, {
             "title": "Фирма",
             "className": "center",

@@ -103,15 +103,15 @@ class RbOpers extends RbObject
         $db = JFactory::getDBO();
 
         $input = JFactory::getApplication()->input;
-        $iDisplayStart = $input->getInt('start',-1);
-        $iDisplayLength = $input->getInt('length',-1);
-        $iDraw = $input->getString('draw',1);
+        $iDisplayStart = $input->getInt('start', -1);
+        $iDisplayLength = $input->getInt('length', -1);
+        $iDraw = $input->getString('draw', 1);
         $aSearch = $input->get("search", null, "array");
         $sSearch = null;
         if (!is_null($aSearch)) {
             $sSearch = $aSearch["value"];
         }
-        $sDateFilter = $input->getString('date_filter',"");
+        $sDateFilter = $input->getString('date_filter', "");
 
         $query = $db->getQuery(true);
 
@@ -125,17 +125,21 @@ class RbOpers extends RbObject
             $db->quoteName('rbo_cust', 'rc') . ' ON (' . $db->quoteName('so.custId') . ' = ' .
             $db->quoteName('rc.custId') . ')');
 
+        $query->where("so.oper_date>0");
         $where = array();
-        $where[] = "so.oper_date>0";
         if (isset($sDateFilter) && $sDateFilter != "") {
             $where[] = "DATE_FORMAT(so.oper_date,'%d.%m.%Y')='$sDateFilter'";
         } elseif (!empty ($sSearch)) {
             $searchAr = preg_split("/[\s,]+/", $sSearch);// split the phrase by any number of commas or space characters
             foreach ($searchAr as $v) {
                 $where[] = "LOWER(so.product_name) LIKE '%" . strtolower($v) . "%'";
+                $where[] = "LOWER(so.oper_rem) LIKE '%" . strtolower($v) . "%'";
             }
         }
-        if (count($where)>0) $query->where($where);
+        if (count($where) > 0) {
+            $cond = implode(" OR ", $where);
+            $query->where("(".$cond.")");
+        }
 
         if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
             $db->setQuery($query, intval($iDisplayStart), intval($iDisplayLength));//$query->setQuery instead in joomla 3
@@ -151,7 +155,7 @@ class RbOpers extends RbObject
         $query->clear();
         $query->select('count(*)');
         $query->from($db->quoteName($this->table_name, 'so'));
-        if (count($where)>0) $query->where($where);
+        if (count($where) > 0) $query->where($where);
         $db->setQuery($query);
         $iRecordsTotal = $db->loadResult();
         $iRecordsFiltered = $iRecordsTotal;
