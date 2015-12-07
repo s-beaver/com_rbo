@@ -414,7 +414,7 @@ RbDoc.prototype.showDocForm = function (doc_data) {
 
     //установим фирму
     if (!IsNull(doc_data.doc_firm))
-        $("#" + self.docFormPrefix + "\\.doc_firm option:contains('" + doc_data.doc_firm.toUpperCase() + "')").prop("selected", "selected");
+        $("#" + self.docFormPrefix + "\\.doc_firm option:contains('" + doc_data.doc_firm + "')").prop("selected", "selected");
     $("#" + self.docFormPrefix + "\\.doc_rem").val(doc_data.doc_rem);
 
     //заполним список товаров/услуг
