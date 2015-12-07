@@ -40,49 +40,43 @@ switch ($cmd) {
     // ==================================== doc ==========================
     case "get_doc_list" : {
         $docList = new RbDocs ();
-        $docList->getDocList();
-        echo $docList->getResponse();
+        $docList->getDocList(true);
         break;
     }
 
     case "doc_read" : {
         $doc = new RbDocs ();
-        $doc->readObject();
-        echo $doc->getResponse();
+        $doc->readObject(true);
         break;
     }
 
     case "doc_create" : {
         $doc = new RbDocs ();
-        $doc->createObject();
-        echo $doc->getResponse();
+        $doc->createObject(true);
         break;
     }
 
     case "doc_update" : {
         $doc = new RbDocs ();
-        $doc->updateObject();
-        echo $doc->getResponse();
+        $doc->updateObject(true);
         break;
     }
 
     case "doc_delete" : {
         $doc = new RbDocs ();
-        $doc->deleteObject();
-        echo $doc->getResponse();
+        $doc->deleteObject(true);
         break;
     }
 
     case "doc_copy" : {
         $doc = new RbDocs ();
-        $doc->copyDocTo();
-        echo $doc->getResponse();
+        $doc->copyDocTo(true);
         break;
     }
 
     case "get_doc_num" : {
         $doc = new RbDocs ();
-        $doc->getNextDocNumber();
+        $doc->getNextDocNumber(true);
         break;
     }
 

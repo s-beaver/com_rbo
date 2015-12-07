@@ -232,7 +232,14 @@ RbDoc.prototype.readDoc = function (docId) {
         },
         url: comPath + "ajax.php?task=doc_read",
         success: function (doc_data) {
-            self.showDocForm(doc_data);
+            if (doc_data.errorCode > 0) {
+                Msg(doc_data.errorMsg, "Ок", null, "#dialog-confirm", "Ошибка");
+            } else {
+                self.showDocForm(doc_data);
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert("Статус: " + textStatus + " Ошибка: " + errorThrown)
         }
     });
 };
@@ -282,11 +289,11 @@ RbDoc.prototype.saveDoc = function (docId) {
         data: oData,
         url: comPath + "ajax.php?task=" + taskCmd,
         success: function (doc_data) {
-            if (doc_data.docId > 0) {
+            if (doc_data.errorCode) {
+                Msg(doc_data.errorMsg, "Ок", null, "#dialog-confirm", "Ошибка");
+            } else {
                 self.oFormDlg.dialog("close");
                 self.oTableAPI.draw();
-            } else {
-                Msg(doc_data.error, "Ок", null, "#dialog-confirm", "Ошибка");
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -323,10 +330,10 @@ RbDoc.prototype.copyDoc = function (docId) {
             },
             url: comPath + "ajax.php?task=doc_copy",
             success: function (doc_data) {
-                if (doc_data.docId > 0) {
-                    self.oTableAPI.draw();
+                if (doc_data.errorCode > 0) {
+                    Msg(doc_data.errorMsg, "Ок", null, "#dialog-confirm", "Ошибка");
                 } else {
-                    Msg(doc_data.error, "Ок", null, "#dialog-confirm", "Ошибка");
+                    self.oTableAPI.draw();
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -341,23 +348,6 @@ RbDoc.prototype.copyDoc = function (docId) {
 // ===================================================================================
 RbDoc.prototype.createDoc = function () {
     this.showDocForm({});
-    /*    var self = this;
-     $.ajax({
-     dataType: 'json',
-     type: "POST",
-     data: {
-     "rbo_docs": {
-     "doc_type": self.sDocType
-     }
-     },
-     url: comPath + "ajax.php?task=get_doc_num",
-     success: function (p) {
-     var i = {};
-     i.doc_num = p.new_num;
-     i.doc_date = p.new_date;
-     self.showDocForm(i);
-     }
-     });*/
 };
 
 // ===================================================================================
@@ -374,7 +364,14 @@ RbDoc.prototype.deleteDoc = function (docId) {
         },
         url: comPath + "ajax.php?task=doc_delete",
         success: function (doc_data) {
-            self.oTableAPI.draw();
+            if (doc_data.errorCode > 0) {
+                Msg(doc_data.errorMsg, "Ок", null, "#dialog-confirm", "Ошибка");
+            } else {
+                self.oTableAPI.draw();
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert("Статус: " + textStatus + " Ошибка: " + errorThrown)
         }
     });
 
@@ -552,7 +549,7 @@ extendObject(RbDocSale, RbDoc);
 //===================================================================================
 
 // ===================================================================================
-RbDocSale.prototype.readDoc = function (docId) {//удалить? дублирует RbDoc?
+RbDocSale.prototype.readDoc = function (docId) {//todo удалить? дублирует RbDoc?
     var self = this;
     $.ajax({
         dataType: 'json',
@@ -565,13 +562,21 @@ RbDocSale.prototype.readDoc = function (docId) {//удалить? дублиру
         },
         url: comPath + "ajax.php?task=doc_read",
         success: function (doc_data) {
-            self.showDocForm(doc_data);
+            if (doc_data.errorCode > 0) {
+                Msg(doc_data.errorMsg, "Ок", null, "#dialog-confirm", "Ошибка");
+            } else {
+                self.showDocForm(doc_data);
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert("Статус: " + textStatus + " Ошибка: " + errorThrown)
         }
+
     });
 };
 
 // ===================================================================================
-RbDocSale.prototype.createDoc = function () {//удалить? дублирует RbDoc?
+RbDocSale.prototype.createDoc = function () {//todo удалить? дублирует RbDoc?
     var self = this;
     $.ajax({
         dataType: 'json',

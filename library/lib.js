@@ -210,6 +210,7 @@ function Ask(sText, okText, cancelText, fnOk, fnCancel, sElemSelector) {
 // ===================================================================================
 function Msg(sText, okText, fnOk, sElemSelector, sTitle) {
     sTitle = NullTo(sTitle, "");
+    sText = NullTo(sText, "");
     $(sElemSelector).html(sText);
     var bOk = {};
     bOk[okText] = function (arg) {
