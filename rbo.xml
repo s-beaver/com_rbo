@@ -26,7 +26,6 @@
 
 	<files folder="site">
 		<folder>css</folder>
-		<folder>db</folder>
 		<folder>images</folder>
 		<folder>language</folder>
 		<folder>library</folder>
