@@ -2,11 +2,12 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/library/DataTables-1.10.9" />
+      <excludeFolder url="file://$MODULE_DIR$/library/jquery-ui-1.11.4.custom" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="jQuery" level="project" />
-    <orderEntry type="library" name="Datatables" level="project" />
     <orderEntry type="module-library">
       <library name="PHP">
         <CLASSES>
@@ -18,5 +19,19 @@
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../libraries3/joomla" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../libraries3/joomla" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="DataTables-1.10" level="project" />
+    <orderEntry type="library" name="jquery-ui-1.11.4" level="project" />
+    <orderEntry type="library" name="joomla" level="project" />
   </component>
 </module>

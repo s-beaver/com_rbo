@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="old.robik.ru" deleteMissingItems="true" uploadOnCheckin="5e9b42f2-de3a-433d-becf-ef3c183859c7" exclude=".svn;.cvs;.idea;.DS_Store;.git;.hg;*.cmd">
+  <component name="PublishConfigData" autoUpload="Always" serverName="old.robik.ru" deleteMissingItems="true" uploadOnCheckin="5e9b42f2-de3a-433d-becf-ef3c183859c7" exclude=".svn;.cvs;.idea;.DS_Store;.git;.hg;*.cmd">
     <serverData>
       <paths name="old.robik.ru">
         <serverdata>
@@ -18,5 +18,6 @@
       </paths>
     </serverData>
     <option name="myUploadOnCheckinName" value="old.robik.ru" />
+    <option name="myAutoUpload" value="ALWAYS" />
   </component>
 </project>

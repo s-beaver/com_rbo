@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="joomla">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../libraries3/joomla" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../libraries3/joomla" />
+    </SOURCES>
+  </library>
+</component>
