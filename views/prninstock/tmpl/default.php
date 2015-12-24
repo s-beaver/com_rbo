@@ -2,11 +2,7 @@
 
 <html>
 <head>
-    <link rel="stylesheet" href="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.css"/>
-
-    <script src="libraries/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script>
-    <script src="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
-
+    <?php include RBO_PATH . '/views/header.head.links.php' ?>
     <script src="<?php echo JRBO_PATH ?>/library/lib.js"></script>
     <script src="<?php echo JRBO_PATH ?>/models/js/PrnInStock.js"></script>
 

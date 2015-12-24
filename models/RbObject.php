@@ -6,6 +6,7 @@ class RbObject
     public $is_multiple = false; // читать одну запись или несколько по идентификатору
     public $response = ""; // подготовленный ответ для отправки в ответ на ajax запрос
     public $table_name = ""; // наименование таблицы БД в которой хранится объект, по совместительству - название переменной для передачи данных через input буфер
+    public $buffer_root_name = ""; // устанавливается автоматически по наименованию таблицы БД, но без префиксов и суффиксов
     public $flds = array(); // ассоциативный массив, где ключ - название поле таблицы БД, а значение - тип поля из списка: numeric, string, datetime
     // public $flds = array (); // ассоциативный массив системных полей таблицы
     public $buffer; // Значения для загрузки в таблицу. Ассоциативный массив, или массив ассоциативных массивов. Результат загрузки значений из таблицы. Ассоциативный массив, или массив ассоциативных массивов
@@ -21,14 +22,15 @@ class RbObject
     // =================================================================
     public function setTableName($table_name)
     {
-        $this->table_name = RbConfig::$prefixForDBTables . $table_name . RbConfig::$suffixForDBTables;
+        $this->buffer_root_name = $table_name;
+        $this->table_name = RbHelper::getTableName($table_name);
     }
 
     // =================================================================
     public function getInputBuffer()
     { // должно приходить в виде массива
         $input = JFactory::getApplication()->input;
-        $inp_str = $input->get($this->table_name, null, null); // Читаем то, что записано в буфере. Формат буфера - одно поле, совпадающее с именем таблицы в БД
+        $inp_str = $input->get($this->buffer_root_name, null, null); // Читаем то, что записано в буфере. Формат буфера - одно поле, совпадающее с именем таблицы в БД
         $this->buffer = ( object )$inp_str; // не всегда ведь?
     }
 

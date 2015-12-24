@@ -123,8 +123,10 @@ class RbOpers extends RbObject
         $query->select($select);
         $query->from($db->quoteName($this->table_name, 'so'));
         $query->order($db->quoteName('so.oper_date') . " DESC");
+
+        $rboCustTableName = RbHelper::getTableName("rbo_cust");
         $query->leftJoin(
-            $db->quoteName('rbo_cust', 'rc') . ' ON (' . $db->quoteName('so.custId') . ' = ' .
+            $db->quoteName($rboCustTableName, 'rc') . ' ON (' . $db->quoteName('so.custId') . ' = ' .
             $db->quoteName('rc.custId') . ')');
 
         $query->where("so.oper_date>0");

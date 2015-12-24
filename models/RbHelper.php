@@ -57,5 +57,16 @@ class RbHelper
     {
         return file_get_contents(RBO_PATH.'/.version');
     }
+
+    // =================================================================
+    static function getTableName($table_name)
+    {
+        if (RbConfig::$useJoomlaPrefixForDBTables) {
+            $jConfig = new JConfig();
+            return $jConfig->dbprefix . $table_name . RbConfig::$suffixForDBTables;
+        } else
+            return RbConfig::$prefixForDBTables . $table_name . RbConfig::$suffixForDBTables;
+    }
+
 }
 

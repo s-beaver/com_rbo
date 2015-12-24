@@ -58,7 +58,7 @@ class RbCust extends RbObject {
     
     $query->clear ();
     $query->select ("custId, cust_name, cust_fullname, cust_email, cust_data, cust_phone");
-    $query->from ("rbo_cust");
+    $query->from ($this->table_name);
     $query->where ("cust_name LIKE '%" . $searchSubstr . "%'", "OR");
     // $query->where ("cust_data LIKE '%" . $searchSubstr . "%'", "OR");пока не хотим искать по данным
     

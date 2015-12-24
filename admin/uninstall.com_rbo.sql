@@ -6,3 +6,6 @@
 -- DROP TABLE IF EXISTS #__rbo_opers;
 -- DROP TABLE IF EXISTS #__rbo_operstype;
 -- DROP TABLE IF EXISTS #__rbo_products;
+-- DROP TRIGGER IF EXISTS #__rbo_changeInStockDelete;
+-- DROP TRIGGER IF EXISTS #__rbo_changeInStockInsert;
+-- DROP TRIGGER IF EXISTS #__rbo_changeInStockUpdate;

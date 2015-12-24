@@ -2,13 +2,7 @@
 
 <html>
 <head>
-    <link rel="stylesheet" href="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.css"/>
-    <!--id="theme"-->
-    <link rel="stylesheet" href="libraries/DataTables-1.10.9/media/css/jquery.dataTables_themeroller.css"/>
-
-    <script src="libraries/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script>
-    <script src="libraries/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
-    <script src="libraries/DataTables-1.10.9/media/js/jquery.dataTables.min.js"></script>
+    <?php include RBO_PATH . '/views/header.head.links.php' ?>
     <link rel="stylesheet" href="<?php echo JRBO_PATH ?>/css/rbo.css"/>
     <style>
         h2 {

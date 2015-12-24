@@ -152,3 +152,99 @@ AUTO_INCREMENT = 1
 AVG_ROW_LENGTH = 687
 CHARACTER SET utf8
 COLLATE utf8_general_ci;
+
+DELIMITER $$
+
+CREATE
+TRIGGER #__rbo_changeInStockDelete
+AFTER DELETE
+ON #__rbo_opers
+FOR EACH ROW
+  BEGIN
+    SET @signMoveVar := (SELECT signMove FROM #__rbo_operstype WHERE operRName = OLD.oper_type);
+    SET @signCashVar := (SELECT signCash FROM #__rbo_operstype WHERE operRName = OLD.oper_type);
+    SET @_balanceCash := ifnull((SELECT balance FROM #__rbo_cash WHERE name = OLD.oper_firm),"null");
+    SET @_balanceMove := ifnull((SELECT product_in_stock FROM #__rbo_products WHERE productId = OLD.productId),"null");
+
+    -- INSERT log SET event_time = now(), event_user = 'trigger', event_type = 'debug_trigger', event_descr = concat(OLD.oper_firm,'=',@_balanceCash,';',OLD.productId,'=',@_balanceMove);
+
+    UPDATE #__rbo_products SET product_in_stock = ifnull(product_in_stock,0) - @signMoveVar * ifnull(OLD.product_cnt, 0) * ifnull(product_type, 0) WHERE productId = OLD.productId;
+    UPDATE #__rbo_cash     SET balance =          ifnull(balance,0)          - @signCashVar * ifnull(OLD.oper_sum, 0)    WHERE name = OLD.oper_firm;
+
+    SET @_balanceCash := ifnull((SELECT balance FROM #__rbo_cash WHERE name = OLD.oper_firm),"null");
+    SET @_balanceMove := ifnull((SELECT product_in_stock FROM #__rbo_products WHERE productId = OLD.productId),"null");
+
+    -- INSERT log SET event_time = now(), event_user = 'trigger', event_type = 'debug_trigger', event_descr = concat('OLD.oper_sum=', OLD.oper_sum * @signCashVar, '; OLD.oper_type=', OLD.oper_type, '; operId=', OLD.operId);
+    -- INSERT log SET event_time = now(), event_user = 'trigger', event_type = 'debug_trigger', event_descr = concat(OLD.oper_firm,'=',@_balanceCash,';',OLD.productId,'=',@_balanceMove);
+  END
+$$
+
+CREATE
+TRIGGER #__rbo_changeInStockInsert
+AFTER INSERT
+ON #__rbo_opers
+FOR EACH ROW
+  BEGIN
+
+    SET @signMoveVar := (SELECT signMove FROM #__rbo_operstype WHERE operRName = NEW.oper_type);
+    SET @signCashVar := (SELECT signCash FROM #__rbo_operstype WHERE operRName = NEW.oper_type);
+    SET @_balanceCash := ifnull((SELECT balance FROM #__rbo_cash WHERE name = NEW.oper_firm),"null");
+    SET @_balanceMove := ifnull((SELECT product_in_stock FROM #__rbo_products WHERE productId = NEW.productId),"null");
+
+    -- INSERT log SET event_time = now(), event_user = 'trigger', event_type = 'debug_trigger', event_descr = concat(NEW.oper_firm,'=',@_balanceCash,';',NEW.productId,'=',@_balanceMove);
+
+    UPDATE #__rbo_products SET product_in_stock = ifnull(product_in_stock,0) + @signMoveVar * ifnull(NEW.product_cnt, 0) * ifnull(product_type, 0) WHERE productId = NEW.productId;
+    UPDATE #__rbo_cash     SET balance =          ifnull(balance,0)          + @signCashVar * ifnull(NEW.oper_sum, 0)    WHERE name = NEW.oper_firm;
+
+    SET @_balanceCash := ifnull((SELECT balance FROM #__rbo_cash WHERE name = NEW.oper_firm),"null");
+    SET @_balanceMove := ifnull((SELECT product_in_stock FROM #__rbo_products WHERE productId = NEW.productId),"null");
+
+    -- INSERT log SET event_time = now(), event_user = 'trigger', event_type = 'debug_trigger', event_descr = concat('NEW.oper_sum=', NEW.oper_sum * @signCashVar, '; NEW.oper_type=', NEW.oper_type, '; operId=', NEW.operId);
+    -- INSERT log SET event_time = now(), event_user = 'trigger', event_type = 'debug_trigger', event_descr = concat(NEW.oper_firm,'=',@_balanceCash,';',NEW.productId,'=',@_balanceMove);
+
+
+  END
+$$
+
+CREATE
+TRIGGER #__rbo_changeInStockUpdate
+AFTER UPDATE
+ON #__rbo_opers
+FOR EACH ROW
+  BEGIN
+
+    SET @signMoveVar := (SELECT signMove FROM #__rbo_operstype WHERE operRName = OLD.oper_type);
+    SET @signCashVar := (SELECT signCash FROM #__rbo_operstype WHERE operRName = OLD.oper_type);
+    SET @_balanceCash := ifnull((SELECT balance FROM #__rbo_cash WHERE name = OLD.oper_firm),"null");
+    SET @_balanceMove := ifnull((SELECT product_in_stock FROM #__rbo_products WHERE productId = OLD.productId),"null");
+
+    -- INSERT log SET event_time = now(), event_user = 'trigger', event_type = 'debug_trigger', event_descr = concat(OLD.oper_firm,'=',@_balanceCash,';',OLD.productId,'=',@_balanceMove);
+
+    UPDATE #__rbo_products SET product_in_stock = ifnull(product_in_stock,0) - @signMoveVar * ifnull(OLD.product_cnt, 0) * ifnull(product_type, 0) WHERE productId = OLD.productId;
+    UPDATE #__rbo_cash     SET balance =          ifnull(balance,0)          - @signCashVar * ifnull(OLD.oper_sum, 0)    WHERE name = OLD.oper_firm;
+
+    SET @_balanceCash := ifnull((SELECT balance FROM #__rbo_cash WHERE name = OLD.oper_firm),"null");
+    SET @_balanceMove := ifnull((SELECT product_in_stock FROM #__rbo_products WHERE productId = OLD.productId),"null");
+
+    -- INSERT log SET event_time = now(), event_user = 'trigger', event_type = 'debug_trigger', event_descr = concat('OLD.oper_sum=', OLD.oper_sum * @signCashVar, '; OLD.oper_type=', OLD.oper_type, '; operId=', OLD.operId);
+    -- INSERT log SET event_time = now(), event_user = 'trigger', event_type = 'debug_trigger', event_descr = concat(OLD.oper_firm,'=',@_balanceCash,';',OLD.productId,'=',@_balanceMove);
+
+    SET @signMoveVar := (SELECT signMove FROM #__rbo_operstype WHERE operRName = NEW.oper_type);
+    SET @signCashVar := (SELECT signCash FROM #__rbo_operstype WHERE operRName = NEW.oper_type);
+    SET @_balanceCash := ifnull((SELECT balance FROM #__rbo_cash WHERE name = NEW.oper_firm),"null");
+    SET @_balanceMove := ifnull((SELECT product_in_stock FROM #__rbo_products WHERE productId = NEW.productId),"null");
+
+    -- INSERT log SET event_time = now(), event_user = 'trigger', event_type = 'debug_trigger', event_descr = concat(NEW.oper_firm,'=',@_balanceCash,';',NEW.productId,'=',@_balanceMove);
+
+    UPDATE #__rbo_products SET product_in_stock = ifnull(product_in_stock,0) + @signMoveVar * ifnull(NEW.product_cnt, 0) * ifnull(product_type, 0) WHERE productId = NEW.productId;
+    UPDATE #__rbo_cash     SET balance =          ifnull(balance,0)          + @signCashVar * ifnull(NEW.oper_sum, 0)    WHERE name = NEW.oper_firm;
+
+    SET @_balanceCash := ifnull((SELECT balance FROM #__rbo_cash WHERE name = NEW.oper_firm),"null");
+    SET @_balanceMove := ifnull((SELECT product_in_stock FROM #__rbo_products WHERE productId = NEW.productId),"null");
+
+    -- INSERT log SET event_time = now(), event_user = 'trigger', event_type = 'debug_trigger', event_descr = concat('NEW.oper_sum=', NEW.oper_sum * @signCashVar, '; NEW.oper_type=', NEW.oper_type, '; operId=', NEW.operId);
+    -- INSERT log SET event_time = now(), event_user = 'trigger', event_type = 'debug_trigger', event_descr = concat(NEW.oper_firm,'=',@_balanceCash,';',NEW.productId,'=',@_balanceMove);
+  END
+$$
+
+DELIMITER ;

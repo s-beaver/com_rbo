@@ -334,8 +334,10 @@ class RbDocs extends RbObject
         if (isset ($sSearch) && $sSearch != "") {
             $sWhere .= " AND rc.cust_name LIKE '%" . $sSearch . "%'";
         }
+
+        $rboCustTableName = RbHelper::getTableName("rbo_cust");
         $sSelect = "SELECT docId, doc_num, doc_date, rc.cust_name doc_cust, doc_sum, doc_status, doc_firm, doc_manager ";
-        $sRestOfQuery = " FROM rbo_docs rd LEFT JOIN rbo_cust rc ON rd.custId = rc.custId " .
+        $sRestOfQuery = " FROM ".$this->table_name." rd LEFT JOIN ".$rboCustTableName." rc ON rd.custId = rc.custId " .
             $sWhere . " ORDER BY rd.docId DESC";
 
         if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
@@ -346,11 +348,11 @@ class RbDocs extends RbObject
 
         $data_rows_assoc_list = $db->loadAssocList();
 
-        $db->setQuery('SELECT count(*) FROM rbo_docs rd ' . $sWhere);
+        $db->setQuery('SELECT count(*) FROM '.$this->table_name.' rd ' . $sWhere);
         $iRecordsTotal = $db->loadResult();
 
         $db->setQuery("SELECT doc_base, docId, doc_num, doc_date, doc_type " .
-            "FROM rbo_docs WHERE doc_base IN (SELECT docId " . $sRestOfQuery . ") AND doc_status!='удален'");
+            "FROM ".$this->table_name." WHERE doc_base IN (SELECT docId " . $sRestOfQuery . ") AND doc_status!='удален'");
         $baseDocs = $db->loadAssocList();
 
         foreach ($data_rows_assoc_list as &$v) {
@@ -387,7 +389,7 @@ class RbDocs extends RbObject
             $db = JFactory::getDBO();
             $query = $db->getQuery(true);
             $query->select("MAX(doc_num)");
-            $query->from("rbo_docs");
+            $query->from($this->table_name);
             if (!RbConfig::$continuousNumbering) {
                 $query->where("doc_type='" . $this->buffer->doc_type . "'");
             }
@@ -420,7 +422,7 @@ class RbDocs extends RbObject
             $db = JFactory::getDBO();
             $query = $db->getQuery(true);
             $query->select("docId");
-            $query->from("rbo_docs");
+            $query->from($this->table_name);
             $query->where("doc_type='" . $this->buffer->doc_type . "'");//здесь не нужно проверять $continuousNumbering
             $query->where("DATE_FORMAT(doc_date,'%Y')=$year");
             $query->where("doc_num=$docNum");
