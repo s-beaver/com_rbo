@@ -18,6 +18,7 @@ require_once "models/RbProducts.php";
 require_once "models/RbDocsProducts.php";
 require_once "models/RbCust.php";
 require_once "models/RbOpers.php";
+require_once "models/RbFirms.php";
 JLog::addLogger(array('text_file' => 'com_rbo.php'), JLog::ALL, array('com_rbo'));
 
 $app = JFactory::getApplication('site');
@@ -190,6 +191,13 @@ switch ($cmd) {
     // ==================================== customer ==========================
     case   "report_in_stock": {
         RbProducts::getProductInStock();
+        break;
+    }
+
+    // ==================================== firms ==========================
+    case   "get_firm_list": {
+        $frm = new RbFirms();
+        $frm->getFirmList();
         break;
     }
 

@@ -2,13 +2,12 @@
 require_once 'configuration.php';
 
 class RbObject
-{
+{//todo добавить getters и setters
     public $is_multiple = false; // читать одну запись или несколько по идентификатору
     public $response = ""; // подготовленный ответ для отправки в ответ на ajax запрос
     public $table_name = ""; // наименование таблицы БД в которой хранится объект, по совместительству - название переменной для передачи данных через input буфер
     public $buffer_root_name = ""; // устанавливается автоматически по наименованию таблицы БД, но без префиксов и суффиксов
     public $flds = array(); // ассоциативный массив, где ключ - название поле таблицы БД, а значение - тип поля из списка: numeric, string, datetime
-    // public $flds = array (); // ассоциативный массив системных полей таблицы
     public $buffer; // Значения для загрузки в таблицу. Ассоциативный массив, или массив ассоциативных массивов. Результат загрузки значений из таблицы. Ассоциативный массив, или массив ассоциативных массивов
     public $keyValue = 0; // если $is_multiple, то отсюда берется значение ключа для связи с родительской таблицей. Название ключа выбирается из flds
     public $insertid;
@@ -41,7 +40,7 @@ class RbObject
     }
 
     // =================================================================
-    public function getFieldsForSelectClause($prefix)
+    public function getFieldsForSelectClause()
     {
         if (!isset ($prefix)) $prefix = '';
         else $prefix = $prefix . '.';
@@ -73,25 +72,6 @@ class RbObject
         foreach ($this->flds as $fldname => $fldvalue) {
             if ($fldvalue ["is_key"]) return "$fldname=" . $this->keyValue;
         }
-    }
-
-    // =================================================================
-    public function getWhereClause_deprecated()
-    {
-        if ($this->is_multiple) {
-            foreach ($this->flds as $fldname => $fldvalue) {
-                if ($fldvalue ["is_key"]) return "$fldname=" . $this->keyValue;
-            }
-        } else {
-            $buffer = ( object )$this->buffer;
-            $buffProp = get_object_vars($buffer);
-            foreach ($buffProp as $key => $value) {
-                if ($this->flds [$key] ["is_key"]) return "$key=$value";
-            }
-        }
-        JLog::add(get_class() . "->getWhereClause() " . print_r($buffer, true), JLog::ERROR,
-            'com_rbo');
-        throw new Exception ('Не найдено ключевое поле');
     }
 
     // =================================================================

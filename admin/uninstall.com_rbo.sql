@@ -1,4 +1,4 @@
--- DROP TABLE IF EXISTS #__rbo_cash;
+-- DROP TABLE IF EXISTS #__rbo_firms;
 -- DROP TABLE IF EXISTS #__rbo_categories;
 -- DROP TABLE IF EXISTS #__rbo_cust;
 -- DROP TABLE IF EXISTS #__rbo_docs;
