@@ -499,12 +499,11 @@ RbDoc.prototype.showProductForm = function (x) {// x-номер редактир
     if (IsNull(x)) {
         self.editing_lineNo = -1;
         var p = {};
-        self.lines_before_update = 0;
     } else {
         self.editing_lineNo = x;
         var p = self.apiTableProducts.row(x).data();
-        self.lines_before_update = self.apiTableProducts.rows().data().length;
     }
+    self.lines_before_update = self.apiTableProducts.rows().data().length;
 
     self.oProduct.showProductForm({
         pData: p,
