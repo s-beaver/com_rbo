@@ -40,7 +40,7 @@ class RbObject
     }
 
     // =================================================================
-    public function getFieldsForSelectClause()
+    public function getFieldsForSelectClause($prefix)
     {
         if (!isset ($prefix)) $prefix = '';
         else $prefix = $prefix . '.';
