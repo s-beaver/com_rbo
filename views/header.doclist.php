@@ -1,6 +1,6 @@
 <div>
     <div style="float: left" id="header_doclist_adddoc">
-        <a href="" id="doc_add_btn"><img src="components/com_rbo/images/icon-32-new-on.png"/></a>
+        <a href="" id="doc_add_btn"><img src="<?php echo JRBO_PATH ?>/images/icon-32-new-on.png"/></a>
     </div>
 
     <div style="float: right">

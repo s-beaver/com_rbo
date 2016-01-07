@@ -80,7 +80,7 @@ function fillInvoicePrintForm(i) {
   iManOffset.left = 250;
 
   if (!IsNull(i.doc_firm_details))
-    $("#img_stamp").attr("src", "components/com_rbo/images/" + f.f_stamp);
+    $("#img_stamp").attr("src", comPath+"images/" + f.f_stamp);
   $("#img_stamp").offset(iManOffset);
 
 }

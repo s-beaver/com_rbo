@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="component" version="2.5.0" method="upgrade">
-	<name>COM_RBO</name>
-	<creationDate>Февраль 2015</creationDate>
+	<name>Учетная система Robik</name>
+	<creationDate>Январь 2016</creationDate>
 	<author>Сергей Ефремов</author>
 	<authorEmail>s_efremov@mail.ru</authorEmail>
 	<authorUrl>robik.ru</authorUrl>
 	<copyright>(c) Efremov Sergei</copyright>
 	<license>Информация о лицензии</license>
-	<version>0.2.2</version>
-	<description>Учетная система для небольших торговых предприятий</description>
+	<version>2.4</version>
+	<description>Легкая учетная система для небольших предприятий</description>
 
 	<install>
 		<sql><file driver="mysql" charset="utf8">install.com_rbo.sql</file></sql>

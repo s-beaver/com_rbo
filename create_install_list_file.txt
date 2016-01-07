@@ -1,0 +1,4 @@
+.git
+.idea
+create_install*.*
+version_git*.*
