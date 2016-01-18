@@ -1,40 +1,73 @@
 <?php
-defined( '_JEXEC' ) or die( 'Restricted access' );
-jimport('joomla.installer.installer');
-jimport('joomla.installer.helper');
+/**
+ * @package     Joomla.Administrator
+ * @subpackage  com_helloworld
+ *
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
+// No direct access to this file
+defined('_JEXEC') or die('Restricted access');
 
 /**
-* Method to install the component
-*
-* @param mixed $parent The class calling this method
-* @return void
-*/
-function install($parent)
+ * Script file of HelloWorld component
+ */
+class Com_RbOInstallerScript
 {
-    echo JText::_('COM_RBO_INSTALL_SUCCESSFULL');
-}
+    /**
+     * method to install the component
+     *
+     * @return void
+     */
+    function install($parent)
+    {
+        echo 'Проверка_Проверка_Проверка_Проверка_';
+        echo '<p>' . JText::_('COM_RBO_DESCRIPTION') . '</p>';
+    }
 
-/**
-* Method to update the component
-*
-* @param mixed $parent The class calling this method
-* @return void
-*/
-function update($parent)
-{
-    echo JText::_('COM_RBO_INSTALL_SUCCESSFULL');
-}
+    /**
+     * method to uninstall the component
+     *
+     * @return void
+     */
+    function uninstall($parent)
+    {
+        //echo '<p>' . JText::_('COM_HELLOWORLD_UNINSTALL_TEXT') . '</p>';
+    }
 
-/**
-* Method to run before an install/update/uninstall method
-*
-* @param mixed $parent The class calling this method
-* @return void
-*/
-function preflight($type, $parent)
-{
-}
- 
-function postflight($type, $parent)
-{
+    /**
+     * method to update the component
+     *
+     * @return void
+     */
+    function update($parent)
+    {
+        // $parent is the class calling this method
+        //echo '<p>' . JText::sprintf('COM_HELLOWORLD_UPDATE_TEXT', $parent->get('manifest')->version) . '</p>';
+    }
+
+    /**
+     * method to run before an install/update/uninstall method
+     *
+     * @return void
+     */
+    function preflight($type, $parent)
+    {
+        // $parent is the class calling this method
+        // $type is the type of change (install, update or discover_install)
+        //echo '<p>' . JText::_('COM_HELLOWORLD_PREFLIGHT_' . $type . '_TEXT') . '</p>';
+    }
+
+    /**
+     * method to run after an install/update/uninstall method
+     *
+     * @return void
+     */
+    function postflight($type, $parent)
+    {
+        // $parent is the class calling this method
+        // $type is the type of change (install, update or discover_install)
+        //echo '<p>' . JText::_('COM_HELLOWORLD_POSTFLIGHT_' . $type . '_TEXT') . '</p>';
+    }
 }

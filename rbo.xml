@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="component" version="2.5.0" method="upgrade">
-	<name>Учетная система Robik</name>
+	<name>Учетная система Rbo</name>
 	<creationDate>Январь 2016</creationDate>
 	<author>Сергей Ефремов</author>
 	<authorEmail>s_efremov@mail.ru</authorEmail>
@@ -8,7 +8,7 @@
 	<copyright>(c) Efremov Sergei</copyright>
 	<license>Информация о лицензии</license>
 	<version>2.4</version>
-	<description>Легкая учетная система для небольших предприятий</description>
+	<description>Легкая учетная система Robik для небольших предприятий</description>
 
 	<install>
 		<sql><file driver="mysql" charset="utf8">install.com_rbo.sql</file></sql>
@@ -50,6 +50,7 @@
 	<administration>
 		<menu>COM_RBO</menu>
 		<files folder="admin">
+			<folder>language</folder>
 			<filename>index.html</filename>
 			<filename>install.com_rbo.sql</filename>
 			<filename>uninstall.com_rbo.sql</filename>
