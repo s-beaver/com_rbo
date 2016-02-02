@@ -19,6 +19,7 @@ class RbProducts extends RbObject
         $this->flds ["product_price"] = array("type" => "numeric");
         $this->flds ["product_price1"] = array("type" => "numeric");
         $this->flds ["product_type"] = array("type" => "numeric");
+        $this->flds ["price_name"] = array("type" => "string");
 
         $this->getInputBuffer();
         if (!isset ($keyValue)) $this->keyValue = $this->buffer->productId;
@@ -63,6 +64,9 @@ class RbProducts extends RbObject
         $query->clear();
         $query->select($prodRef->getFieldsForSelectClause());
         $query->from($db->quoteName($prodRef->table_name));
+        if (isset(RbConfig::$currentPriceName) && strcmp(RbConfig::$currentPriceName, "") != 0) {
+            $query->where("(price_name='" . RbConfig::$currentPriceName . "' OR product_in_stock>0)", "AND");
+        }
 
         $searchAr = preg_split("/[\s,]+/", $searchSubstr);// split the phrase by any number of commas or space characters
         foreach ($searchAr as $v) {
@@ -104,6 +108,9 @@ class RbProducts extends RbObject
         $query->select($prodRef->getFieldsForSelectClause());
         $query->from($db->quoteName($prodRef->table_name, "rp"));
         $query->order($db->quoteName('rp.productId') . " DESC");
+        if (isset(RbConfig::$currentPriceName) && strcmp(RbConfig::$currentPriceName, "") != 0) {
+            $query->where("(price_name='" . RbConfig::$currentPriceName . "' OR product_in_stock>0)", "AND");
+        }
 
         $where = array();
         if ($sInStockFilter!=-1) {

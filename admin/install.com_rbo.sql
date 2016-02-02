@@ -73,24 +73,6 @@ AVG_ROW_LENGTH = 169
 CHARACTER SET utf8
 COLLATE utf8_general_ci;
 
-CREATE TABLE #__rbo_docs_products (
-  id int(11) NOT NULL AUTO_INCREMENT,
-  docId int(11) DEFAULT NULL,
-  productId int(11) NOT NULL DEFAULT 0,
-  product_code varchar(25) DEFAULT NULL,
-  product_name varchar(255) DEFAULT NULL,
-  product_cnt varchar(255) DEFAULT NULL,
-  product_price float NOT NULL DEFAULT 0,
-  doc_num int(11) DEFAULT NULL,
-  PRIMARY KEY (id),
-  INDEX IDX_rbo_docs_products_docId (docId)
-)
-ENGINE = INNODB
-AUTO_INCREMENT = 1
-AVG_ROW_LENGTH = 149
-CHARACTER SET utf8
-COLLATE utf8_general_ci;
-
 CREATE TABLE #__rbo_opers (
   operId int(11) NOT NULL AUTO_INCREMENT,
   oper_type varchar(20) DEFAULT NULL,
@@ -145,6 +127,7 @@ CREATE TABLE #__rbo_products (
   product_in_stock int(11) DEFAULT NULL,
   product_price1 float DEFAULT NULL,
   product_type int(1) NOT NULL DEFAULT 1 COMMENT 'Если TRUE, то это товар, иначе услуга',
+  price_name varchar(30) DEFAULT NULL,
   PRIMARY KEY (productId)
 )
 ENGINE = INNODB

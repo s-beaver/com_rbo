@@ -35,23 +35,4 @@ class RbDocsProducts extends RbObject
         $this->getInputBuffer();
     }
 
-    // =================================================================
-    public function __constructOld($keyValue)
-    {
-        parent::__construct($keyValue);
-
-        $this->is_multiple = true;
-        $this->setTableName("rbo_docs_products");
-        $this->flds ["docId"] = array("type" => "numeric", "is_key" => true);
-        $this->flds ["productId"] = array("type" => "numeric");
-        $this->flds ["product_code"] = array("type" => "string");
-        $this->flds ["product_name"] = array("type" => "string");
-        $this->flds ["product_cnt"] = array("type" => "numeric");
-        $this->flds ["product_price"] = array("type" => "numeric");
-        $this->flds ["oper_sum"] = array("type" => "numeric");
-        $this->flds ["product_uom"] = array("type" => "string", "read_only" => true,
-            "formula" => "'шт.'");
-
-        $this->getInputBuffer();
-    }
 }

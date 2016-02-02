@@ -28,6 +28,7 @@ class RbConfig
     public static $useJoomlaPrefixForDBTables = true;
     public static $prefixForDBTables = '';
     public static $suffixForDBTables = '';
+    public static $currentPriceName = 'price_retail_160101';
 
     /*Сквозная нумерация для документов: Нумерация прибавляется на 1 с каждым новым документом, независимо от его типа.
     Если же акты/накладные создаются на основании счетов, то они приобретают номера счетов*/

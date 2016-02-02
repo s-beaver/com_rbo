@@ -2,7 +2,6 @@
 -- DROP TABLE IF EXISTS #__rbo_categories;
 -- DROP TABLE IF EXISTS #__rbo_cust;
 -- DROP TABLE IF EXISTS #__rbo_docs;
--- DROP TABLE IF EXISTS #__rbo_docs_products;
 -- DROP TABLE IF EXISTS #__rbo_opers;
 -- DROP TABLE IF EXISTS #__rbo_operstype;
 -- DROP TABLE IF EXISTS #__rbo_products;
