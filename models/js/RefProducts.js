@@ -161,6 +161,19 @@ RefProducts.prototype.saveProduct = function () {
     });
 };
 
+// ===================================================================================
+RefProducts.prototype.testFunc = function () {
+    $.ajax({
+        dataType: 'json',
+        type: "POST",
+        data: {},
+        url: comPath + "ajax.php?task=add_trigger",
+        success: function (data) {
+        }
+    });
+
+};
+
 //===================================================================================
 RefProducts.prototype.createProduct = function () {
     var self = this;

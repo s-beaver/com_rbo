@@ -1,60 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="component" version="2.5.0" method="upgrade">
-	<name>Учетная система Rbo</name>
-	<creationDate>Январь 2016</creationDate>
-	<author>Сергей Ефремов</author>
-	<authorEmail>s_efremov@mail.ru</authorEmail>
-	<authorUrl>robik.ru</authorUrl>
-	<copyright>(c) Efremov Sergei</copyright>
-	<license>Информация о лицензии</license>
-	<version>2.4</version>
-	<description>Легкая учетная система Robik для небольших предприятий</description>
+    <name>Учетная система Rbo</name>
+    <creationDate>Январь 2016</creationDate>
+    <author>Сергей Ефремов</author>
+    <authorEmail>s_efremov@mail.ru</authorEmail>
+    <authorUrl>robik.ru</authorUrl>
+    <copyright>(c) Efremov Sergei</copyright>
+    <license>Информация о лицензии</license>
+    <version>2.4</version>
+    <description>Легкая учетная система Robik для небольших предприятий</description>
 
-	<install>
-		<sql><file driver="mysql" charset="utf8">install.com_rbo.sql</file></sql>
-	</install>
+    <install>
+        <sql>
+            <file driver="mysql" charset="utf8">install.com_rbo.sql</file>
+        </sql>
+    </install>
 
-	<uninstall>
-		<sql><file driver="mysql" charset="utf8">uninstall.com_rbo.sql</file></sql>
-	</uninstall>
+    <uninstall>
+        <sql>
+            <file driver="mysql" charset="utf8">uninstall.com_rbo.sql</file>
+        </sql>
+    </uninstall>
 
-	<!--update>
-		<schemas>
-			<schemapath type="mysql">sql/updates/mysql</schemapath>
-		</schemas>
-	</update-->
+    <!--update>
+        <schemas>
+            <schemapath type="mysql">sql/updates/mysql</schemapath>
+        </schemas>
+    </update-->
 
-	<files folder="site">
-		<folder>css</folder>
-		<folder>images</folder>
-		<folder>language</folder>
-		<folder>library</folder>
-		<folder>models</folder>
-		<folder>views</folder>
-		<filename>ajax.php</filename>
-		<filename>configuration.php</filename>
-		<filename>controller.php</filename>
-		<filename>index.html</filename>
-		<filename>index.php</filename>
-		<filename>rbo.php</filename>
-		<filename>rbo.xml</filename>
-		<filename>router.php</filename>
-	</files>
+    <files folder="site">
+        <folder>css</folder>
+        <folder>images</folder>
+        <folder>language</folder>
+        <folder>library</folder>
+        <folder>models</folder>
+        <folder>views</folder>
+        <filename>ajax.php</filename>
+        <filename>configuration.php</filename>
+        <filename>controller.php</filename>
+        <filename>index.html</filename>
+        <filename>index.php</filename>
+        <filename>rbo.php</filename>
+        <filename>rbo.xml</filename>
+        <filename>router.php</filename>
+    </files>
 
-	<languages folder="site">
-		<language tag="ru-RU">language/ru-RU/ru-RU.com_rbo.ini</language>
-	</languages>
+    <languages folder="site">
+        <language tag="ru-RU">language/ru-RU/ru-RU.com_rbo.ini</language>
+    </languages>
 
-	<scriptfile>install.php</scriptfile>
+    <scriptfile>install.php</scriptfile>
 
-	<administration>
-		<menu>COM_RBO</menu>
-		<files folder="admin">
-			<folder>language</folder>
-			<filename>index.html</filename>
-			<filename>install.com_rbo.sql</filename>
-			<filename>uninstall.com_rbo.sql</filename>
-		</files>
-	</administration>
+    <administration>
+        <menu>COM_RBO</menu>
+        <files folder="admin">
+            <folder>language</folder>
+            <filename>index.html</filename>
+            <filename>install.com_rbo.sql</filename>
+            <filename>uninstall.com_rbo.sql</filename>
+        </files>
+    </administration>
 
 </extension>

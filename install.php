@@ -1,18 +1,12 @@
 <?php
-/**
- * @package     Joomla.Administrator
- * @subpackage  com_helloworld
- *
- * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
- */
-
 // No direct access to this file
 defined('_JEXEC') or die('Restricted access');
+if (!defined('_JDEFINES')) {
+    define('RBO_PATH', realpath(dirname(__FILE__)));
+    define('JPATH_BASE', realpath(dirname(__FILE__) . "/../.."));
+    require_once JPATH_BASE . '/includes/defines.php';
+}
 
-/**
- * Script file of HelloWorld component
- */
 class Com_RbOInstallerScript
 {
     /**
@@ -33,7 +27,6 @@ class Com_RbOInstallerScript
      */
     function uninstall($parent)
     {
-        //echo '<p>' . JText::_('COM_HELLOWORLD_UNINSTALL_TEXT') . '</p>';
     }
 
     /**
@@ -43,8 +36,6 @@ class Com_RbOInstallerScript
      */
     function update($parent)
     {
-        // $parent is the class calling this method
-        //echo '<p>' . JText::sprintf('COM_HELLOWORLD_UPDATE_TEXT', $parent->get('manifest')->version) . '</p>';
     }
 
     /**
@@ -54,9 +45,6 @@ class Com_RbOInstallerScript
      */
     function preflight($type, $parent)
     {
-        // $parent is the class calling this method
-        // $type is the type of change (install, update or discover_install)
-        //echo '<p>' . JText::_('COM_HELLOWORLD_PREFLIGHT_' . $type . '_TEXT') . '</p>';
     }
 
     /**
@@ -66,8 +54,22 @@ class Com_RbOInstallerScript
      */
     function postflight($type, $parent)
     {
-        // $parent is the class calling this method
-        // $type is the type of change (install, update or discover_install)
-        //echo '<p>' . JText::_('COM_HELLOWORLD_POSTFLIGHT_' . $type . '_TEXT') . '</p>';
+        echo 'Creating triggers.';
+        try {
+            $db = JFactory::getDBO();
+            $db->setQuery(file_get_contents(RBO_PATH . '/admin/install.com_rbo_trigger_insert.sql'));
+            $result = $db->execute();
+            echo ' Insert.';
+
+            $db->setQuery(file_get_contents(RBO_PATH . '/admin/install.com_rbo_trigger_delete.sql'));
+            $result = $db->execute();
+            echo ' Delete.';
+
+            $db->setQuery(file_get_contents(RBO_PATH . '/admin/install.com_rbo_trigger_update.sql'));
+            $result = $db->execute();
+            echo ' Update.';
+        } catch (Exception $e) {
+            echo "Ошибка при создании триггера after insert";
+        }
     }
 }
