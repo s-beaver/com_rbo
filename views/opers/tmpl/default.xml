@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-    <layout title="COM_RBO_TITLE">
-        <message>COM_RBO_DESC</message>
+    <layout title="COM_RBO_OPERS_TITLE">
+        <message>COM_RBO_OPERS_DESC</message>
     </layout>
 </metadata>

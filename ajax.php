@@ -30,20 +30,6 @@ $input = $app->input;
 $cmd = $input->getCmd('task');
 
 switch ($cmd) {
-    case "add_trigger" : {
-        $db = JFactory::getDBO();
-        $db->setQuery(file_get_contents(RBO_PATH . '/admin/install.com_rbo_trigger_insert.sql'));
-        $result = $db->execute();
-
-        $db->setQuery(file_get_contents(RBO_PATH . '/admin/install.com_rbo_trigger_delete.sql'));
-        $result = $db->execute();
-
-        $db->setQuery(file_get_contents(RBO_PATH . '/admin/install.com_rbo_trigger_update.sql'));
-        $result = $db->execute();
-
-        break;
-    }
-
     case "get_current_date" : {
         $currentTime = new JDate ();
         $res = new stdClass ();

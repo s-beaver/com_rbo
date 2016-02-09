@@ -46,6 +46,8 @@
     </files>
 
     <languages folder="site">
+        <language tag="en-GB">language/en-GB/en-GB.com_rbo.ini</language>
+        <language tag="en-GB">language/en-GB/en-GB.com_rbo.sys.ini</language>
         <language tag="ru-RU">language/ru-RU/ru-RU.com_rbo.ini</language>
     </languages>
 

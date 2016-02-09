@@ -16,8 +16,7 @@ class Com_RbOInstallerScript
      */
     function install($parent)
     {
-        echo 'Проверка_Проверка_Проверка_Проверка_';
-        echo '<p>' . JText::_('COM_RBO_DESCRIPTION') . '</p>';
+        echo '<p>' . JText::_('COM_RBO_DESC') . '</p>';
     }
 
     /**
