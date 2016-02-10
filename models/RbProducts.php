@@ -26,9 +26,32 @@ class RbProducts extends RbObject
     }
 
     // =================================================================
+    public function createObject($echoResponse = false)
+    {
+        if (isset(RbConfig::$currentPriceName) && strcmp(RbConfig::$currentPriceName, "") != 0) {
+            $this->buffer = ( object )$this->buffer;
+            $this->buffer->price_name = RbConfig::$currentPriceName;
+        }
+        parent::createObject($echoResponse);
+    }
+
+    // =================================================================
+    public function updateObject($echoResponse = false)
+    {
+        if (isset(RbConfig::$currentPriceName) && strcmp(RbConfig::$currentPriceName, "") != 0) {
+            $this->buffer = ( object )$this->buffer;
+            $this->buffer->price_name = RbConfig::$currentPriceName;
+        }
+        parent::updateObject($echoResponse);
+    }
+
+    // =================================================================
     static function updateOrCreateProduct(& $prodId, $prod_data)
     {
         $prod_data = ( object )$prod_data;
+        if (isset ($prod_data) && isset(RbConfig::$currentPriceName) && strcmp(RbConfig::$currentPriceName, "") != 0) {
+            $prod_data->price_name = RbConfig::$currentPriceName;
+        }
         $input = JFactory::getApplication()->input;
         $input->set("rbo_products", $prod_data);
         $prodRef = new RbProducts ($prodId);
@@ -54,7 +77,7 @@ class RbProducts extends RbObject
     static function getProductListForm()
     {
         $input = JFactory::getApplication()->input;
-        $searchSubstr = $input->getString('search',"");
+        $searchSubstr = $input->getString('search', "");
         if (!is_string($searchSubstr) || strlen($searchSubstr) < 2) return;
 
         $db = JFactory::getDBO();
@@ -90,15 +113,15 @@ class RbProducts extends RbObject
     static function getProductList()
     {
         $input = JFactory::getApplication()->input;
-        $iDisplayStart = $input->getInt('start',-1);
-        $iDisplayLength = $input->getInt('length',-1);
-        $iDraw = $input->getString('draw',1);
+        $iDisplayStart = $input->getInt('start', -1);
+        $iDisplayLength = $input->getInt('length', -1);
+        $iDraw = $input->getString('draw', 1);
         $aSearch = $input->get("search", null, "array");
         $sSearch = null;
         if (!is_null($aSearch)) {
             $sSearch = $aSearch["value"];
         }
-        $sInStockFilter = $input->getString('filter_instock',-1);
+        $sInStockFilter = $input->getString('filter_instock', -1);
 
         $db = JFactory::getDBO();
         $query = $db->getQuery(true);
@@ -113,7 +136,7 @@ class RbProducts extends RbObject
         }
 
         $where = array();
-        if ($sInStockFilter!=-1) {
+        if ($sInStockFilter != -1) {
             $where[] = $db->quoteName('rp.product_type') . '=0';
             $where[] = $db->quoteName('rp.product_in_stock') . '>0';
         } elseif (!empty ($sSearch)) {
@@ -122,7 +145,7 @@ class RbProducts extends RbObject
                 $where[] = "LOWER(product_name) LIKE '%" . strtolower($v) . "%'";
             }
         }
-        if (count($where)>0) $query->where($where);
+        if (count($where) > 0) $query->where($where);
 
         try {
             if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
@@ -136,7 +159,7 @@ class RbProducts extends RbObject
             $query->clear();
             $query->select('count(*)');
             $query->from($db->quoteName($prodRef->table_name, "rp"));
-            if (count($where)>0) $query->where($where);
+            if (count($where) > 0) $query->where($where);
             $db->setQuery($query);
             $iRecordsTotal = $db->loadResult();
 

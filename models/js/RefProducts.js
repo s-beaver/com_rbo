@@ -156,22 +156,9 @@ RefProducts.prototype.saveProduct = function () {
         url: comPath + "ajax.php?task=" + taskCmd,
         success: function (data) {
             $("#prd-form").dialog("close");
-            self.oTable.draw();
+            self.oTableAPI.draw();
         }
     });
-};
-
-// ===================================================================================
-RefProducts.prototype.testFunc = function () {
-    $.ajax({
-        dataType: 'json',
-        type: "POST",
-        data: {},
-        url: comPath + "ajax.php?task=add_trigger",
-        success: function (data) {
-        }
-    });
-
 };
 
 //===================================================================================
@@ -193,7 +180,7 @@ RefProducts.prototype.deleteProduct = function (productId) {
         },
         url: comPath + "ajax.php?task=product_delete",
         success: function (data) {
-            self.oTable.draw();
+            self.oTableAPI.draw();
         }
     });
 
