@@ -29,9 +29,6 @@ function RbOper(o) {
     this.oSavedData = {
         "rbo_opers": {}
     };
-    this.saleTotal = 0;
-    this.purchTotal = 0;
-    this.expTotals = 0;
 }
 
 //===================================================================================
@@ -95,8 +92,7 @@ RbOper.prototype.attachOperModule = function () {
     self.oTableAPI = self.oTable.api();
 
     self.oTableAPI.on('draw.dt', function () {
-        self.calcTotals();
-        $("div.oper_totals").html("Продажа=" + self.saleTotal + " Закуп=" + self.purchTotal + " Затраты=" + self.expTotals);
+        $("div.oper_totals").html(self.calcTotals());
     });
 
     //добавляем фильтры и их обработчики
@@ -105,11 +101,11 @@ RbOper.prototype.attachOperModule = function () {
         showButtonPanel: true,
         dateFormat: "dd.mm.yy"
     }).change(function (event) {
-        self.oTableAPI.ajax.url(comPath + "ajax.php?task=get_oper_list&date_filter=" + $("#oper_filter_date").val()+"&type_filter=" + $("#oper_filter_type").val()).load();
+        self.oTableAPI.ajax.url(comPath + "ajax.php?task=get_oper_list&date_filter=" + $("#oper_filter_date").val() + "&type_filter=" + $("#oper_filter_type").val()).load();
     });
     refillSelect("oper_filter_type", getOperTypeList(), true);
     $("#oper_filter_type").change(function (event) {
-        self.oTableAPI.ajax.url(comPath + "ajax.php?task=get_oper_list&date_filter=" + $("#oper_filter_date").val()+"&type_filter=" + $("#oper_filter_type").val()).load();
+        self.oTableAPI.ajax.url(comPath + "ajax.php?task=get_oper_list&date_filter=" + $("#oper_filter_date").val() + "&type_filter=" + $("#oper_filter_type").val()).load();
     });
 
     $("#header_doclist_choose_list h2").html("Операции");
@@ -377,20 +373,30 @@ RbOper.prototype.calcSum = function () {
 RbOper.prototype.calcTotals = function () {
     var self = this;
     var oData = self.oTableAPI.data();
-    self.saleTotal = 0;
-    self.purchTotal = 0;
-    self.expTotals = 0;
-    for (var i = 0; i < oData.length; i++) {
+    var i, f;
+    var firms = [];
+    var totals = [];
+    for (i = 0; i < oData.length; i++) {
+        if ((f = firms.indexOf(oData[i].oper_firm)) < 0) {
+            firms.push(oData[i].oper_firm);
+            f = firms.length - 1;
+            totals[f] = {"saleTotal": 0, "purchTotal": 0, "expTotals": 0};
+        }
         if (oData[i].oper_type.indexOf("продажа") >= 0) {
-            self.saleTotal += Number(oData[i].oper_sum);
+            totals[f].saleTotal += Number(oData[i].oper_sum);
         }
         if (oData[i].oper_type.indexOf("закуп") >= 0) {
-            self.purchTotal += Number(oData[i].oper_sum);
+            totals[f].purchTotal += Number(oData[i].oper_sum);
         }
         if (oData[i].oper_type.indexOf("затраты") >= 0) {
-            self.expTotals += Number(oData[i].oper_sum);
+            totals[f].expTotals += Number(oData[i].oper_sum);
         }
     }
+    var totalStr = "";
+    for (i = 0; i < firms.length; i++) {
+        totalStr += firms[i] + ": Продажа=" + totals[i].saleTotal + " Закуп=" + totals[i].purchTotal + " Затраты=" + totals[i].expTotals + "<br>";
+    }
+    return totalStr;
 };
 
 // ===================================================================================
