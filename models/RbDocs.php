@@ -295,8 +295,8 @@ class RbDocs extends RbObject
                     $product["oper_type"] = "продажа";
                     break;
                 }
-                case "B-ACT":
-                case "B-BILL": {
+                case "B_ACT":
+                case "B_BILL": {
                     $product["oper_type"] = "закуп";
                     break;
                 }
