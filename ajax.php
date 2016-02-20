@@ -117,6 +117,11 @@ switch ($cmd) {
         break;
     }
 
+    case "oper_report" : {
+        RbOpers::getOperReport();
+        break;
+    }
+
     // ==================================== product ==========================
     case "product_search" : {
         RbProducts::getProductListForm();

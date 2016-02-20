@@ -61,7 +61,7 @@
                         </div>
                 <tr>
                     <td>
-                        <label for="rbo_products.product_type">Услуга</label>
+                        <label for="rbo_products.product_type">Товар (не услуга)</label>
                         <input type="checkbox" name="rbo_products.product_type" id="rbo_products.product_type">
                     </td>
                 </tr>

@@ -40,34 +40,34 @@ RefProducts.prototype.attachProductModule = function () {
         "columns": [{
             "title": "Ключ",
             "className": "center",
-            "data":function (source, type, val) {
+            "data": function (source, type, val) {
                 return "<a href='javascript:prd.readProduct(" + source.productId + ")'>#" + source.productId + "</a>";
             }
         }, {
             "title": "Наименование",
-            "data":"product_name"
+            "data": "product_name"
         }, {
             "title": "Код",
-            "data":"product_code"
+            "data": "product_code"
         }, {
             "title": "Категория",
             "className": "center",
-            "data":"categoryId"
+            "data": "categoryId"
         }, {
             "title": "К-во",
             "className": "center",
             data://"product_in_stock"
                 function (source, type, val) {
-                    return source.product_type == '1' ? "услуга" : source.product_in_stock;
+                    return source.product_type == '1' ? source.product_in_stock : "услуга";
                 }
         }, {
             "title": "Цена",
             "className": "center",
-            "data":"product_price"
+            "data": "product_price"
         }, {
             "title": "Цена опт.",
             "className": "center",
-            "data":"product_price1"
+            "data": "product_price1"
         }],
         language: dataTablesLanguage
     });
@@ -140,7 +140,7 @@ RefProducts.prototype.saveProduct = function () {
     self.checkFields.removeClass("ui-state-error");
     bValid = bValid && checkNotEmpty($("#rbo_products\\.product_price"), "Цена", self.tips);
     bValid = bValid && checkNotEmpty($("#rbo_products\\.product_price1"), "Цена1", self.tips);
-    if (oData.rbo_products.product_type == "1")
+    if (oData.rbo_products.product_type == "1")//товар
         bValid = bValid && checkNotEmpty($("#rbo_products\\.product_in_stock"), "К-во на складе", self.tips);
     oData.rbo_products.product_in_stock = EmptyTo(oData.rbo_products.product_in_stock, 0);
     if (!bValid)
@@ -225,11 +225,11 @@ RefProducts.prototype.showProductForm = function (i) {
 //===================================================================================
 RefProducts.prototype.switchInStockField = function () {
     if ($("#rbo_products\\.product_type").prop("checked")) {
-        $("#label_rbo_products\\.product_in_stock").hide();
-        $("#rbo_products\\.product_in_stock").hide();
-    } else {
         $("#label_rbo_products\\.product_in_stock").show();
         $("#rbo_products\\.product_in_stock").show();
+    } else {
+        $("#label_rbo_products\\.product_in_stock").hide();
+        $("#rbo_products\\.product_in_stock").hide();
     }
 };
 
@@ -237,7 +237,7 @@ RefProducts.prototype.switchInStockField = function () {
 $(document).ready(function () {
 
     prd = new RefProducts({
-        checkFields: ["product_price","product_price1"],
+        checkFields: ["product_price", "product_price1"],
         tips: $(".validateTips")
     });
     prd.attachProductModule();

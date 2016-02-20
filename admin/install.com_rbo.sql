@@ -127,7 +127,7 @@ CREATE TABLE #__rbo_products (
   product_price float DEFAULT NULL,
   product_in_stock int(11) DEFAULT NULL,
   product_price1 float DEFAULT NULL,
-  product_type int(1) NOT NULL DEFAULT 1 COMMENT 'Если TRUE, то это товар, иначе услуга',
+  product_type int(1) NOT NULL DEFAULT 1 COMMENT 'Если 1, то это товар, иначе услуга',
   price_name varchar(30) DEFAULT NULL,
   PRIMARY KEY (productId)
 )

@@ -137,8 +137,8 @@ class RbProducts extends RbObject
 
         $where = array();
         if ($sInStockFilter != -1) {
-            $where[] = $db->quoteName('rp.product_type') . '=0';
-            $where[] = $db->quoteName('rp.product_in_stock') . '>0';
+            //$where[] = $db->quoteName('rp.product_type') . '=1';
+            $where[] = $db->quoteName('rp.product_in_stock') . '!=0';
         } elseif (!empty ($sSearch)) {
             $searchAr = preg_split("/[\s,]+/", $sSearch);// split the phrase by any number of commas or space characters
             foreach ($searchAr as $v) {
@@ -185,8 +185,8 @@ class RbProducts extends RbObject
         $query->select($prodRef->getFieldsForSelectClause());
         $query->from($db->quoteName($prodRef->table_name, "rp"));
         $query->order($db->quoteName('rp.product_name'));
-        $query->where($db->quoteName('rp.product_type') . '=0');
-        $query->where($db->quoteName('rp.product_in_stock') . '>0');
+        //$query->where($db->quoteName('rp.product_type') . '=1');//пусть покажутся и услуги, если они неверно были оформлены
+        $query->where($db->quoteName('rp.product_in_stock') . '!=0');
 
         try {
             $db->setQuery($query);

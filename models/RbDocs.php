@@ -288,15 +288,15 @@ class RbDocs extends RbObject
     {
         if (strtotime($this->buffer->doc_date) < strtotime('1 November 2015')) return;
 
-        if ($this->buffer->doc_status == "подписан") {
+        if ($this->buffer->doc_status == "подписан" && $this->buffer->doc_cust["cust_is_own_firm"]!="1") {
             switch ($this->buffer->doc_type) {
                 case "акт":
                 case "накл": {
                     $product["oper_type"] = "продажа";
                     break;
                 }
-                case "B-ACT":
-                case "B-BIL": {
+                case "B_ACT":
+                case "B_BIL": {
                     $product["oper_type"] = "закуп";
                     break;
                 }

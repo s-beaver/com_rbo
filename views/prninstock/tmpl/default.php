@@ -25,6 +25,10 @@
             display: inline
         }
 
+        .alert {
+            background-color: yellow;
+        }
+
     </style>
 
 </head>
