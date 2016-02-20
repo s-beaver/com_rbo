@@ -12,8 +12,8 @@
             </td>
           </tr>
           <tr>
-            <td><label for="cust_name">Название</label></td>
-            <td><select name="cust_name" id="cust_name" style="width: 500px"></select></td>
+            <td colspan="2"><label for="cust_name">Название</label>&nbsp;<select name="cust_name" id="cust_name" style="width: 400px"></select>
+              <label for="cust_is_own_firm">Своя компания</label><input type="checkbox" name="cust_is_own_firm" id="cust_is_own_firm"></td>
           </tr>
         </table>
         <table>

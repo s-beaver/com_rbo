@@ -36,6 +36,7 @@ CREATE TABLE #__rbo_cust (
   cust_email varchar(30) DEFAULT NULL,
   cust_data text DEFAULT NULL,
   cust_phone varchar(30) DEFAULT NULL,
+  cust_is_own_firm int(11) DEFAULT NULL,
   cust_rem text DEFAULT NULL,
   created_by varchar(30) NOT NULL,
   created_on datetime NOT NULL,

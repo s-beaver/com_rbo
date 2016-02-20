@@ -13,7 +13,8 @@ class RbCust extends RbObject {
     $this->flds ["cust_email"] = array ("type" => "string" );
     $this->flds ["cust_data"] = array ("type" => "string" );
     $this->flds ["cust_phone"] = array ("type" => "string" );
-    
+    $this->flds ["cust_is_own_firm"] = array ("type" => "numeric" );
+
     $this->flds ["created_by"] = array ("type" => "string" );
     $this->flds ["created_on"] = array ("type" => "datetime" );
     $this->flds ["modified_by"] = array ("type" => "string" );
@@ -57,7 +58,7 @@ class RbCust extends RbObject {
     $query = $db->getQuery (true);
     
     $query->clear ();
-    $query->select ("custId, cust_name, cust_fullname, cust_email, cust_data, cust_phone");
+    $query->select ("custId, cust_name, cust_is_own_firm, cust_fullname, cust_email, cust_data, cust_phone");
     $query->from ($this->table_name);
     $query->where ("cust_name LIKE '%" . $searchSubstr . "%'", "OR");
     // $query->where ("cust_data LIKE '%" . $searchSubstr . "%'", "OR");пока не хотим искать по данным

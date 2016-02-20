@@ -147,6 +147,7 @@ RboCust.prototype.setCustFlds = function (cmd, o) {
     $("#custId").val(f.custId);
     self.parentCustField.val(f.cust_name);
     //$("#cust_name").val(f.cust_name);
+    $("#cust_is_own_firm").prop("checked", (f.cust_is_own_firm == "1"));
     $("#cust_fullname").val(f.cust_fullname);
     $("#cust_email").val(f.cust_email);
     $("#cust_phone").val(f.cust_phone);
@@ -166,6 +167,7 @@ RboCust.prototype.setCustFlds = function (cmd, o) {
 RboCust.prototype.saveCustFlds = function () {
     this.flds.custId = $("#custId").val();
     this.flds.cust_name = this.parentCustField.val();
+    this.flds.cust_is_own_firm = $("#cust_is_own_firm").prop("checked") ? "1" : "0";
     this.flds.cust_fullname = $("#cust_fullname").val();
     this.flds.cust_email = $("#cust_email").val();
     this.flds.cust_phone = $("#cust_phone").val();
