@@ -25,7 +25,7 @@ RefCustomers.prototype.attachCustomerModule = function () {
     //подключаем форму для редакции контрагентов
     $("#cst-form").dialog({
         autoOpen: false,
-        height: 550,
+        height: 600,
         width: 750,
         modal: true,
         resizable: true

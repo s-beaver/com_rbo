@@ -21,7 +21,7 @@ RboCust.prototype.attachCustomerModule = function () {
     //подключаем форму выбора контрагента
     $("#cust-form").dialog({
         autoOpen: false,
-        height: 550,
+        height: 600,
         width: 750,
         modal: true,
         resizable: true
@@ -151,6 +151,7 @@ RboCust.prototype.setCustFlds = function (cmd, o) {
     $("#cust_fullname").val(f.cust_fullname);
     $("#cust_email").val(f.cust_email);
     $("#cust_phone").val(f.cust_phone);
+    $("#cust_rem").val(f.cust_rem);
     $("#cust_inn").val(fd.cust_inn);
     $("#cust_kpp").val(fd.cust_kpp);
     $("#cust_okpo").val(fd.cust_okpo);
@@ -171,6 +172,7 @@ RboCust.prototype.saveCustFlds = function () {
     this.flds.cust_fullname = $("#cust_fullname").val();
     this.flds.cust_email = $("#cust_email").val();
     this.flds.cust_phone = $("#cust_phone").val();
+    this.flds.cust_rem = $("#cust_rem").val();
     this.flds.cust_data.cust_inn = $("#cust_inn").val();
     this.flds.cust_data.cust_kpp = $("#cust_kpp").val();
     this.flds.cust_data.cust_okpo = $("#cust_okpo").val();

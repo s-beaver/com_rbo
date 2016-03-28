@@ -34,12 +34,13 @@
                 </tr>
                 <tr>
                     <td><label for="cust_data.cust_addr">Адрес</label></td>
-                    <td><input type="text" name="cust_data.cust_addr" id="cust_data.cust_addr" style='width: 500px'/></td>
+                    <td><input type="text" name="cust_data.cust_addr" id="cust_data.cust_addr" style='width: 500px'/>
+                    </td>
                 </tr>
                 <tr>
                     <td colspan="2"><label for="cust_data.cust_nonds">Без НДС</label><input type="checkbox"
-                                                                                           name="cust_data.cust_nonds"
-                                                                                           id="cust_data.cust_nonds">
+                                                                                            name="cust_data.cust_nonds"
+                                                                                            id="cust_data.cust_nonds">
                         <label for="rbo_cust.cust_phone">&nbsp;Тел.</label> <input
                             type="text" name="rbo_cust.cust_phone" id="rbo_cust.cust_phone" style='width: 200px'/>
                         <label for="rbo_cust.cust_email">&nbsp;@</label> <input type="text" name="rbo_cust.cust_email"
@@ -50,23 +51,26 @@
             <table>
                 <tr>
                     <td colspan="2"><label for="cust_data.cust_inn">&nbsp;ИНН</label><input type="text"
-                                                                                           name="cust_data.cust_inn"
-                                                                                           id="cust_data.cust_inn"
-                                                                                           style='width: 150px'/> <label
+                                                                                            name="cust_data.cust_inn"
+                                                                                            id="cust_data.cust_inn"
+                                                                                            style='width: 150px'/>
+                        <label
                             for="cust_data.cust_kpp">&nbsp;КПП</label><input
                             type="text" name="cust_data.cust_kpp" id="cust_data.cust_kpp" style='width: 150px'/></td>
                 </tr>
                 <tr>
                     <td colspan="2"><label for="cust_data.cust_okpo">ОКПО</label><input type="text"
-                                                                                       name="cust_data.cust_okpo"
-                                                                                       id="cust_data.cust_okpo"
-                                                                                       style='width: 150px'/> <label
+                                                                                        name="cust_data.cust_okpo"
+                                                                                        id="cust_data.cust_okpo"
+                                                                                        style='width: 150px'/> <label
                             for="cust_data.cust_ogrn">&nbsp;ОГРН</label>
-                        <input type="text" name="cust_data.cust_ogrn" id="cust_data.cust_ogrn" style='width: 150px'/></td>
+                        <input type="text" name="cust_data.cust_ogrn" id="cust_data.cust_ogrn" style='width: 150px'/>
+                    </td>
                 </tr>
                 <tr>
                     <td><label for="cust_data.cust_bank">Банк</label></td>
-                    <td><input type="text" name="cust_data.cust_bank" id="cust_data.cust_bank" style='width: 500px'/></td>
+                    <td><input type="text" name="cust_data.cust_bank" id="cust_data.cust_bank" style='width: 500px'/>
+                    </td>
                 </tr>
                 <tr>
                     <td><label for="cust_data.cust_bik">БИК</label></td>
@@ -74,11 +78,16 @@
                 </tr>
                 <tr>
                     <td colspan="2"><label for="cust_data.cust_rch">р/сч</label><input type="text"
-                                                                                      name="cust_data.cust_rch"
-                                                                                      id="cust_data.cust_rch"
-                                                                                      style='width: 250px'/> <label
+                                                                                       name="cust_data.cust_rch"
+                                                                                       id="cust_data.cust_rch"
+                                                                                       style='width: 250px'/> <label
                             for="cust_data.cust_kch">к/сч</label><input
                             type="text" name="cust_data.cust_kch" id="cust_data.cust_kch" style='width: 250px'/></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label for="rbo_cust.cust_rem">Прим.</label>
+                        <textarea name="rbo_cust.cust_rem" id="rbo_cust.cust_rem" style="width: 100%; height: 50px;"></textarea>
+                    </td>
                 </tr>
             </table>
         </fieldset>
@@ -89,6 +98,6 @@
 
 <table id="TableCustomer" class="display compact"></table>
 
-<div class="version"><?php echo RbHelper::getVersion()?></div>
+<div class="version"><?php echo RbHelper::getVersion() ?></div>
 </body>
 </html>
