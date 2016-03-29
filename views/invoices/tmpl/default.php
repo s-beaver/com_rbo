@@ -41,6 +41,12 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>
+                        <label for="inv.doc_rem">Прим.</label>
+                        <textarea name="inv.doc_rem" id="inv.doc_rem" style="width: 90%; height: 50px; float: right;"></textarea>
+                    </td>
+                </tr>
+                <tr>
                     <td><a href="" id="inv.prod_add_btn"> <img src="<?php echo JRBO_PATH ?>/images/icon-32-new-on.png"/></a>
 
                         <div style="float: right">

@@ -51,7 +51,7 @@ RbDoc.prototype.attachDocForm = function () {
     this.oFormDlg = $("#" + self.docFormPrefix + "\\.doc-form");
     this.oFormDlg.dialog({
         autoOpen: false,
-        height: 550,
+        height: 600,
         width: 900,
         modal: true,
         resizable: true
@@ -276,6 +276,7 @@ RbDoc.prototype.saveDoc = function (docId) {
             "custId": $("#custId").val(),// скрытое поле в форме выбора клиента
             "doc_cust": self.oCust.flds,
             "doc_firm": $("#" + self.docFormPrefix + "\\.doc_firm").val(),
+            "doc_rem": $("#" + self.docFormPrefix + "\\.doc_rem").val(),
             "doc_products": pAr
         }
     };
