@@ -165,10 +165,8 @@ RbDoc.prototype.attachPageElements = function () {
                 return s;
             }
         }, {
-            "title": "Оп.",
-            "data": function (source, type, val) {
-                return "";
-            }
+            "title": "Прим.",
+            "data": "doc_rem"
         }, {
             "title": "Менеджер",
             "data": "doc_manager"
