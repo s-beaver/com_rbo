@@ -42,6 +42,7 @@
         <h2>Отчеты</h2>
         <ul id="selectable">
             <li><a href='/index.php?option=com_rbo&view=PrnInStock&format=raw'>Товарные остатки</a></li>
+            <li><a href='/index.php?option=com_rbo&view=PrnProdVed&format=raw'>Товарная ведомость</a></li>
         </ul>
 
         <h2>Справка</h2>

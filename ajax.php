@@ -117,8 +117,14 @@ switch ($cmd) {
         break;
     }
 
-    case "oper_report" : {
-        RbOpers::getOperReport();
+    case "oper_report" : {//todo ≈жедневный отчет по операци€м
+        $oper = new RbOpers ();
+        $oper->getOperReport();
+        break;
+    }
+
+    case "report_prod_ved" : {
+        RbOpers::getProdVedomost();
         break;
     }
 
@@ -193,7 +199,7 @@ switch ($cmd) {
         break;
     }
 
-    // ==================================== customer ==========================
+    // ==================================== reports ==========================
     case   "report_in_stock": {
         RbProducts::getProductInStock();
         break;

@@ -37,7 +37,8 @@ function getFormData(formName, objPrefix) {
                     o[objPrefix][s] = $(this).val();
                 break;
 
-            case "BUTTON": {
+            case "BUTTON":
+            {
                 break;
             }
 
@@ -93,7 +94,8 @@ function setFormData(formName, objPrefix, o) {
                     $('#' + sIdDot + ' option:first').prop("selected", "selected");
                 break;
 
-            case "BUTTON": {
+            case "BUTTON":
+            {
                 break;
             }
 
@@ -166,4 +168,68 @@ function getOperTypeList() {
         "затраты-связь": "затраты-связь"
     };
 
+}
+
+//===================================================================================
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+    }
+    return "";
+}
+
+//===================================================================================
+/**
+ * Получает куки по имени, возвращает в виде объекта
+ * @param cname - имя куки
+ * @returns {{}}
+ */
+function getObjCookie(cname) {
+    var c = getCookie(cname);
+    if (c == "") return {};
+    return JSON.parse(c);
+}
+
+//===================================================================================
+/**
+ * Устанавливает куки
+ * @param cname - имя куки
+ * @param o - объект
+ */
+function setObjCookie(cname, o) {
+    document.cookie = cname + "=" + JSON.stringify(o);
+}
+
+//===================================================================================
+function getPrintLinkByDoc(docId, docType) {
+    docId = NullTo(docId,0);
+    if (docId==0) return "";
+    var link = "index.php?option=com_rbo&format=raw";
+    var printLink="";
+    switch (docType) {
+        case "акт": {
+            printLink = "PrnInv";
+            break;
+        }
+        case "накл": {
+            printLink = "PrnShip";
+            break;
+        }
+        case "B_ACT": {
+            printLink = "";
+            break;
+        }
+        case "B_BIL": {
+            printLink = "";
+            break;
+        }
+        default:
+            printLink = "";
+    }
+    if (printLink=="") return "";
+    return link+"&view="+printLink+"&docid="+docId;
 }

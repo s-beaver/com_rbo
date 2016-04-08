@@ -22,6 +22,7 @@
             </optgroup>
             <optgroup label="Отчеты">
                 <option value="/index.php?option=com_rbo&view=PrnInStock&format=raw">Товарные остатки</option>
+                <option value="/index.php?option=com_rbo&view=PrnProdVed&format=raw">Товарная ведомость</option>
             </optgroup>
         </select>
     </div>

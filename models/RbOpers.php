@@ -180,8 +180,9 @@ class RbOpers extends RbObject
     /** Получение отчета по операциям. Варианты запуска:
      * - Отчет доход+затраты урупненный report_type = income_costs
      * - Отчет детализированный по доходам или по затратам report_type = income / costs
-    */
-    public function getOperReport()    {
+     */
+    public function getOperReport()
+    {
         //$this->buffer->report_type
         //$this->buffer->year
         //$this->buffer->month
@@ -189,14 +190,14 @@ class RbOpers extends RbObject
         //$this->buffer->oper_type
         if (isset($this->buffer->report_type)) {
             $result = new stdClass();
-            if ($this->buffer->report_type=="income_costs") {
+            if ($this->buffer->report_type == "income_costs") {
                 $result->income = RbOpers::getIncomeOpers($this->buffer->year, $this->buffer->month, $this->buffer->cat, $this->buffer->oper_type);
                 $result->costs = RbOpers::getCostsOpers($this->buffer->year, $this->buffer->month, $this->buffer->oper_type);
             }
-            if ($this->buffer->report_type=="income") {
+            if ($this->buffer->report_type == "income") {
                 $result->income = RbOpers::getIncomeOpers($this->buffer->year, $this->buffer->month, $this->buffer->cat, $this->buffer->oper_type);
             }
-            if ($this->buffer->report_type=="costs") {
+            if ($this->buffer->report_type == "costs") {
                 $result->costs = RbOpers::getCostsOpers($this->buffer->year, $this->buffer->month, $this->buffer->oper_type);
             }
             echo json_encode($result, JSON_UNESCAPED_UNICODE);
@@ -206,7 +207,70 @@ class RbOpers extends RbObject
     }
 
     // =================================================================
-    static function getIncomeOpers($year, $month, $cat, $oper_type = "продажа")    {
+    /** Получение товарной ведомости по параметрам:
+     * - период
+     * - подстрока названия товара
+     * - контрагент
+     * - сотрудник
+     */
+    static function getProdVedomost()
+    {
+        $input = JFactory::getApplication()->input;
+        $dateStart = $input->getString('date_start', '01.01.' . JFactory::getDate()->format('y'));
+        $dateEnd = $input->getString('date_end', JFactory::getDate()->format('d.m.Y'));
+        $prodSubstr = $input->getString('search', '');
+
+        $oper = new RbOpers ();
+        $db = JFactory::getDBO();
+        $query = $db->getQuery(true);
+        $query->clear();
+        $query->select($db->quoteName(
+            array("op.operId",
+                "op.oper_type",
+                "op.custId",
+                "op.docId",
+                "op.productId",
+                "op.product_code",
+                "op.product_name",
+                "op.product_price",
+                "op.product_cnt",
+                "op.oper_sum",
+                "op.oper_firm",
+                "op.oper_rem",
+                "rrc.cust_name",
+                "rrd.doc_num",
+                "rrd.doc_type")));
+        $query->select("DATE_FORMAT(op.oper_date,'%d.%m.%Y') as oper_date");
+        $query->from($db->quoteName($oper->table_name,"op"));
+        $query->leftJoin(
+            $db->quoteName(RbHelper::getTableName("rbo_cust"), 'rrc') . ' ON (' . $db->quoteName('op.custId') . ' = ' .
+            $db->quoteName('rrc.custId') . ')');
+        $query->leftJoin(
+            $db->quoteName(RbHelper::getTableName("rbo_docs"), 'rrd') . ' ON (' . $db->quoteName('op.docId') . ' = ' .
+            $db->quoteName('rrd.docId') . ')');
+        $query->leftJoin(
+            $db->quoteName(RbHelper::getTableName("rbo_products"), 'rrp') . ' ON (' . $db->quoteName('op.productId') . ' = ' .
+            $db->quoteName('rrp.productId') . ')');
+        $query->where("op.product_name LIKE '%" . $prodSubstr . "%'");
+        $query->where("oper_date>=STR_TO_DATE('$dateStart','%d.%m.%Y')");
+        $query->where("oper_date<=STR_TO_DATE('$dateEnd','%d.%m.%Y')");
+        $query->where("rrp.product_type=1");
+        $query->order($db->quoteName('oper_date'));
+
+        try {
+            $db->setQuery($query);
+            $res = new stdClass ();
+            $res->data = $db->loadAssocList();
+            echo json_encode($res);
+        } catch (Exception $e) {
+            JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
+        }
+
+    }
+
+    // =================================================================
+    static function getIncomeOpers($year, $month, $cat, $oper_type = "продажа")
+    {
         $having = array();
         $group_by = array();
         if (isset($year)) array_push($having, "sYear = $year");
@@ -221,8 +285,8 @@ class RbOpers extends RbObject
         array_push($having, "oper_type = '$oper_type'");
 
         $sql = file_get_contents(RBO_PATH . '/admin/income_opers.sql');
-        $sql = str_replace("%group_by%",implode(", ",$group_by),$sql);
-        $sql = str_replace("%having%",implode(" AND ",$having),$sql);
+        $sql = str_replace("%group_by%", implode(", ", $group_by), $sql);
+        $sql = str_replace("%having%", implode(" AND ", $having), $sql);
 
         $db = JFactory::getDBO();
         $db->setQuery($sql);
