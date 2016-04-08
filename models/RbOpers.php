@@ -241,6 +241,7 @@ class RbOpers extends RbObject
                 "rrd.doc_num",
                 "rrd.doc_type")));
         $query->select("DATE_FORMAT(op.oper_date,'%d.%m.%Y') as oper_date");
+        $query->select("DATE_FORMAT(rrd.doc_date,'%d.%m.%Y') as doc_date");
         $query->from($db->quoteName($oper->table_name,"op"));
         $query->leftJoin(
             $db->quoteName(RbHelper::getTableName("rbo_cust"), 'rrc') . ' ON (' . $db->quoteName('op.custId') . ' = ' .

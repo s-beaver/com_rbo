@@ -11,6 +11,8 @@ function getReportData(params) {
         url: comPath + "ajax.php?task=report_prod_ved",
         success: function (rep_data) {
             if (!IsNull(params)) {
+                params.date_start = NullTo(params.date_start,"");
+                params.date_end= NullTo(params.date_end,"");
                 $("#report_params").html("за " + params.date_start + " - " + params.date_end);
             }
             fillReport(rep_data);
@@ -77,7 +79,7 @@ function fillReport(rep_data) {
     rep_data = NullTo(rep_data, {});
     var opers = rep_data.data;
     var report = "", totalsMinus = 0, totalsPlus = 0;
-    var operId, oper_type, oper_date, custId, docId, doc_type, doc_num, doc_link, oper_sum, oper_firm, oper_rem;
+    var operId, oper_type, oper_date, custId, docId, doc_type, doc_num, doc_date, doc_link, oper_sum, oper_firm, oper_rem;
     var productId, product_code, product_name, product_price, product_cnt;
 
     report = "<thead>";
@@ -100,7 +102,8 @@ function fillReport(rep_data) {
         docId = NullTo(Number(opers[i].docId), 0);
         doc_type = NullTo(opers[i].doc_type,"");
         doc_num = NullTo(opers[i].doc_num,"");
-        doc_link = docId==0?"":"<a href='"+getPrintLinkByDoc(docId,doc_type)+"'>№"+doc_num+" ("+doc_type+")</a>";
+        doc_date = NullTo(opers[i].doc_date,"");
+        doc_link = docId==0?"":"<a href='"+getPrintLinkByDoc(docId,doc_type)+"'>№"+doc_num+" / "+doc_date+" ("+doc_type+")</a>";
 
         productId = NullTo(Number(opers[i].productId), 0);
 
@@ -110,6 +113,8 @@ function fillReport(rep_data) {
 
         switch (oper_type) {
             case 'закуп':
+            case 'затраты-прочие':
+            case 'списание':
             {
                 totalsMinus += product_cnt * product_price;
                 break;
@@ -117,11 +122,6 @@ function fillReport(rep_data) {
             case 'продажа':
             {
                 totalsPlus += product_cnt * product_price;
-                break;
-            }
-            case 'списание':
-            {
-                totalsMinus += product_cnt * product_price;
                 break;
             }
         }
