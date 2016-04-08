@@ -13,7 +13,8 @@ function getReportData(params) {
             if (!IsNull(params)) {
                 params.date_start = NullTo(params.date_start,"");
                 params.date_end= NullTo(params.date_end,"");
-                $("#report_params").html("за " + params.date_start + " - " + params.date_end);
+                params.search= NullTo(params.search,"");
+                $("#report_params").html("за " + params.date_start + " - " + params.date_end+"<br> по товару &quot;"+params.search+"&quot;");
             }
             fillReport(rep_data);
             setObjCookie(cookieName, params);
