@@ -3,6 +3,9 @@ var oFormDlg;
 var cookieName = "prn_prod_ved";
 // ===================================================================================
 function getReportData(params) {
+    $("#progressbar").show();
+    $("#report_table").html("");
+    $("#report_totals").html("");
     if (IsNull(params)) params = getObjCookie(cookieName);
     $.ajax({
         dataType: 'json',
@@ -10,14 +13,32 @@ function getReportData(params) {
         data: params,
         url: comPath + "ajax.php?task=report_prod_ved",
         success: function (rep_data) {
+            $("#progressbar").hide();
             if (!IsNull(params)) {
-                params.date_start = NullTo(params.date_start,"");
-                params.date_end= NullTo(params.date_end,"");
-                params.search= NullTo(params.search,"");
-                $("#report_params").html("за " + params.date_start + " - " + params.date_end+"<br> по товару &quot;"+params.search+"&quot;");
+                var s = "";
+                params.date_start = NullTo(params.date_start, "");
+                params.date_end = NullTo(params.date_end, "");
+                s += "за " + params.date_start + " - " + params.date_end;
+
+                if (NullTo(params.prodId, 0) > 0)
+                    s += ", по товару &quot;" + params.search + "&quot;";
+
+                if (NullTo(params.custId, 0) > 0)
+                    s += ", по контрагенту &quot;" + params.cust_name + "&quot;";
+
+                if (NullTo(params.firm, "") != "")
+                    s += ", по фирме &quot;" + params.firm + "&quot;";
+
+                $("#report_params").html(s);
             }
-            fillReport(rep_data);
+            if (rep_data != {})
+                fillReport(rep_data);
+            else
+                $("#report_totals").html("По запросу ничего не найдено");
             setObjCookie(cookieName, params);
+        },
+        error: function (err) {
+            $("#progressbar").hide();
         }
     });
 }
@@ -30,6 +51,15 @@ function readDocument() {
     var oBtns = {};
     oBtns["Построить отчет"] = function () {
         var params = getFormData("pv\\.rep-form", "pv");
+
+        params.pv.prodId = 0;
+        var oVal = $("#pv\\.product_name option:selected").val();
+        if (Number(oVal) > 0) params.pv.prodId = Number(oVal);
+
+        params.pv.custId = 0;
+        var oVal = $("#pv\\.cust_name option:selected").val();
+        if (Number(oVal) > 0) params.pv.custId = Number(oVal);
+
         getReportData(params.pv);
         oFormDlg.dialog("close");
     };
@@ -41,8 +71,8 @@ function readDocument() {
     oFormDlg = $("#pv\\.rep-form");
     oFormDlg.dialog({
         autoOpen: false,
-        height: 300,
-        width: 600,
+        height: 400,
+        width: 650,
         modal: true,
         resizable: true,
         title: "Введите параметры отчета",
@@ -65,6 +95,32 @@ function readDocument() {
         showOn: "button",
         dateFormat: "dd.mm.yy"
     });
+
+    refillSelect("pv\\.firm", getFirmList(), true);
+
+    $("#prod_search_btn").click(function (event) {
+        productSearch();
+        return false;
+    });
+
+    $("#cust_search_btn").click(function (event) {
+        custSearch();
+        return false;
+    });
+
+    $("#prod_search_delete_btn").click(function (event) {
+        $('#pv\\.product_name option').remove();
+        return false;
+    });
+
+    $("#cust_search_delete_btn").click(function (event) {
+        $('#pv\\.cust_name option').remove();
+        return false;
+    });
+
+    $("#progressbar").progressbar({
+        value: false
+    });
 }
 
 // ===================================================================================
@@ -75,13 +131,60 @@ function OpenDlg() {
     oFormDlg.dialog("open");
 }
 
+//===================================================================================
+function productSearch() {
+    $.ajax({
+        dataType: 'json',
+        type: "POST",
+        data: {
+            "search": $("#pv\\.search").val(),
+            "filter": false
+        },
+        url: comPath + "ajax.php?task=product_search",
+        success: function (p) {
+            var oProd = {};
+            for (var i = 0; i < p.result.length; i++) {
+                oProd[p.result[i].productId] = p.result[i].product_name;
+            }
+            refillSelect("pv\\.product_name", oProd);
+            if (p.count > p.result.length) {
+                $('#pv\\.product_name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
+            }
+
+        }
+    });
+}
+
+//===================================================================================
+function custSearch() {
+    $.ajax({
+        dataType: 'json',
+        type: "POST",
+        data: {
+            "search": $("#pv\\.cust").val()
+        },
+        url: comPath + "ajax.php?task=cust_search",
+        success: function (p) {
+            var oCust = {};
+            for (var i = 0; i < p.result.length; i++) {
+                oCust[p.result[i].custId] = p.result[i].cust_name;
+            }
+            refillSelect("pv\\.cust_name", oCust);
+            if (p.count > p.result.length) {
+                $('#pv\\.cust_name').append('<option value="-1">=== Найдено позиций:' + p.count + ' (уточните поиск)</option>');
+            }
+
+        }
+    });
+}
+
 // ===================================================================================
 function fillReport(rep_data) {
     rep_data = NullTo(rep_data, {});
     var opers = rep_data.data;
     var report = "", totalsMinus = 0, totalsPlus = 0;
     var operId, oper_type, oper_date, custId, docId, doc_type, doc_num, doc_date, doc_link, oper_sum, oper_firm, oper_rem;
-    var productId, product_code, product_name, product_price, product_cnt;
+    var productId, productTitle, product_code, product_name, product_price, product_cnt;
 
     report = "<thead>";
     report += "<td>#</td>";
@@ -89,11 +192,11 @@ function fillReport(rep_data) {
     report += "<td>Дата</td>";
     report += "<td>Контрагент</td>";
     report += "<td>Документ</td>";
-    report += "<td>Код товара</td>";
     report += "<td>Товар</td>";
     report += "<td>Цена</td>";
     report += "<td>К-во</td>";
     report += "<td>Сумма</td>";
+    report += "<td>С-стоим.</td>";
     report += "<td>Фирма</td>";
     report += "<td>Прим.</td>";
     report += "</thead>";
@@ -101,12 +204,14 @@ function fillReport(rep_data) {
         oper_type = NullTo(opers[i].oper_type, "");
         custId = NullTo(Number(opers[i].custId), 0);
         docId = NullTo(Number(opers[i].docId), 0);
-        doc_type = NullTo(opers[i].doc_type,"");
-        doc_num = NullTo(opers[i].doc_num,"");
-        doc_date = NullTo(opers[i].doc_date,"");
-        doc_link = docId==0?"":"<a href='"+getPrintLinkByDoc(docId,doc_type)+"'>№"+doc_num+" / "+doc_date+" ("+doc_type+")</a>";
+        doc_type = NullTo(opers[i].doc_type, "");
+        doc_num = NullTo(opers[i].doc_num, "");
+        doc_date = NullTo(opers[i].doc_date, "");
+        doc_link = docId == 0 ? "" : "<a href='" + getPrintLinkByDoc(docId, doc_type) + "'>№" + doc_num + " / " + doc_date + " (" + doc_type + ")</a>";
 
         productId = NullTo(Number(opers[i].productId), 0);
+        //productTitle = NullTo(opers[i].product_name, "") + ((NullTo(opers[i].product_code, "")!="")?" ("+opers[i].product_code+")":"");
+        productTitle = NullTo(opers[i].product_name, "");
 
         product_price = NullTo(Number(opers[i].product_price), 0);
         product_cnt = NullTo(Number(opers[i].product_cnt), 0);
@@ -133,22 +238,27 @@ function fillReport(rep_data) {
         report += "<td>" + NullTo(opers[i].oper_date, "") + "</td>";
         report += "<td>" + NullTo(opers[i].cust_name, "") + "</td>";
         report += "<td>" + doc_link + "</td>";
-        report += "<td>" + NullTo(opers[i].product_code, "") + "</td>";
-        report += "<td>" + NullTo(opers[i].product_name, "") + "</td>";
+        report += "<td>" + productTitle + "</td>";
         report += "<td align='right'>" + product_price + "</td>";
         report += "<td align='center'>" + product_cnt + "</td>";
         report += "<td align='right'>" + oper_sum + "</td>";
+        report += "<td align='right'>" + NullTo(opers[i].buyPrice, 0) + "</td>";
         report += "<td>" + NullTo(opers[i].oper_firm, "") + "</td>";
         report += "<td>" + NullTo(opers[i].oper_rem, "") + "</td>";
         report += "</tr>";
     }
 
-    totalsMinus = Math.round(totalsMinus,1);
-    totalsPlus = Math.round(totalsPlus,1);
-    var total = Math.round(totalsPlus-totalsMinus,1);
+    totalsMinus = Math.round(totalsMinus, 1);
+    totalsPlus = Math.round(totalsPlus, 1);
+    var total = Math.round(totalsPlus - totalsMinus, 1);
     $("#report_date").html(rep_data.date);
     $("#report_table").html(report);
-    $("#report_totals").html("<br><b>Итого затрат "+totalsMinus+" руб.<br>Итого поступлений "+totalsPlus+" руб.<br>Итого " + total + " руб.</b>");
+    var s = "<br><b>";
+    s += "Итого затрат " + totalsMinus + " руб.<br>";
+    s += "Итого поступлений " + totalsPlus + " руб.<br>";
+    s += "Итого " + total + " руб.<br>";
+    s += "Строк в таблице:" + opers.length + " шт.<br>";
+    $("#report_totals").html(s);
 
     //$("#report_debug").html("");
 }

@@ -207,19 +207,19 @@ class RbOpers extends RbObject
     }
 
     // =================================================================
-    /** Получение товарной ведомости по параметрам:
-     * - период
-     * - подстрока названия товара
-     * - контрагент
-     * - сотрудник
+    /**
+     * @param $d1 - строка даты в формате dd.mm.YYYY
+     * @param $d2 - строка даты в формате dd.mm.YYYY
+     * @param $oper_type - строка операции или все (пустая строка)
+     * @param $custId - id контрагента или массив id контрагентов
+     * @param $prodId - id товара или массив id товаров
+     * @param $prod_type - 1- товар, 2 - услуга, null - любое
+     * @param $firm - строка
+     * @param $sort - DESC или пусто
+     * @return mixed
      */
-    static function getProdVedomost()
+    static function getOpersArrayByQuery($d1, $d2, $oper_type, $custId, $prodId, $prod_type, $firm, $sort, $limit)
     {
-        $input = JFactory::getApplication()->input;
-        $dateStart = $input->getString('date_start', '01.01.' . JFactory::getDate()->format('y'));
-        $dateEnd = $input->getString('date_end', JFactory::getDate()->format('d.m.Y'));
-        $prodSubstr = $input->getString('search', '');
-
         $oper = new RbOpers ();
         $db = JFactory::getDBO();
         $query = $db->getQuery(true);
@@ -242,7 +242,7 @@ class RbOpers extends RbObject
                 "rrd.doc_type")));
         $query->select("DATE_FORMAT(op.oper_date,'%d.%m.%Y') as oper_date");
         $query->select("DATE_FORMAT(rrd.doc_date,'%d.%m.%Y') as doc_date");
-        $query->from($db->quoteName($oper->table_name,"op"));
+        $query->from($db->quoteName($oper->table_name, "op"));
         $query->leftJoin(
             $db->quoteName(RbHelper::getTableName("rbo_cust"), 'rrc') . ' ON (' . $db->quoteName('op.custId') . ' = ' .
             $db->quoteName('rrc.custId') . ')');
@@ -252,16 +252,86 @@ class RbOpers extends RbObject
         $query->leftJoin(
             $db->quoteName(RbHelper::getTableName("rbo_products"), 'rrp') . ' ON (' . $db->quoteName('op.productId') . ' = ' .
             $db->quoteName('rrp.productId') . ')');
-        $query->where("op.product_name LIKE '%" . $prodSubstr . "%'");
-        $query->where("oper_date>=STR_TO_DATE('$dateStart','%d.%m.%Y')");
-        $query->where("oper_date<=STR_TO_DATE('$dateEnd','%d.%m.%Y')");
-        $query->where("rrp.product_type=1");
-        $query->order($db->quoteName('oper_date'));
+        $query->where("oper_date>=STR_TO_DATE('$d1','%d.%m.%Y')");
+        $query->where("oper_date<=STR_TO_DATE('$d2','%d.%m.%Y')");
+
+        if (is_array($prodId)) {
+            $query->where("op.productId in (" . implode(", ", $prodId) . ")");
+        } elseif (isset($prodId) && $prodId > 0) {
+            $query->where("op.productId = " . $prodId);
+        }
+
+        if (isset($oper_type))
+            $query->where("op.oper_type='" . $oper_type . "'");
+
+        if (isset($prod_type))
+            $query->where("rrp.product_type=" . $prod_type);
+
+        if (isset($firm) && $firm != "")
+            $query->where("op.oper_firm='" . $firm . "'");
+
+        if (is_array($custId)) {
+            $query->where("op.custId in (" . implode(", ", $custId) . ")");
+        } elseif (isset($custId) && $custId > 0) {
+            $query->where("op.custId = " . $custId);
+        }
+
+        if (isset($sort) && $sort != "")
+            $query->order($db->quoteName('op.oper_date') . " " . $sort);
+        else
+            $query->order($db->quoteName('op.oper_date'));
+
+        if (version_compare(JPlatform::getShortVersion(), "12.1.0",">=")) {
+            if (isset($limit)) {
+                $query->setLimit($limit);
+            }
+        }
 
         try {
-            $db->setQuery($query);
+            if (version_compare(JPlatform::getShortVersion(), "12.1.0","<")) {
+                if (isset($limit)) {
+                    $db->setQuery($query, 0, $limit);
+                } else {
+                    $db->setQuery($query);
+                }
+            } else {
+                $db->setQuery($query);
+            }
+        } catch (Exception $e) {
+            JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
+        }
+
+        return $db->loadAssocList();
+    }
+    // =================================================================
+    /** Получение товарной ведомости по параметрам:
+     * - период
+     * - подстрока названия товара
+     * - контрагент
+     * - сотрудник
+     */
+    static function getProdVedomost()
+    {
+        $input = JFactory::getApplication()->input;
+        $dateStart = $input->getString('date_start', "");
+        $dateEnd = $input->getString('date_end', "");
+        if ($dateStart=="") $dateStart='01.' . JFactory::getDate()->format('m.Y');
+        if ($dateEnd=="") $dateEnd=JFactory::getDate()->format('d.m.Y');
+        $prodSubstr = $input->getString('search', '');
+        $prodId = $input->getString('prodId', null);
+        $firmSubstr = $input->getString('firm', null);
+        $custSubstr = $input->getString('cust', '');
+        $custId = $input->getString('custId', null);
+
+        try {
             $res = new stdClass ();
-            $res->data = $db->loadAssocList();
+            $res->data = RbOpers::getOpersArrayByQuery($dateStart, $dateEnd, null, $custId, $prodId, 1, $firmSubstr, 'ASC');
+            foreach ($res->data as &$o) {
+                if (isset($o["productId"]) && $o["productId"] != "" && isset($o["oper_date"]) && $o["oper_date"] != "") {
+                    $buyPriceHist = RbOpers::getOpersArrayByQuery(null, $o["oper_date"], "закуп", null, (int)$o["productId"], 1, null, "DESC", 1);
+                    $o["buyPrice"] = $buyPriceHist[0]["product_price"];
+                }
+            }
             echo json_encode($res);
         } catch (Exception $e) {
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
@@ -269,7 +339,7 @@ class RbOpers extends RbObject
 
     }
 
-    // =================================================================
+// =================================================================
     static function getIncomeOpers($year, $month, $cat, $oper_type = "продажа")
     {
         $having = array();

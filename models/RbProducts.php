@@ -78,6 +78,7 @@ class RbProducts extends RbObject
     {
         $input = JFactory::getApplication()->input;
         $searchSubstr = $input->getString('search', "");
+        $searchWithFilter = $input->getString('filter', "1");
         if (!is_string($searchSubstr) || strlen($searchSubstr) < 2) return;
 
         $db = JFactory::getDBO();
@@ -87,7 +88,7 @@ class RbProducts extends RbObject
         $query->clear();
         $query->select($prodRef->getFieldsForSelectClause());
         $query->from($db->quoteName($prodRef->table_name));
-        if (isset(RbConfig::$currentPriceName) && strcmp(RbConfig::$currentPriceName, "") != 0) {
+        if ($searchWithFilter=="1" && isset(RbConfig::$currentPriceName) && strcmp(RbConfig::$currentPriceName, "") != 0) {
             $query->where("(price_name='" . RbConfig::$currentPriceName . "' OR product_in_stock>0)", "AND");
         }
 

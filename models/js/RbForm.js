@@ -27,6 +27,7 @@ function getFormData(formName, objPrefix) {
 
             case "SELECT":
                 o[objPrefix][s] = $(this).find('option:selected').text();
+                o[objPrefix][s + "_value"] = $(this).find('option:selected').val();
                 break;
 
             case "INPUT":
@@ -83,11 +84,17 @@ function setFormData(formName, objPrefix, o) {
                     $(elem).selected = false;
                 });
                 if (!IsEmpty(o[s])) {
+                    var needToAdd = false;
                     $("#" + sIdDot + " option:contains('" + o[s] + "')").prop("selected", "selected");
-                    var sCheck1 = NullTo($('#' + sIdDot + ' option:selected').val(), "");
-                    var sCheck2 = NullTo(o[s], "");
-                    if (sCheck1.toUpperCase() != sCheck2.toUpperCase()) {
-                        $(elem).append('<option value="' + o[s] + '">' + o[s] + '</option>');
+                    if (NullTo(o[s + "_value"], "") != "") {//есть сохраненное значение
+                        needToAdd = NullTo($('#' + sIdDot + ' option:selected').val(), "").toUpperCase() != NullTo(o[s + "_value"], "").toUpperCase();
+                    } else {
+                        needToAdd = NullTo($('#' + sIdDot + ' option:selected').val(), "").toUpperCase() != NullTo(o[s], "").toUpperCase();
+                    }
+
+                    if (needToAdd) {
+                        var selValue = (NullTo(o[s + "_value"], "") == "") ? o[s] : o[s + "_value"];
+                        $(elem).append('<option value="' + selValue + '">' + o[s] + '</option>');
                         $("#" + sIdDot + " option:contains('" + o[s] + "')").prop("selected", "selected");
                     }
                 } else
@@ -191,7 +198,14 @@ function getCookie(cname) {
 function getObjCookie(cname) {
     var c = getCookie(cname);
     if (c == "") return {};
-    return JSON.parse(c);
+    var res = {};
+    try {
+        res = JSON.parse(c);
+    }
+    catch (e) {
+        res = {};
+    }
+    return res;
 }
 
 //===================================================================================
@@ -206,30 +220,34 @@ function setObjCookie(cname, o) {
 
 //===================================================================================
 function getPrintLinkByDoc(docId, docType) {
-    docId = NullTo(docId,0);
-    if (docId==0) return "";
+    docId = NullTo(docId, 0);
+    if (docId == 0) return "";
     var link = "index.php?option=com_rbo&format=raw";
-    var printLink="";
+    var printLink = "";
     switch (docType) {
-        case "акт": {
+        case "акт":
+        {
             printLink = "PrnInv";
             break;
         }
-        case "накл": {
+        case "накл":
+        {
             printLink = "PrnShip";
             break;
         }
-        case "B_ACT": {
+        case "B_ACT":
+        {
             printLink = "";
             break;
         }
-        case "B_BIL": {
+        case "B_BIL":
+        {
             printLink = "";
             break;
         }
         default:
             printLink = "";
     }
-    if (printLink=="") return "";
-    return link+"&view="+printLink+"&docid="+docId;
+    if (printLink == "") return "";
+    return link + "&view=" + printLink + "&docid=" + docId;
 }
