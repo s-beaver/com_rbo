@@ -11,6 +11,9 @@ $(document).ready(function () {
         sDocTypeTitle: 'Накладная (закуп)',
         checkFields: ["doc_num","doc_date","doc_manager","doc_firm"],
         tips: $(".validateTips"),
+        printList: [
+            {title: "Печатать", viewName: "PrnBBil"}
+        ],
         statusList: {
             "подписан": "подписан",
             "удален": "удален"

@@ -242,7 +242,7 @@ function getPrintLinkByDoc(docId, docType) {
         }
         case "B_BIL":
         {
-            printLink = "";
+            printLink = "PrnBBil";
             break;
         }
         default:

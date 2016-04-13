@@ -6,7 +6,15 @@ function getReportData(params) {
     $("#progressbar").show();
     $("#report_table").html("");
     $("#report_totals").html("");
-    if (IsNull(params)) params = getObjCookie(cookieName);
+
+    if (getURLParam("pv_prodId") != "") {
+        params = NullTo(params, {});
+        params.date_end = getURLParam("pv_date");
+        params.prodId = getURLParam("pv_prodId");
+    } else {
+        params = NullTo(params, getObjCookie(cookieName));
+    }
+
     $.ajax({
         dataType: 'json',
         type: "POST",
@@ -207,7 +215,9 @@ function fillReport(rep_data) {
         doc_type = NullTo(opers[i].doc_type, "");
         doc_num = NullTo(opers[i].doc_num, "");
         doc_date = NullTo(opers[i].doc_date, "");
-        doc_link = docId == 0 ? "" : "<a href='" + getPrintLinkByDoc(docId, doc_type) + "'>№" + doc_num + " / " + doc_date + " (" + doc_type + ")</a>";
+        doc_link = "";
+        if (docId > 0 && getPrintLinkByDoc(docId, doc_type) != "")
+            doc_link = "<a target='blank' href='" + getPrintLinkByDoc(docId, doc_type) + "'>№" + doc_num + " / " + doc_date + " (" + doc_type + ")</a>";
 
         productId = NullTo(Number(opers[i].productId), 0);
         //productTitle = NullTo(opers[i].product_name, "") + ((NullTo(opers[i].product_code, "")!="")?" ("+opers[i].product_code+")":"");
