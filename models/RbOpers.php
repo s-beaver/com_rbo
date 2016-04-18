@@ -330,6 +330,7 @@ class RbOpers extends RbObject
                 if (isset($o["productId"]) && $o["productId"] != "" && isset($o["oper_date"]) && $o["oper_date"] != "") {
                     $buyPriceHist = RbOpers::getOpersArrayByQuery(null, $o["oper_date"], "закуп", null, (int)$o["productId"], 1, null, "DESC", 1);
                     $o["buyPrice"] = $buyPriceHist[0]["product_price"];
+                    $o["buyDocId"] = $buyPriceHist[0]["docId"];
                 }
             }
             echo json_encode($res);

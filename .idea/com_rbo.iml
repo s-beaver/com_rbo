@@ -25,11 +25,11 @@
     <orderEntry type="module-library">
       <library name="PHP">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/../libraries/joomla" />
+          <root url="file://$MODULE_DIR$/../libraries/robik.ru" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/../libraries/joomla" />
+          <root url="file://$MODULE_DIR$/../libraries/robik.ru" />
         </SOURCES>
       </library>
     </orderEntry>

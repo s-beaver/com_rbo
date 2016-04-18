@@ -192,7 +192,7 @@ function fillReport(rep_data) {
     var opers = rep_data.data;
     var report = "", totalsMinus = 0, totalsPlus = 0;
     var operId, oper_type, oper_date, custId, docId, doc_type, doc_num, doc_date, doc_link, oper_sum, oper_firm, oper_rem;
-    var productId, productTitle, product_code, product_name, product_price, product_cnt, buy_price;
+    var productId, productTitle, product_code, product_name, product_price, product_cnt, buy_price, buy_docId, doc_buy_link;
 
     report = "<thead>";
     report += "<td>#</td>";
@@ -227,6 +227,10 @@ function fillReport(rep_data) {
         product_cnt = NullTo(Number(opers[i].product_cnt), 0);
         oper_sum = NullTo(Number(opers[i].oper_sum), 0);
         buy_price = NullTo(opers[i].buyPrice, 0);
+        buy_docId = NullTo(opers[i].buyDocId, 0);
+        doc_buy_link = "";
+        if (buy_docId > 0 && getPrintLinkByDoc(buy_docId, "B_BIL") != "")
+            doc_buy_link = "<a target='blank' href='" + getPrintLinkByDoc(buy_docId, "B_BIL") + "'>" + buy_price + "</a>";
 
         if (oper_type == "продажа" && buy_price > 0) {
             totalsPlus += product_cnt * product_price;
@@ -243,7 +247,8 @@ function fillReport(rep_data) {
         report += "<td align='right'>" + product_price + "</td>";
         report += "<td align='center'>" + product_cnt + "</td>";
         report += "<td align='right'>" + oper_sum + "</td>";
-        report += "<td align='right'>" + NullTo(opers[i].buyPrice, 0) + "</td>";
+        //report += "<td align='right'>" + NullTo(opers[i].buyPrice, 0) + "</td>";
+        report += "<td align='right'>" + doc_buy_link + "</td>";
         report += "<td>" + NullTo(opers[i].oper_firm, "") + "</td>";
         report += "<td>" + NullTo(opers[i].oper_rem, "") + "</td>";
         report += "</tr>";
