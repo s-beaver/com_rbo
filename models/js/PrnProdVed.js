@@ -192,7 +192,7 @@ function fillReport(rep_data) {
     var opers = rep_data.data;
     var report = "", totalsMinus = 0, totalsPlus = 0;
     var operId, oper_type, oper_date, custId, docId, doc_type, doc_num, doc_date, doc_link, oper_sum, oper_firm, oper_rem;
-    var productId, productTitle, product_code, product_name, product_price, product_cnt;
+    var productId, productTitle, product_code, product_name, product_price, product_cnt, buy_price;
 
     report = "<thead>";
     report += "<td>#</td>";
@@ -204,7 +204,7 @@ function fillReport(rep_data) {
     report += "<td>Цена</td>";
     report += "<td>К-во</td>";
     report += "<td>Сумма</td>";
-    report += "<td>С-стоим.</td>";
+    report += "<td>Закуп</td>";
     report += "<td>Фирма</td>";
     report += "<td>Прим.</td>";
     report += "</thead>";
@@ -217,7 +217,7 @@ function fillReport(rep_data) {
         doc_date = NullTo(opers[i].doc_date, "");
         doc_link = "";
         if (docId > 0 && getPrintLinkByDoc(docId, doc_type) != "")
-            doc_link = "<a target='blank' href='" + getPrintLinkByDoc(docId, doc_type) + "'>№" + doc_num + " / " + doc_date + " (" + doc_type + ")</a>";
+            doc_link = "<a target='blank' href='" + getPrintLinkByDoc(docId, doc_type) + "'>№" + doc_num + " / " + doc_date + "</a>";
 
         productId = NullTo(Number(opers[i].productId), 0);
         //productTitle = NullTo(opers[i].product_name, "") + ((NullTo(opers[i].product_code, "")!="")?" ("+opers[i].product_code+")":"");
@@ -226,20 +226,11 @@ function fillReport(rep_data) {
         product_price = NullTo(Number(opers[i].product_price), 0);
         product_cnt = NullTo(Number(opers[i].product_cnt), 0);
         oper_sum = NullTo(Number(opers[i].oper_sum), 0);
+        buy_price = NullTo(opers[i].buyPrice, 0);
 
-        switch (oper_type) {
-            case 'закуп':
-            case 'затраты-прочие':
-            case 'списание':
-            {
-                totalsMinus += product_cnt * product_price;
-                break;
-            }
-            case 'продажа':
-            {
-                totalsPlus += product_cnt * product_price;
-                break;
-            }
+        if (oper_type == "продажа" && buy_price > 0) {
+            totalsPlus += product_cnt * product_price;
+            totalsMinus += product_cnt * buy_price;
         }
 
         report += "<tr>";
@@ -264,9 +255,10 @@ function fillReport(rep_data) {
     $("#report_date").html(rep_data.date);
     $("#report_table").html(report);
     var s = "<br><b>";
-    s += "Итого затрат " + totalsMinus + " руб.<br>";
-    s += "Итого поступлений " + totalsPlus + " руб.<br>";
-    s += "Итого " + total + " руб.<br>";
+    s += "Итого продаж " + totalsPlus + " руб.<br>";
+    s += "За вычетом закупа " + totalsMinus + " руб.<br>";
+    s += "Итого " + total + " руб.</b><br>";
+    s += "Из расчета исключены строки со стоимостью закупа 0 руб<br>";
     s += "Строк в таблице:" + opers.length + " шт.<br>";
     $("#report_totals").html(s);
 
