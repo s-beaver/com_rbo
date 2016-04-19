@@ -117,7 +117,7 @@ switch ($cmd) {
         break;
     }
 
-    case "oper_report" : {//todo ���������� ����� �� ���������
+    case "oper_report" : {//todo Ежедневный отчет по операциям
         $oper = new RbOpers ();
         $oper->getOperReport();
         break;
@@ -219,3 +219,6 @@ switch ($cmd) {
 
 
 
+//todo не работает добавление операции/счета... и пр
+//todo операции открываются readonly
+//bootstrap requires jquery

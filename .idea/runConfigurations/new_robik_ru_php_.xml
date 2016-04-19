@@ -1,7 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="new.robik.ru(php)" type="PhpWebAppRunConfigurationType" factoryName="PHP Web Application" browser="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" server_name="new.robik.ru" start_url="/components/com_rbo/index.php">
-    <method>
-      <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_Create version file" />
-    </method>
-  </configuration>
-</component>

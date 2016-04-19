@@ -17,7 +17,7 @@ class RbHelper
     }
 
     // =================================================================
-    static function getTimeZone()
+    static function getTimeZone_before_12_1()
     {
         $userTz = JFactory::getUser()->getParam('timezone');
         $timeZone = JFactory::getConfig()->getValue('offset');
@@ -25,6 +25,12 @@ class RbHelper
             $timeZone = $userTz;
         }
         return new DateTimeZone ($timeZone);
+    }
+
+    // =================================================================
+    static function getTimeZone()
+    {
+        return new DateTimeZone(JFactory::getConfig()->get('offset'));
     }
 
     // =================================================================
