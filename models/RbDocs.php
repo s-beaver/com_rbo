@@ -348,7 +348,7 @@ class RbDocs extends RbObject
 
         $data_rows_assoc_list = $db->loadAssocList();
 
-        $db->setQuery('SELECT count(*) FROM '.$this->table_name.' rd ' . $sWhere);
+        $db->setQuery('SELECT count(*) '.$sRestOfQuery);
         $iRecordsTotal = $db->loadResult();
 
         $db->setQuery("SELECT doc_base, docId, doc_num, doc_date, doc_type " .

@@ -217,8 +217,3 @@ switch ($cmd) {
     }
 }
 
-
-
-//todo не работает добавление операции/счета... и пр
-//todo операции открываются readonly
-//bootstrap requires jquery
