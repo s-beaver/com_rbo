@@ -211,7 +211,7 @@ class RbOpers extends RbObject
      * @param $d1 - строка даты в формате dd.mm.YYYY
      * @param $d2 - строка даты в формате dd.mm.YYYY
      * @param $oper_type - строка операции или все (пустая строка)
-     * @param $custId - id контрагента или массив id контрагентов
+     * @param $custId - id контрагента или массив id контрагентов (или пусто)
      * @param $prodId - id товара или массив id товаров
      * @param $prod_type - 1- товар, 2 - услуга, null - любое
      * @param $firm - строка
@@ -255,10 +255,12 @@ class RbOpers extends RbObject
         $query->where("oper_date>=STR_TO_DATE('$d1','%d.%m.%Y')");
         $query->where("oper_date<=STR_TO_DATE('$d2','%d.%m.%Y')");
 
-        if (is_array($prodId)) {
-            $query->where("op.productId in (" . implode(", ", $prodId) . ")");
-        } elseif (isset($prodId) && $prodId > 0) {
-            $query->where("op.productId = " . $prodId);
+        if (isset($prodId)) {
+            if (is_array($prodId)) {
+                $query->where("op.productId in (" . implode(", ", $prodId) . ")");
+            } elseif ($prodId > 0) {
+                $query->where("op.productId = " . $prodId);
+            }
         }
 
         if (isset($oper_type))
@@ -270,10 +272,12 @@ class RbOpers extends RbObject
         if (isset($firm) && $firm != "")
             $query->where("op.oper_firm='" . $firm . "'");
 
-        if (is_array($custId)) {
-            $query->where("op.custId in (" . implode(", ", $custId) . ")");
-        } elseif (isset($custId) && $custId > 0) {
-            $query->where("op.custId = " . $custId);
+        if (isset($custId)) {
+            if (is_array($custId)) {
+                $query->where("op.custId in (" . implode(", ", $custId) . ")");
+            } elseif ($custId > 0) {
+                $query->where("op.custId = " . $custId);
+            }
         }
 
         if (isset($sort) && $sort != "")
@@ -281,14 +285,15 @@ class RbOpers extends RbObject
         else
             $query->order($db->quoteName('op.oper_date'));
 
-        if (version_compare(JPlatform::getShortVersion(), "12.1.0",">=")) {
+        if (version_compare(JPlatform::getShortVersion(), "12.1.0", ">=")) {
             if (isset($limit)) {
                 $query->setLimit($limit);
             }
         }
+        //JLog::add($query->__toString(), 'debug', 'com_rbo');
 
         try {
-            if (version_compare(JPlatform::getShortVersion(), "12.1.0","<")) {
+            if (version_compare(JPlatform::getShortVersion(), "12.1.0", "<")) {
                 if (isset($limit)) {
                     $db->setQuery($query, 0, $limit);
                 } else {
@@ -315,13 +320,14 @@ class RbOpers extends RbObject
         $input = JFactory::getApplication()->input;
         $dateStart = $input->getString('date_start', "");
         $dateEnd = $input->getString('date_end', "");
-        if ($dateStart=="") $dateStart='01.' . JFactory::getDate()->format('m.Y');
-        if ($dateEnd=="") $dateEnd=JFactory::getDate()->format('d.m.Y');
+        if ($dateStart == "") $dateStart = '01.' . JFactory::getDate()->format('m.Y');
+        if ($dateEnd == "") $dateEnd = JFactory::getDate()->format('d.m.Y');
         $prodSubstr = $input->getString('search', '');
         $prodId = $input->getString('prodId', null);
         $firmSubstr = $input->getString('firm', null);
         $custSubstr = $input->getString('cust', '');
         $custId = $input->getString('custId', null);
+        //JLog::add("Params: ".$dateStart."-".$dateEnd."-".$custId."-".$prodId."-".$firmSubstr, 'debug', 'com_rbo');
 
         try {
             $res = new stdClass ();
