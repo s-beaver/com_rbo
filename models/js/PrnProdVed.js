@@ -28,8 +28,11 @@ function getReportData(params) {
                 params.date_end = NullTo(params.date_end, "");
                 s += "за " + params.date_start + " - " + params.date_end;
 
-                if (NullTo(params.prodId, 0) > 0)
+                if (NullTo(params.prodId, 0) > 0) {
+                    s += ", по товару &quot;" + params.product_name + "&quot;";
+                } else {
                     s += ", по товару &quot;" + params.search + "&quot;";
+                }
 
                 if (NullTo(params.custId, 0) > 0)
                     s += ", по контрагенту &quot;" + params.cust_name + "&quot;";

@@ -212,7 +212,7 @@ class RbOpers extends RbObject
      * @param $d2 - строка даты в формате dd.mm.YYYY
      * @param $oper_type - строка операции или все (пустая строка)
      * @param $custId - id контрагента или массив id контрагентов (или пусто)
-     * @param $prodId - id товара или массив id товаров
+     * @param $prodId - id товара, массив id товаров или подстрока названия товара
      * @param $prod_type - 1- товар, 2 - услуга, null - любое
      * @param $firm - строка
      * @param $sort - DESC или пусто
@@ -256,10 +256,19 @@ class RbOpers extends RbObject
         $query->where("oper_date<=STR_TO_DATE('$d2','%d.%m.%Y')");
 
         if (isset($prodId)) {
-            if (is_array($prodId)) {
-                $query->where("op.productId in (" . implode(", ", $prodId) . ")");
-            } elseif ($prodId > 0) {
-                $query->where("op.productId = " . $prodId);
+            switch (gettype($prodId)) {
+                case "string": {
+                    $query->where("op.product_name like '%" . $prodId . "%'");
+                    break;
+                }
+                case "integer": {
+                    $query->where("op.productId = " . $prodId);
+                    break;
+                }
+                case "array": {
+                    $query->where("op.productId in (" . implode(", ", $prodId) . ")");
+                    break;
+                }
             }
         }
 
@@ -323,19 +332,20 @@ class RbOpers extends RbObject
         if ($dateStart == "") $dateStart = '01.' . JFactory::getDate()->format('m.Y');
         if ($dateEnd == "") $dateEnd = JFactory::getDate()->format('d.m.Y');
         $prodSubstr = $input->getString('search', '');
-        $prodId = $input->getString('prodId', null);
-        $firmSubstr = $input->getString('firm', null);
-        $custSubstr = $input->getString('cust', '');
-        $custId = $input->getString('custId', null);
-        //JLog::add("Params: ".$dateStart."-".$dateEnd."-".$custId."-".$prodId."-".$firmSubstr, 'debug', 'com_rbo');
+        $prodId = $input->getString('prodId', $prodSubstr);
+        if ((integer)$prodId==0) $prodId = $prodSubstr;
+                    $firmSubstr = $input->getString('firm', null);
+                    $custSubstr = $input->getString('cust', '');
+                    $custId = $input->getString('custId', null);
+                    //JLog::add("Params: ".$dateStart."-".$dateEnd."-".$custId."-".$prodId."-".$firmSubstr, 'debug', 'com_rbo');
 
-        try {
-            $res = new stdClass ();
-            $res->data = RbOpers::getOpersArrayByQuery($dateStart, $dateEnd, null, $custId, $prodId, 1, $firmSubstr, 'ASC');
-            foreach ($res->data as &$o) {
-                if (isset($o["productId"]) && $o["productId"] != "" && isset($o["oper_date"]) && $o["oper_date"] != "") {
-                    $buyPriceHist = RbOpers::getOpersArrayByQuery(null, $o["oper_date"], "закуп", null, (int)$o["productId"], 1, null, "DESC", 1);
-                    $o["buyPrice"] = $buyPriceHist[0]["product_price"];
+                    try {
+                        $res = new stdClass ();
+                        $res->data = RbOpers::getOpersArrayByQuery($dateStart, $dateEnd, null, $custId, $prodId, 1, $firmSubstr, 'ASC');
+                        foreach ($res->data as &$o) {
+                            if (isset($o["productId"]) && $o["productId"] != "" && isset($o["oper_date"]) && $o["oper_date"] != "") {
+                                $buyPriceHist = RbOpers::getOpersArrayByQuery(null, $o["oper_date"], "закуп", null, (int)$o["productId"], 1, null, "DESC", 1);
+                                $o["buyPrice"] = $buyPriceHist[0]["product_price"];
                     $o["buyDocId"] = $buyPriceHist[0]["docId"];
                 }
             }
