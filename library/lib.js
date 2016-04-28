@@ -381,3 +381,17 @@ function getURLParam(paramName) {
     else
         return aSearched[1];
 }
+
+//==================================================================================
+/**
+ #hfunc(double)#Функция предназначена для округления числа в нужном знаке
+ #hval(double)#первый параметр fVal - число
+ #hval(long)#второй параметр digits - номер знака после запятой
+ */
+function Round(fVal, digits)
+{
+    digits = NullTo(digits,0);
+    var p = Math.pow(10, digits);
+    return Math.round(p * fVal) / p;
+//  return o_Sys.Trunc(Sign(fVal)*0.5 + p * fVal) / p;
+}
