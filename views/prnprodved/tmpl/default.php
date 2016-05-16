@@ -5,6 +5,9 @@
     <?php include RBO_PATH . '/views/header.head.links.php' ?>
     <script src="<?php echo JRBO_PATH ?>/library/lib.js"></script>
     <script src="<?php echo JRBO_PATH ?>/models/js/RbForm.js"></script>
+    <script src="<?php echo JRBO_PATH ?>/models/js/RbDoc.js"></script>
+    <script src="<?php echo JRBO_PATH ?>/models/js/RbProduct.js"></script>
+    <script src="<?php echo JRBO_PATH ?>/models/js/RbCust.js"></script>
     <script src="<?php echo JRBO_PATH ?>/models/js/PrnProdVed.js"></script>
     <link rel="stylesheet" href="<?php echo JRBO_PATH ?>/css/rbo.css"/>
 
@@ -44,6 +47,7 @@
         <div id="report_params" style="display: inline;"></div>
     </h2>
 </a>
+
 <div id="progressbar"></div>
 <table id="report_table">
 </table>
@@ -59,9 +63,15 @@
                 <input type="text" name="pv.date_start" id="pv.date_start" style='text-align: left; width: 100px'/>
                 <label for="pv.date_end">&nbsp;до</label>
                 <input type="text" name="pv.date_end" id="pv.date_end" style='text-align: left; width: 100px'/>
+            </div>
+            <div>
                 <label for="pv.firm">&nbsp;Фирма</label>
                 <select id="pv.firm" name="pv.firm" style="width: 120px"></select>
-            </div><br><hr>
+                <label for="pv.manager">&nbsp;Менеджер</label>
+                <select id="pv.manager" name="pv.manager" style="width: 120px"></select>
+            </div>
+            <br>
+            <hr>
             <div>
                 <label for="pv.search">Поиск</label>
                 <input type="text" name="pv.search" id="pv.search" style='width: 300px'/>
@@ -75,7 +85,9 @@
             <div>
                 <label for="pv.product_name">Товар</label>
                 <select id="pv.product_name" name="pv.product_name" style="width: 400px"></select>
-            </div><br><hr>
+            </div>
+            <br>
+            <hr>
             <div>
                 <label for="pv.cust">Поиск</label>
                 <input type="text" name="pv.cust" id="pv.cust" style='width: 300px'/>
@@ -94,6 +106,7 @@
     </form>
 </div>
 
+<?php include RBO_PATH . '/views/form.doc-s-bill.php' ?>
 
 </body>
 </html>

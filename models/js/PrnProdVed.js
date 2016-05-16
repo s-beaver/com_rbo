@@ -1,6 +1,7 @@
 'use strict';
 var oFormDlg;
 var cookieName = "prn_prod_ved";
+var s_bill;
 // ===================================================================================
 function getReportData(params) {
     $("#progressbar").show();
@@ -31,7 +32,8 @@ function getReportData(params) {
                 if (NullTo(params.prodId, 0) > 0) {
                     s += ", по товару &quot;" + params.product_name + "&quot;";
                 } else {
-                    s += ", по товару &quot;" + params.search + "&quot;";
+                    if (NullTo(params.search, "") != "")
+                        s += ", по товару &quot;" + params.search + "&quot;";
                 }
 
                 if (NullTo(params.custId, 0) > 0)
@@ -39,6 +41,9 @@ function getReportData(params) {
 
                 if (NullTo(params.firm, "") != "")
                     s += ", по фирме &quot;" + params.firm + "&quot;";
+
+                if (NullTo(params.manager, "") != "")
+                    s += ", по менеджеру &quot;" + params.manager + "&quot;";
 
                 $("#report_params").html(s);
             }
@@ -108,6 +113,7 @@ function readDocument() {
     });
 
     refillSelect("pv\\.firm", getFirmList(), true);
+    refillSelect("pv\\.manager", getPeopleList(), true);
 
     $("#prod_search_btn").click(function (event) {
         productSearch();
@@ -194,7 +200,7 @@ function fillReport(rep_data) {
     rep_data = NullTo(rep_data, {});
     var opers = rep_data.data;
     var report = "", totalsMinus = 0, totalsPlus = 0;
-    var operId, oper_type, oper_date, custId, docId, doc_type, doc_num, doc_date, doc_link, oper_sum, oper_firm, oper_rem;
+    var operId, oper_type, oper_date, custId, docId, doc_type, doc_num, doc_date, doc_link, oper_sum, oper_firm, oper_manager, oper_rem;
     var productId, productTitle, product_code, product_name;
     var product_price, product_cnt, buy_price, buy_docId, doc_buy_link, buy_sum;
 
@@ -211,6 +217,7 @@ function fillReport(rep_data) {
     report += "<td>Закуп</td>";
     report += "<td>Сумма закуп</td>";
     report += "<td>Фирма</td>";
+    report += "<td>Мен.</td>";
     report += "<td>Прим.</td>";
     report += "</thead>";
     for (var i = 0; i < opers.length; i++) {
@@ -221,8 +228,11 @@ function fillReport(rep_data) {
         doc_num = NullTo(opers[i].doc_num, "");
         doc_date = NullTo(opers[i].doc_date, "");
         doc_link = "";
-        if (docId > 0 && getPrintLinkByDoc(docId, doc_type) != "")
-            doc_link = "<a target='blank' href='" + getPrintLinkByDoc(docId, doc_type) + "'>№" + doc_num + " / " + doc_date + "</a>";
+        if (docId > 0 && getPrintLinkByDoc(docId, doc_type) != "") {
+            //doc_link = "<a target='blank' href='" + getPrintLinkByDoc(docId, doc_type) + "'>№" + doc_num + " / " + doc_date + "</a>";
+            if (doc_type == "накл")
+                doc_link = "<a href='javascript:s_bill.readDoc(" + docId + ")'>№" + doc_num + " / " + doc_date + "</a>";
+        }
 
         productId = NullTo(Number(opers[i].productId), 0);
         //productTitle = NullTo(opers[i].product_name, "") + ((NullTo(opers[i].product_code, "")!="")?" ("+opers[i].product_code+")":"");
@@ -254,8 +264,9 @@ function fillReport(rep_data) {
         report += "<td align='center'>" + product_cnt + "</td>";
         report += "<td align='right'>" + oper_sum + "</td>";
         report += "<td align='right'>" + doc_buy_link + "</td>";
-        report += "<td align='right'>" + Round(buy_sum,2) + "</td>";
+        report += "<td align='right'>" + Round(buy_sum, 2) + "</td>";
         report += "<td>" + NullTo(opers[i].oper_firm, "") + "</td>";
+        report += "<td>" + NullTo(opers[i].oper_manager, "") + "</td>";
         report += "<td>" + NullTo(opers[i].oper_rem, "") + "</td>";
         report += "</tr>";
     }
@@ -278,5 +289,28 @@ function fillReport(rep_data) {
 
 // ===================================================================================
 $(document).ready(function () {
+    s_bill = new RbDoc({
+        docFormPrefix: "s_bill",
+        sDocType: 'накл',
+        sDocTypeListTitle: 'Накладные',
+        sDocTypeTitle: 'Накладная',
+        checkFields: ["doc_num", "doc_date", "doc_manager", "doc_firm"],
+        tips: $(".validateTips"),
+        printList: [
+            {title: "Печатать ТОРГ-12", viewName: "PrnTorg12"},
+            {title: "Печатать накл.", viewName: "PrnShip"},
+            {title: "Печатать тов.чек", viewName: "PrnTvCheck"}
+        ],
+        statusList: {
+            "подписан": "подписан",
+            "удален": "удален"
+        }
+    });
+    //s_bill.attachPageElements();
+
+    $("#dialog-confirm").dialog({
+        autoOpen: false
+    });
+
     readDocument();
 });

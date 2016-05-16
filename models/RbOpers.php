@@ -218,7 +218,7 @@ class RbOpers extends RbObject
      * @param $sort - DESC или пусто
      * @return mixed
      */
-    static function getOpersArrayByQuery($d1, $d2, $oper_type, $custId, $prodId, $prod_type, $firm, $sort, $limit)
+    static function getOpersArrayByQuery($d1, $d2, $oper_type, $custId, $prodId, $prod_type, $firm, $manager, $sort, $limit)
     {
         $oper = new RbOpers ();
         $db = JFactory::getDBO();
@@ -236,6 +236,7 @@ class RbOpers extends RbObject
                 "op.product_cnt",
                 "op.oper_sum",
                 "op.oper_firm",
+                "op.oper_manager",
                 "op.oper_rem",
                 "rrc.cust_name",
                 "rrd.doc_num",
@@ -280,6 +281,9 @@ class RbOpers extends RbObject
 
         if (isset($firm) && $firm != "")
             $query->where("op.oper_firm='" . $firm . "'");
+
+        if (isset($manager) && $manager != "")
+            $query->where("op.oper_manager='" . $manager . "'");
 
         if (isset($custId)) {
             if (is_array($custId)) {
@@ -333,22 +337,25 @@ class RbOpers extends RbObject
         if ($dateEnd == "") $dateEnd = JFactory::getDate()->format('d.m.Y');
         $prodSubstr = $input->getString('search', '');
         $prodId = $input->getString('prodId', $prodSubstr);
-        if ((integer)$prodId==0) $prodId = $prodSubstr;
-                    $firmSubstr = $input->getString('firm', null);
-                    $custSubstr = $input->getString('cust', '');
-                    $custId = $input->getString('custId', null);
-                    //JLog::add("Params: ".$dateStart."-".$dateEnd."-".$custId."-".$prodId."-".$firmSubstr, 'debug', 'com_rbo');
+        if ((integer)$prodId == 0) $prodId = $prodSubstr;
+        $firmSubstr = $input->getString('firm', null);
+        $managerSubstr = $input->getString('manager', null);
+        $custSubstr = $input->getString('cust', '');
+        $custId = $input->getString('custId', null);
+        //JLog::add("Params: ".$dateStart."-".$dateEnd."-".$custId."-".$prodId."-".$firmSubstr, 'debug', 'com_rbo');
 
-                    try {
-                        $res = new stdClass ();
-                        $res->data = RbOpers::getOpersArrayByQuery($dateStart, $dateEnd, null, $custId, $prodId, 1, $firmSubstr, 'ASC');
-                        foreach ($res->data as &$o) {
-                            if (isset($o["productId"]) && $o["productId"] != "" && isset($o["oper_date"]) && $o["oper_date"] != "") {
-                                $buyPriceHist = RbOpers::getOpersArrayByQuery(null, $o["oper_date"], "закуп", null, (int)$o["productId"], 1, null, "DESC", 1);
-                                $o["buyPrice"] = $buyPriceHist[0]["product_price"];
+        try {
+            $res = new stdClass ();
+            $res->data = RbOpers::getOpersArrayByQuery($dateStart, $dateEnd, null, $custId, $prodId, 1, $firmSubstr, $managerSubstr, 'ASC');
+            foreach ($res->data as &$o) {
+                if (isset($o["productId"]) && $o["productId"] != "" && isset($o["oper_date"]) && $o["oper_date"] != "") {
+                    $buyPriceHist = RbOpers::getOpersArrayByQuery(null, $o["oper_date"], "закуп", null, (int)$o["productId"], 1, null, null, "DESC", 1);
+                    $o["buyPrice"] = $buyPriceHist[0]["product_price"];
                     $o["buyDocId"] = $buyPriceHist[0]["docId"];
                 }
             }
+            $res->date_start = $dateStart;
+            $res->date_end = $dateEnd;
             echo json_encode($res);
         } catch (Exception $e) {
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
