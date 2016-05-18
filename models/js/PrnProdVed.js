@@ -1,7 +1,7 @@
 'use strict';
 var oFormDlg;
 var cookieName = "prn_prod_ved";
-var s_bill;
+var s_bill, b_bill;
 // ===================================================================================
 function getReportData(params) {
     $("#progressbar").show();
@@ -246,7 +246,8 @@ function fillReport(rep_data) {
         buy_sum = buy_price * product_cnt;
         doc_buy_link = "";
         if (buy_docId > 0 && getPrintLinkByDoc(buy_docId, "B_BIL") != "")
-            doc_buy_link = "<a target='blank' href='" + getPrintLinkByDoc(buy_docId, "B_BIL") + "'>" + buy_price + "</a>";
+            //doc_buy_link = "<a target='blank' href='" + getPrintLinkByDoc(buy_docId, "B_BIL") + "'>" + buy_price + "</a>";
+            doc_buy_link = "<a href='javascript:b_bill.readDoc(" + buy_docId + ")'>" + buy_price + "</a>";
 
         if (oper_type == "продажа" && buy_price > 0) {
             totalsPlus += product_cnt * product_price;
@@ -307,6 +308,22 @@ $(document).ready(function () {
         }
     });
     //s_bill.attachPageElements();
+
+    b_bill = new RbDoc({
+        sDocType: 'B_BIL',
+        docFormPrefix:"b_bill",
+        sDocTypeListTitle: 'Накладные (закуп)',
+        sDocTypeTitle: 'Накладная (закуп)',
+        checkFields: ["doc_num","doc_date","doc_manager","doc_firm"],
+        tips: $(".validateTips"),
+        printList: [
+            {title: "Печатать", viewName: "PrnBBil"}
+        ],
+        statusList: {
+            "подписан": "подписан",
+            "удален": "удален"
+        }
+    });
 
     $("#dialog-confirm").dialog({
         autoOpen: false

@@ -17,17 +17,17 @@
             font-size: 10pt;
         }
 
-        table {
+        #report_table {
             border-collapse: collapse;
         }
 
-        table, th, td {
+        #report_table td {
             border: 1px solid black;
             padding: 5px;
         }
 
-        #report_date {
-            display: inline
+        fieldset {
+            border-width: 0;
         }
 
         .alert {
@@ -106,7 +106,13 @@
     </form>
 </div>
 
-<?php include RBO_PATH . '/views/form.doc-s-bill.php' ?>
+<?php include RBO_PATH.'/views/form.doc-s-bill.php'?>
+<?php include RBO_PATH.'/views/form.doc-b-bill.php'?>
+<?php include RBO_PATH.'/views/form.product.php'?>
+<?php include RBO_PATH.'/views/form.customer.php'?>
+<?php include RBO_PATH.'/views/form.base-doc.php'?>
+<?php include RBO_PATH.'/views/form.dialog-confirm.php'?>
+
 
 </body>
 </html>
