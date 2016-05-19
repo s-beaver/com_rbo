@@ -85,19 +85,13 @@ RbDoc.prototype.attachDocForm = function () {
             "title": "Ред.",
             "className": "center",
             "data": function (source, type, val) {
-                return "<a id='edit_product' href='javascript:" + self.docFormPrefix + ".showProductForm(" + source.lineNo + ")'><img src='" + comPath + "images/icon-32-edit-on.png'/></a>";
+                return "<a id='" + self.docFormPrefix + ".edit_product' href='javascript:" + self.docFormPrefix + ".showProductForm(" + source.lineNo + ")'><img src='" + comPath + "images/icon-32-edit-on.png'/></a>";
             }
         }],
         "language": dataTablesLanguage
     });
 
     this.apiTableProducts = this.oTableProducts.api();
-
-    //обработчик нажатия кнопки добавления товара в документ
-    $("#" + self.docFormPrefix + "\\.prod_add_btn").click(function (event) {
-        self.showProductForm();
-        return false;
-    });
 
 };
 
@@ -201,9 +195,19 @@ RbDoc.prototype.setRW = function (sStatus) {//todo проверять из statu
         $("[id^='" + self.docFormPrefix + "\\.edit_product']").each(function (x, elem) {
             $(this).attr("href", "javascript:;");
         });
+        $("#" + self.docFormPrefix + "\\.prod_add_btn").off("click");
+        $("#" + self.docFormPrefix + "\\.prod_add_btn").click(function (event) {
+            return false;
+        });
         return true;
     } else {
         this.checkFields.removeAttr("disabled");
+        //обработчик нажатия кнопки добавления товара в документ
+        $("#" + self.docFormPrefix + "\\.prod_add_btn").off("click");
+        $("#" + self.docFormPrefix + "\\.prod_add_btn").click(function (event) {
+            self.showProductForm();
+            return false;
+        });
         return false;
     }
 };
