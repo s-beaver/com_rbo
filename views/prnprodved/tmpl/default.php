@@ -75,10 +75,10 @@
             <div>
                 <label for="pv.search">Поиск</label>
                 <input type="text" name="pv.search" id="pv.search" style='width: 300px'/>
-                <a href="" id="prod_search_btn">
+                <a href="" id="_pv.prod_search_btn">
                     <img src="<?php echo JRBO_PATH ?>/images/icon-32-search-on.png" width="32" height="32"/>
                 </a>
-                <a href="" id="prod_search_delete_btn">
+                <a href="" id="_pv.prod_search_delete_btn">
                     <img src="<?php echo JRBO_PATH ?>/images/icon-32-delete-on.png" width="32" height="32"/>
                 </a>
             </div>
@@ -91,10 +91,10 @@
             <div>
                 <label for="pv.cust">Поиск</label>
                 <input type="text" name="pv.cust" id="pv.cust" style='width: 300px'/>
-                <a href="" id="cust_search_btn">
+                <a href="" id="_pv.cust_search_btn">
                     <img src="<?php echo JRBO_PATH ?>/images/icon-32-search-on.png" width="32" height="32"/>
                 </a>
-                <a href="" id="cust_search_delete_btn">
+                <a href="" id="_pv.cust_search_delete_btn">
                     <img src="<?php echo JRBO_PATH ?>/images/icon-32-delete-on.png" width="32" height="32"/>
                 </a>
             </div>

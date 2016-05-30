@@ -115,22 +115,22 @@ function readDocument() {
     refillSelect("pv\\.firm", getFirmList(), true);
     refillSelect("pv\\.manager", getPeopleList(), true);
 
-    $("#prod_search_btn").click(function (event) {
+    $("#_pv\\.prod_search_btn").click(function (event) {
         productSearch();
         return false;
     });
 
-    $("#cust_search_btn").click(function (event) {
+    $("#_pv\\.cust_search_btn").click(function (event) {
         custSearch();
         return false;
     });
 
-    $("#prod_search_delete_btn").click(function (event) {
+    $("#_pv\\.prod_search_delete_btn").click(function (event) {
         $('#pv\\.product_name option').remove();
         return false;
     });
 
-    $("#cust_search_delete_btn").click(function (event) {
+    $("#_pv\\.cust_search_delete_btn").click(function (event) {
         $('#pv\\.cust_name option').remove();
         return false;
     });
