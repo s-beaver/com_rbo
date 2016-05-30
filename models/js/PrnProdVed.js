@@ -199,7 +199,7 @@ function custSearch() {
 function fillReport(rep_data) {
     rep_data = NullTo(rep_data, {});
     var opers = rep_data.data;
-    var report = "", totalsMinus = 0, totalsPlus = 0;
+    var report = "", totalsMinus = 0, totalsPlus = 0, totalsMinusZ = 0, totalsPlusZ = 0;
     var operId, oper_type, oper_date, custId, docId, doc_type, doc_num, doc_date, doc_link, oper_sum, oper_firm, oper_manager, oper_rem;
     var productId, productTitle, product_code, product_name;
     var product_price, product_cnt, buy_price, buy_docId, doc_buy_link, buy_sum;
@@ -253,6 +253,10 @@ function fillReport(rep_data) {
             totalsPlus += product_cnt * product_price;
             totalsMinus += product_cnt * buy_price;
         }
+        if (oper_type == "закуп" && buy_price > 0) {
+            totalsPlusZ += product_cnt * product_price;
+            totalsMinusZ += product_cnt * buy_price;
+        }
 
         report += "<tr>";
         report += "<td>" + NullTo(opers[i].operId, "") + "</td>";
@@ -278,10 +282,9 @@ function fillReport(rep_data) {
     $("#report_date").html(rep_data.date);
     $("#report_table").html(report);
     var s = "<br><b>";
-    s += "Итого продаж " + totalsPlus + " руб.<br>";
-    s += "За вычетом закупа " + totalsMinus + " руб.<br>";
-    s += "Итого " + total + " руб.</b><br>";
+    s += "Итого продаж " + totalsPlus + " руб., за вычетом закупа " + totalsMinus + " руб. = " + total + " руб.</b><br>";
     s += "Из расчета исключены строки со стоимостью закупа 0 руб<br>";
+    s += "Строки закупа без продаж " + Round(totalsMinusZ,2) + " руб.</b><br><br>";
     s += "Строк в таблице:" + opers.length + " шт.<br>";
     $("#report_totals").html(s);
 
