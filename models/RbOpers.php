@@ -336,7 +336,8 @@ class RbOpers extends RbObject
         if ($dateStart == "") $dateStart = '01.' . JFactory::getDate()->format('m.Y');
         if ($dateEnd == "") $dateEnd = JFactory::getDate()->format('d.m.Y');
         $prodSubstr = $input->getString('search', '');
-        $prodId = $input->getString('prodId', $prodSubstr);
+        $prodId = $input->getInt('prodId', 0);
+        if (!isset($prodId) || $prodId==0) $prodId = $prodSubstr;
         if ((integer)$prodId == 0) $prodId = $prodSubstr;
         $firmSubstr = $input->getString('firm', null);
         $managerSubstr = $input->getString('manager', null);
