@@ -29,6 +29,8 @@
                 <label id="rbo_opers.operId" style="visibility: hidden"></label>
               </div>
               <div style="float: right">
+                <label for="rbo_opers.pay_date">Оплата</label>
+                <input type="text" name="rbo_opers.pay_date" id="s_bill.pay_date" style='text-align: center; width: 100px' />
                 <label for="rbo_opers.oper_type">Операция</label>
                 <select id="rbo_opers.oper_type" name="rbo_opers.oper_type" style="width: 200px" autofocus>
                 </select>

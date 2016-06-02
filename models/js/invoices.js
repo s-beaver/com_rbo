@@ -67,10 +67,16 @@ $(document).ready(function () {
         autoOpen: false
     });
 
-    $("#doc_date").datepicker({
+    $("#inv\\.doc_date").datepicker({
         showButtonPanel: true,
         dateFormat: "dd.mm.yy"
     });
+
+    $("#inv\\.pay_date").datepicker({
+        showButtonPanel: true,
+        dateFormat: "dd.mm.yy"
+    });
+
 
     inv.readDocFromURLId();
 });

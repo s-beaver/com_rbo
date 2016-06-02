@@ -25,7 +25,12 @@ $(document).ready(function () {
         autoOpen: false
     });
 
-    $("#doc_date").datepicker({
+    $("#b_bill\\.doc_date").datepicker({
+        showButtonPanel: true,
+        dateFormat: "dd.mm.yy"
+    });
+
+    $("#b_bill\\.pay_date").datepicker({
         showButtonPanel: true,
         dateFormat: "dd.mm.yy"
     });

@@ -18,7 +18,7 @@
 <body>
   <?php include RBO_PATH.'/views/header.doclist.php'?>
 
-  <?php include RBO_PATH . '/views/form.doc-s-bill.php' ?>
+  <?php include RBO_PATH.'/views/form.doc-s-bill.php' ?>
 
   <?php include RBO_PATH.'/views/form.product.php'?>
 
@@ -26,7 +26,7 @@
 
   <?php include RBO_PATH.'/views/form.base-doc.php'?>
 
-  <?php include RBO_PATH . '/views/form.dialog-confirm.php' ?>
+  <?php include RBO_PATH.'/views/form.dialog-confirm.php' ?>
 
   <table id="TableDoc" class="display compact"></table>
 

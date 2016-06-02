@@ -26,6 +26,7 @@ class RbDocs extends RbObject
         $this->flds ["custId"] = array("type" => "numeric");
 
         $this->flds ["doc_sum"] = array("type" => "numeric");
+        $this->flds ["pay_date"] = array("type" => "date");
         $this->flds ["doc_manager"] = array("type" => "string");
         $this->flds ["doc_firm"] = array("type" => "string");
         $this->flds ["doc_rem"] = array("type" => "string");
@@ -304,6 +305,7 @@ class RbDocs extends RbObject
                     return;
             }
             $product["oper_date"] = $this->buffer->doc_date;
+            $product["pay_date"] = $this->buffer->pay_date;
             //$product["oper_sum"] = (integer)$product["product_price"]*(integer)$product["product_cnt"];
             $product["custId"] = $this->buffer->custId;
             $product["oper_firm"] = $this->buffer->doc_firm;
@@ -336,7 +338,7 @@ class RbDocs extends RbObject
         }
 
         $rboCustTableName = RbHelper::getTableName("rbo_cust");
-        $sSelect = "SELECT docId, doc_num, doc_date, rc.cust_name doc_cust, doc_sum, doc_status, doc_firm, doc_manager, doc_rem ";
+        $sSelect = "SELECT docId, doc_num, doc_date, pay_date, rc.cust_name doc_cust, doc_sum, doc_status, doc_firm, doc_manager, doc_rem ";
         $sRestOfQuery = " FROM ".$this->table_name." rd LEFT JOIN ".$rboCustTableName." rc ON rd.custId = rc.custId " .
             $sWhere . " ORDER BY rd.docId DESC";
 

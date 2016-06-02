@@ -28,6 +28,8 @@
                                 src="<?php echo JRBO_PATH ?>/images/icon-32-new-on.png"/></a>
 
                         <div style="float: right">
+                            <label for="b_bill.pay_date">Оплата</label>
+                            <input type="text" name="b_bill.pay_date" id="b_bill.pay_date" style='text-align: center; width: 100px' />
                             <label for="b_bill.doc_cust">Поставщик</label>
                             <input disabled type="text" name="b_bill.doc_cust" id="b_bill.doc_cust"
                                    style='width: 200px'/>

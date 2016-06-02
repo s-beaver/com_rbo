@@ -26,6 +26,7 @@ class RbOpers extends RbObject
         $this->flds ["product_price"] = array("type" => "numeric");
         $this->flds ["product_cnt"] = array("type" => "numeric");
         $this->flds ["oper_sum"] = array("type" => "numeric");
+        $this->flds ["pay_date"] = array("type" => "date");
         $this->flds ["oper_manager"] = array("type" => "string");
         $this->flds ["oper_rem"] = array("type" => "string");
 

@@ -42,19 +42,27 @@
                 </tr>
                 <tr>
                     <td>
-                        <label for="inv.doc_rem">Прим.</label>
-                        <textarea name="inv.doc_rem" id="inv.doc_rem" style="width: 90%; height: 50px; float: right;"></textarea>
-                    </td>
-                </tr>
-                <tr>
-                    <td><a href="" id="inv.prod_add_btn"> <img src="<?php echo JRBO_PATH ?>/images/icon-32-new-on.png"/></a>
-
                         <div style="float: right">
+                            <label for="inv.pay_date">Оплата</label>
+                            <input type="text" name="inv.pay_date" id="inv.pay_date"
+                                   style='text-align: center; width: 100px'/>
                             <label for="inv.doc_cust">Покупатель</label>
-                            <input disabled type="text" name="inv.doc_cust" id="inv.doc_cust" style='width: 450px'/>
+                            <input disabled type="text" name="inv.doc_cust" id="inv.doc_cust" style='width: 400px'/>
                             <button id="inv.cedit">..</button>
                             <label for="inv.doc_firm">Фирма</label>
                             <select id="inv.doc_firm" name="inv.doc_firm" style="width: 70px"></select>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="float: left">
+                            <a href="" id="inv.prod_add_btn">
+                                <img src="<?php echo JRBO_PATH ?>/images/icon-32-new-on.png"/></a>
+                        </div>
+                        <div style="float: right">
+                            <label for="inv.doc_rem" style="vertical-align: top;">Прим.</label>
+                            <textarea name="inv.doc_rem" id="inv.doc_rem" style="width: 700px; height: 50px;"></textarea>
                         </div>
                     </td>
                 </tr>

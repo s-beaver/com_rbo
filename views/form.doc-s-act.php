@@ -23,10 +23,12 @@
         <tr>
           <td><a href="" id="s_act.prod_add_btn"> <img src="<?php echo JRBO_PATH?>/images/icon-32-new-on.png" /></a>
             <div style="float: right">
-              <label for="s_act.doc_base">Основание</label>
+              <label for="s_act.pay_date">Оплата</label>
+              <input type="text" name="s_act.pay_date" id="s_act.pay_date" style='text-align: center; width: 100px' />
+              <label for="s_act.doc_base">Осн.</label>
               <input disabled type="text" name="s_act.doc_base" id="s_act.doc_base" style='width: 150px' />
               <button id="s_act.baseedit">..</button>
-              <label for="s_act.doc_cust">Покупатель</label>
+              <label for="s_act.doc_cust">Пок-ль</label>
               <input disabled type="text" name="s_act.doc_cust" id="s_act.doc_cust" style='width: 200px' />
               <button id="s_act.cedit">..</button><label for="s_act.doc_firm">Фирма</label>
               <select id="s_act.doc_firm" name="s_act.doc_firm" style="width: 70px"></select>

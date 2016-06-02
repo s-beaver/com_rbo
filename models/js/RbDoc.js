@@ -127,7 +127,11 @@ RbDoc.prototype.attachPageElements = function () {
         }, {
             "title": "Статус",
             "className": "center",
-            "data": "doc_status"
+            "data": function (source, type, val) {//"doc_status"
+                var status = NullTo(source.doc_status,"");
+                if (!IsEmpty(source.pay_date) && source.pay_date!='0000-00-00') status = "оплачен";
+                return status;
+            }
         }, {
             "title": "Док-ты",
             "data": function (source, type, val) {
@@ -271,6 +275,7 @@ RbDoc.prototype.saveDoc = function (docId) {
             "doc_type": self.sDocType,
             "doc_num": $("#" + self.docFormPrefix + "\\.doc_num").val(),
             "doc_date": $("#" + self.docFormPrefix + "\\.doc_date").val(),
+            "pay_date": $("#" + self.docFormPrefix + "\\.pay_date").val(),
             "doc_sum": $("#" + self.docFormPrefix + "\\.doc_sum").val(),
             "doc_base": $("#doc_baseId").val(),// скрытое поле в форме выбора документа - основания
             "doc_status": $("#" + self.docFormPrefix + "\\.doc_status").val(),
@@ -394,6 +399,7 @@ RbDoc.prototype.showDocForm = function (doc_data) {
     //установим базовые реквизиты документа
     $("#" + self.docFormPrefix + "\\.doc_num").val(doc_data.doc_num);
     $("#" + self.docFormPrefix + "\\.doc_date").val(doc_data.doc_date);
+    $("#" + self.docFormPrefix + "\\.pay_date").val(doc_data.pay_date);
     $("#" + self.docFormPrefix + "\\.doc_sum").val(doc_data.doc_sum);
     $("#" + self.docFormPrefix + "\\.doc_status").val(doc_data.doc_status);
 

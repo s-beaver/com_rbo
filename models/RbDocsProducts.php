@@ -14,6 +14,7 @@ class RbDocsProducts extends RbObject
         $this->flds ["docId"] = array("type" => "numeric", "is_key" => true);
         $this->flds ["oper_type"] = array("type" => "string");
         $this->flds ["oper_date"] = array("type" => "date");
+        $this->flds ["pay_date"] = array("type" => "date");
         $this->flds ["custId"] = array("type" => "numeric");
         $this->flds ["oper_firm"] = array("type" => "string");
         $this->flds ["productId"] = array("type" => "numeric");

@@ -22,7 +22,12 @@ $(document).ready(function () {
         autoOpen: false
     });
 
-    $("#doc_date").datepicker({
+    $("#b_act\\.doc_date").datepicker({
+        showButtonPanel: true,
+        dateFormat: "dd.mm.yy"
+    });
+
+    $("#b_act\\.pay_date").datepicker({
         showButtonPanel: true,
         dateFormat: "dd.mm.yy"
     });

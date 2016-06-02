@@ -106,7 +106,7 @@ class RbObject
                     break;
                 }
                 case "date" : {
-                    if (is_null($value)) {
+                    if (is_null($value) || empty($value)) {
                         $setAr [] = $db->quoteName($key) . "=NULL";
                     } else {
                         $setAr [] = $db->quoteName($key) . "=STR_TO_DATE('$value','%d.%m.%Y')";
@@ -114,7 +114,7 @@ class RbObject
                     break;
                 }
                 case "datetime" : {
-                    if (is_null($value)) {
+                    if (is_null($value) || empty($value)) {
                         $setAr [] = $db->quoteName($key) . "=NULL";
                     } else {
                         $setAr [] = $db->quoteName($key) . "=STR_TO_DATE('$value','%d.%m.%Y %H:%i:00')";
