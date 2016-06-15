@@ -208,6 +208,56 @@ class RbOpers extends RbObject
     }
 
     // =================================================================
+    static function getEverydayReport()
+    {
+        $currentTime = new JDate ("now");
+        $reportTime = new JDate ("now -1 day");
+        $date = $reportTime->format('d.m.Y', true);
+
+        $db = JFactory::getDBO();
+        $query = $db->getQuery(true);
+        $query->clear();
+        $query->select($db->quoteName('id'));
+        $query->from($db->quoteName(RbHelper::getTableName("rbo_log"), 'log'));
+        $query->where("DATE_FORMAT(log.event_time,'%d.%m.%Y')='" . $currentTime->format('d.m.Y', true) . "'");
+        $query->where("log.event_type='everydayReportSent'");
+        $db->setQuery($query);
+        $iCnt = $db->loadResult();
+        if (isset($iCnt) && $iCnt > 0) { //отчет уже был выслан
+            return;
+        }
+
+        $opers = RbOpers::getOpersArrayByQuery($date, $date, null, null, null, null, null, null, null, 500);
+        $res = "";
+        $operTypeTotals = array();
+        foreach ($opers as $key => $value) {
+            if (!is_null($value["oper_sum"]))
+                $operTypeTotals[$value["oper_type"]] += $value["oper_sum"];
+            $res .= $value["operId"] . "|" . $value["oper_date"] . "|" . $value["oper_type"] . "|" .
+                $value["product_price"] . "|" . $value["product_cnt"] . "|" . $value["oper_sum"] . "|" .
+                $value["oper_firm"] . "|" . $value["product_name"] . "|" . $value["cust_name"] . "|" . $value["doc_num"] . "|" . $value["oper_rem"] . "\r\n";
+        }
+        if (empty($res)) {
+            $res .= "Операций не было";
+        } else {
+            $res .= "Итого по типам операций:\r\n";
+            foreach ($operTypeTotals as $key => $value) {
+                $res .= "  - " . $key . "=" . $value . "\r\n";
+            }
+        }
+
+        if (RbHelper::sendEMail($_SERVER["SERVER_NAME"] . " - отчет за " . $date, $res)) {
+            $query = $db->getQuery(true)
+                ->insert(RbHelper::getTableName('rbo_log'))
+                ->columns($db->quoteName(array("event_ip", "event_time", "event_type")))
+                ->values("'" . $_SERVER["REMOTE_ADDR"] . "','$currentTime','everydayReportSent'");
+
+            $db->setQuery($query);
+            $db->execute();
+        }
+    }
+
+    // =================================================================
     /**
      * @param $d1 - строка даты в формате dd.mm.YYYY
      * @param $d2 - строка даты в формате dd.mm.YYYY
@@ -338,7 +388,7 @@ class RbOpers extends RbObject
         if ($dateEnd == "") $dateEnd = JFactory::getDate()->format('d.m.Y');
         $prodSubstr = $input->getString('search', '');
         $prodId = $input->getInt('prodId', 0);
-        if (!isset($prodId) || $prodId==0) $prodId = $prodSubstr;
+        if (!isset($prodId) || $prodId == 0) $prodId = $prodSubstr;
         if ((integer)$prodId == 0) $prodId = $prodSubstr;
         $firmSubstr = $input->getString('firm', null);
         $managerSubstr = $input->getString('manager', null);
@@ -401,6 +451,29 @@ class RbOpers extends RbObject
     static function getCostsOpers($year, $month, $oper_type)
     {
     }
+
+    // =================================================================
+    /* @param $productId - ключ товара
+     * @param $parties - массив объектов партий товара до выполнения операции {id,cnt,price}
+     * @param $operation - объект, содержащий описание операции {oper_type,cnt,price}
+     * @param $prevMove - ссылка на предыдущее движение партии
+     * @return array
+     * Функция возвращает измененное состояние партий $parties
+     * для указанного товара $productId, после применений к нему
+     * операции $oper_type
+     * */
+    static function partyMove($productId, $parties, $operation, $prevMove)
+    {
+        if (!isset($parties)) {
+            $parties = array();
+            $parties[0] = new stdClass ();
+            $parties[0]->id = 0;
+            $parties[0]->cnt = 0;
+            $parties[0]->price = 0;
+        }
+        //еще как-то надо для продажи подсчитать себестоимость и ее вернуть в документ
+    }
+
 }
 
 

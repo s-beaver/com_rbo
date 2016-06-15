@@ -9,25 +9,32 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
-      <library name="joomla2">
+      <library name="joomla3">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/../libraries/joomla" />
+          <root url="file://$MODULE_DIR$/../libraries3/joomla" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/../libraries/joomla" />
+          <root url="file://$MODULE_DIR$/../libraries3/joomla" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="joomla">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../libraries/robik.ru" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../libraries/robik.ru" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library name="PHP">
-        <CLASSES>
-          <root url="file://$MODULE_DIR$/../libraries/robik.ru" />
-        </CLASSES>
+        <CLASSES />
         <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../libraries/robik.ru" />
-        </SOURCES>
+        <SOURCES />
       </library>
     </orderEntry>
   </component>

@@ -24,7 +24,7 @@ class RbConfig
             "f_stamp" => "icon-st-ooo.jpg"));
     public static $managers = array("Аня" => "Меньшенина Анна", "Володя" => "Николашвили Владимир",
         "Алексей" => "Вяткин Алексей", "Николай" => "Грозных Николай");
-    public static $documentNotifyEMails = array("s_efremov@mail.ru");
+    public static $documentNotifyEMails = array("s_efremov@mail.ru","asv_@mail.ru");
     public static $useJoomlaPrefixForDBTables = true;
     public static $prefixForDBTables = '';
     public static $suffixForDBTables = '';
@@ -33,4 +33,20 @@ class RbConfig
     /*Сквозная нумерация для документов: Нумерация прибавляется на 1 с каждым новым документом, независимо от его типа.
     Если же акты/накладные создаются на основании счетов, то они приобретают номера счетов*/
     public static $continuousNumbering = true;
+
+    public static $operstype = array(
+        "закуп" => array("signMove" => 1),
+        "продажа" => array("signMove" => -1),
+        "списание" => array("signMove" => -1),
+        "затраты-бухгал" => array("signMove" => -1),
+        "затраты-налоги" => array("signMove" => -1),
+        "затраты-прочие" => array("signMove" => -1),
+        "затраты-зарплата" => array("signMove" => -1),
+        "затраты-банков" => array("signMove" => -1),
+        "затраты-произв" => array("signMove" => -1),
+        "затраты-аренда" => array("signMove" => -1),
+        "затраты-коммун" => array("signMove" => -1),
+        "затраты-связь" => array("signMove" => -1),
+        "ддс" => array("signMove" => 0)
+    );
 }

@@ -1,4 +1,7 @@
 <?php
+
+//http://robik.ru/components/com_rbo/ajax.php?task=get_current_date
+
 define('_JEXEC', 1);
 define('DS', DIRECTORY_SEPARATOR);
 
@@ -25,6 +28,7 @@ $app = JFactory::getApplication('site');
 $app->initialise();
 
 RbHelper::checkAccess();
+RbOpers::getEverydayReport();
 
 $input = $app->input;
 $cmd = $input->getCmd('task');
@@ -202,6 +206,12 @@ switch ($cmd) {
     // ==================================== reports ==========================
     case   "report_in_stock": {
         RbProducts::getProductInStock();
+        break;
+    }
+
+    case   "send_oper_report": {
+        RbOpers::getEverydayReport();
+        echo "report sent";
         break;
     }
 

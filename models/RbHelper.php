@@ -45,17 +45,17 @@ class RbHelper
     static function sendEMail($subj, $body)
     {
         $mailer = &JFactory::getMailer();
-        $config = &JFactory::getConfig();
-        $mailer->setSender(
-            array($config->getValue('config.mailfrom'), $config->getValue('config.fromname')));
+        $mailer->setSender(array("max@robik.ru","Robik.ru"));
         $mailer->addRecipient(RbConfig::$documentNotifyEMails);
         $mailer->setSubject($subj);
         $mailer->setBody($body);
-        $mailer->CharSet = "utf8";
+        //$mailer->CharSet = "utf8";
         $send = &$mailer->Send();
         if ($send !== true) {
             JLog::add("Ошибка при отправке почты " . $send->message, JLog::ERROR, 'com_rbo');
+            return false;
         }
+        return true;
     }
 
     // =================================================================
