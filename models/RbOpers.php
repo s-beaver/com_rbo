@@ -210,8 +210,9 @@ class RbOpers extends RbObject
     // =================================================================
     static function getEverydayReport()
     {
-        $currentTime = new JDate ("now");
-        $reportTime = new JDate ("now -1 day");
+        $tz = self::getTimezone();
+        $currentTime = new JDate ("now", $tz);
+        $reportTime = new JDate ("now -1 day", $tz);
         $date = $reportTime->format('d.m.Y', true);
 
         $db = JFactory::getDBO();
