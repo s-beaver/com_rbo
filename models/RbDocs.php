@@ -301,6 +301,10 @@ class RbDocs extends RbObject
                     $product["oper_type"] = "закуп";
                     break;
                 }
+                case "D_CMP": {
+                    $product["oper_type"] = "декомплект";
+                    break;
+                }
                 default:
                     return;
             }
@@ -414,7 +418,7 @@ class RbDocs extends RbObject
     }
 
     // =================================================================
-    function duplicateExists($docNum)
+    function duplicateExists($docNum)//todo проверять статус документа. Если удален, то все ок
     {
         if (is_null($docNum)) return false;
         $currentTime = new JDate ();

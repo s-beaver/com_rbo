@@ -16,7 +16,6 @@ function getFormData(formName, objPrefix) {
         s = s.replace(objPrefix + ".", "");
         tagName = $(this).prop("tagName");
         switch (tagName.toUpperCase()) {
-            case "DIV":
             case "LABEL":
                 o[objPrefix][s] = $(this).html();
                 break;
@@ -37,14 +36,6 @@ function getFormData(formName, objPrefix) {
                 else
                     o[objPrefix][s] = $(this).val();
                 break;
-
-            case "BUTTON":
-            {
-                break;
-            }
-
-            default:
-                o[objPrefix][s] = $(this).html();
         }
     });
 
@@ -62,7 +53,6 @@ function setFormData(formName, objPrefix, o) {
         o[s] = NullTo(o[s], "");
         tagName = $(this).prop("tagName");
         switch (tagName.toUpperCase()) {
-            case "DIV":
             case "LABEL":
                 $(this).html(o[s]);
                 break;
@@ -101,13 +91,6 @@ function setFormData(formName, objPrefix, o) {
                     $('#' + sIdDot + ' option:first').prop("selected", "selected");
                 break;
 
-            case "BUTTON":
-            {
-                break;
-            }
-
-            default:
-                $(this).html(o[s]);
         }
     });
 

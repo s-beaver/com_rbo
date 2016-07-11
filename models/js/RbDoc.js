@@ -251,6 +251,28 @@ RbDoc.prototype.readDoc = function (docId) {
 };
 
 // ===================================================================================
+RbDoc.prototype.getDocDataBeforeSave = function (docId) {
+    var self = this;
+    var p = self.apiTableProducts.rows().data();
+    var pAr = [];
+    for (var i = 0; i < p.length; i++)
+        pAr[i] = p[i];
+
+    if (self.oCust.flds.cust_name == "")
+        $("#custId").val("-1");//значит мы сознательно удаляем покупателя из документа
+
+    var oData = getFormData(self.docFormPrefix + "\\.doc-form", self.docFormPrefix);
+    oData.rbo_docs = oData[self.docFormPrefix];
+    oData.rbo_docs.docId = docId;
+    oData.rbo_docs.doc_type = self.sDocType;
+    oData.rbo_docs.doc_base = $("#doc_baseId").val();// скрытое поле в форме выбора документа - основания
+    oData.rbo_docs.custId = $("#custId").val();// скрытое поле в форме выбора клиента
+    oData.rbo_docs.doc_cust = self.oCust.flds;
+    oData.rbo_docs.doc_products = pAr;
+    return oData;
+};
+
+// ===================================================================================
 RbDoc.prototype.saveDoc = function (docId) {
     var self = this;
     var bValid = true;
@@ -258,18 +280,12 @@ RbDoc.prototype.saveDoc = function (docId) {
     //bValid = bValid && checkNotEmpty($("#"+self.docFormPrefix+"\\.doc_num"), "Номер", self.tips);
     //bValid = bValid && checkNotEmpty($("#"+self.docFormPrefix+"\\.doc_date"), "Дата", self.tips);
     bValid = bValid && checkNotEmpty($("#" + self.docFormPrefix + "\\.doc_manager"), "Менеджер", self.tips);
-    var p = self.apiTableProducts.rows().data();
-    var pAr = [];
-    for (var i = 0; i < p.length; i++)
-        pAr[i] = p[i];
-
     if (!bValid)
         return;
 
-    if (self.oCust.flds.cust_name == "")
-        $("#custId").val("-1");//значит мы сознательно удаляем покупателя из документа
+    var oData = self.getDocDataBeforeSave(docId);
 
-    var oData = {
+    /*oData = {
         "rbo_docs": {
             "docId": docId,
             "doc_type": self.sDocType,
@@ -286,7 +302,7 @@ RbDoc.prototype.saveDoc = function (docId) {
             "doc_rem": $("#" + self.docFormPrefix + "\\.doc_rem").val(),
             "doc_products": pAr
         }
-    };
+    };*/
 
     var taskCmd = "doc_create";
     if (!IsNull(docId) && docId > 0)
@@ -397,11 +413,13 @@ RbDoc.prototype.showDocForm = function (doc_data) {
     self.docId = doc_data.docId;
 
     //установим базовые реквизиты документа
-    $("#" + self.docFormPrefix + "\\.doc_num").val(doc_data.doc_num);
+    setFormData(self.docFormPrefix + "\\.doc-form", self.docFormPrefix, doc_data);
+
+    /*$("#" + self.docFormPrefix + "\\.doc_num").val(doc_data.doc_num);
     $("#" + self.docFormPrefix + "\\.doc_date").val(doc_data.doc_date);
     $("#" + self.docFormPrefix + "\\.pay_date").val(doc_data.pay_date);
     $("#" + self.docFormPrefix + "\\.doc_sum").val(doc_data.doc_sum);
-    $("#" + self.docFormPrefix + "\\.doc_status").val(doc_data.doc_status);
+    $("#" + self.docFormPrefix + "\\.doc_status").val(doc_data.doc_status);*/
 
     //установим поля документа-основания
     var sDocBase = "";

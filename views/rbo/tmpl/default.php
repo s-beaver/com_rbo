@@ -23,6 +23,7 @@
             <li><a href='<?php echo JRoute::_('index.php?option=com_rbo&view=invoices')?>'>Счета</a></li>
             <li><a href='<?php echo JRoute::_('index.php?option=com_rbo&view=shipments')?>'>Накладные</a></li>
             <li><a href='<?php echo JRoute::_('index.php?option=com_rbo&view=acts')?>'>Акты</a></li>
+            <li><a href='<?php echo JRoute::_('index.php?option=com_rbo&view=docdcmp')?>'>Разбивки комплектов</a></li>
         </ul>
 
         <h2>Закупки</h2>

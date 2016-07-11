@@ -402,7 +402,7 @@ class RbOpers extends RbObject
             $res->data = RbOpers::getOpersArrayByQuery($dateStart, $dateEnd, null, $custId, $prodId, 1, $firmSubstr, $managerSubstr, 'ASC');
             foreach ($res->data as &$o) {
                 if (isset($o["productId"]) && $o["productId"] != "" && isset($o["oper_date"]) && $o["oper_date"] != "") {
-                    $buyPriceHist = RbOpers::getOpersArrayByQuery(null, $o["oper_date"], "закуп", null, (int)$o["productId"], 1, null, null, "DESC", 1);
+                    $buyPriceHist = RbOpers::getOpersArrayByQuery(null, $o["oper_date"], "закуп", null, (int)$o["productId"], 1, null, null, "DESC", 1);//todo добавить фильтр закуп,d_cmp
                     $o["buyPrice"] = $buyPriceHist[0]["product_price"];
                     $o["buyDocId"] = $buyPriceHist[0]["docId"];
                 }

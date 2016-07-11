@@ -101,7 +101,7 @@ RboProduct.prototype.showProductForm = function (o) {
             },
 
             "Удалить": function () {
-                Ask("Удалить строку из документа?", "Удалить", "Отмена", function () {
+                Ask("Удалить позицию из документа?", "Удалить", "Отмена", function () {
                     o.fnDelete();
                     $("#product-form").dialog("close");
                 }, null, "#dialog-confirm");

@@ -11,6 +11,7 @@
                 <option value="<?php echo JRoute::_("index.php?option=com_rbo&view=invoices")?>">Счета</option>
                 <option value="<?php echo JRoute::_("index.php?option=com_rbo&view=shipments")?>">Накладные</option>
                 <option value="<?php echo JRoute::_("index.php?option=com_rbo&view=acts")?>">Акты</option>
+                <option value="<?php echo JRoute::_("index.php?option=com_rbo&view=docdcmp")?>">Разбивки комплектов</option>
             </optgroup>
             <optgroup label="Закупки">
                 <option value="<?php echo JRoute::_("index.php?option=com_rbo&view=docbbill")?>">Накладные (закуп)</option>

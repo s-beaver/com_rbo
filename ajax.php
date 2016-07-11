@@ -121,7 +121,7 @@ switch ($cmd) {
         break;
     }
 
-    case "oper_report" : {//todo Ежедневный отчет по операциям
+    case "oper_report" : {
         $oper = new RbOpers ();
         $oper->getOperReport();
         break;
