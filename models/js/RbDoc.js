@@ -58,6 +58,7 @@ RbDoc.prototype.attachDocForm = function () {
     });
 
     this.oTableProducts = $('#' + self.docFormPrefix + "\\.products-table").dataTable({
+        "retrieve": true,
         "paging": false,
         "searching": false,
         "ordering": false,

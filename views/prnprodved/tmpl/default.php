@@ -6,6 +6,7 @@
     <script src="<?php echo JRBO_PATH ?>/library/lib.js"></script>
     <script src="<?php echo JRBO_PATH ?>/models/js/RbForm.js"></script>
     <script src="<?php echo JRBO_PATH ?>/models/js/RbDoc.js"></script>
+    <script src="<?php echo JRBO_PATH ?>/models/js/RbDocDCmp.js"></script>
     <script src="<?php echo JRBO_PATH ?>/models/js/RbProduct.js"></script>
     <script src="<?php echo JRBO_PATH ?>/models/js/RbCust.js"></script>
     <script src="<?php echo JRBO_PATH ?>/models/js/PrnProdVed.js"></script>
@@ -108,6 +109,7 @@
 
 <?php include RBO_PATH.'/views/form.doc-s-bill.php'?>
 <?php include RBO_PATH.'/views/form.doc-b-bill.php'?>
+<?php include RBO_PATH.'/views/form.doc-d-cmp.php'?>
 <?php include RBO_PATH.'/views/form.product.php'?>
 <?php include RBO_PATH.'/views/form.customer.php'?>
 <?php include RBO_PATH.'/views/form.base-doc.php'?>

@@ -235,3 +235,4 @@ function getPrintLinkByDoc(docId, docType) {
     if (printLink == "") return "";
     return link + "&view=" + printLink + "&docid=" + docId;
 }
+

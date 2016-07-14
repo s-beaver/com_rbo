@@ -1,7 +1,32 @@
 'use strict';
 var oFormDlg;
 var cookieName = "prn_prod_ved";
-var s_bill, b_bill;
+var s_bill, b_bill, d_cmp;
+
+//===================================================================================
+function getDocNameByOperType(operType) {
+    operType = NullTo(operType, "");
+    if (operType == "") return "";
+    var docName = "";
+    switch (operType) {
+        case "закуп":
+        {
+            docName = "s_bill";
+            break;
+        }
+        case "продажа":
+        {
+            docName = "b_bill";
+            break;
+        }
+        case "декомплект":
+        {
+            docName = "d_cmp";
+            break;
+        }
+    }
+    return docName;
+}
 // ===================================================================================
 function getReportData(params) {
     $("#progressbar").show();
@@ -202,7 +227,7 @@ function fillReport(rep_data) {
     var report = "", totalsMinus = 0, totalsPlus = 0, totalsMinusZ = 0, totalsPlusZ = 0;
     var operId, oper_type, oper_date, custId, docId, doc_type, doc_num, doc_date, doc_link, oper_sum, oper_firm, oper_manager, oper_rem;
     var productId, productTitle, product_code, product_name;
-    var product_price, product_cnt, buy_price, buy_docId, doc_buy_link, buy_sum;
+    var product_price, product_cnt, buy_price, buy_docId, doc_buy_link, buy_sum, buy_oper_type;
 
     report = "<thead>";
     report += "<td>#</td>";
@@ -241,13 +266,13 @@ function fillReport(rep_data) {
         product_price = NullTo(Number(opers[i].product_price), 0);
         product_cnt = NullTo(Number(opers[i].product_cnt), 0);
         oper_sum = NullTo(Number(opers[i].oper_sum), 0);
+        buy_oper_type = NullTo(opers[i].buyOperType, "");
         buy_price = NullTo(opers[i].buyPrice, 0);
         buy_docId = NullTo(opers[i].buyDocId, 0);
         buy_sum = buy_price * product_cnt;
         doc_buy_link = "";
-        if (buy_docId > 0 && getPrintLinkByDoc(buy_docId, "B_BIL") != "")
-            //doc_buy_link = "<a target='blank' href='" + getPrintLinkByDoc(buy_docId, "B_BIL") + "'>" + buy_price + "</a>";
-            doc_buy_link = "<a href='javascript:b_bill.readDoc(" + buy_docId + ")'>" + buy_price + "</a>";
+        if (buy_docId > 0 && getDocNameByOperType(buy_oper_type) != "")
+            doc_buy_link = "<a href='javascript:" + getDocNameByOperType(buy_oper_type) + ".readDoc(" + buy_docId + ")'>" + buy_price + "</a>";
 
         if (oper_type == "продажа" && buy_price > 0) {
             totalsPlus += product_cnt * product_price;
@@ -284,7 +309,7 @@ function fillReport(rep_data) {
     var s = "<br><b>";
     s += "Итого продаж " + totalsPlus + " руб., за вычетом закупа " + totalsMinus + " руб. = " + total + " руб.</b><br>";
     s += "Из расчета исключены строки со стоимостью закупа 0 руб<br>";
-    s += "Строки закупа без продаж " + Round(totalsMinusZ,2) + " руб.</b><br><br>";
+    s += "Строки закупа без продаж " + Round(totalsMinusZ, 2) + " руб.</b><br><br>";
     s += "Строк в таблице:" + opers.length + " шт.<br>";
     $("#report_totals").html(s);
 
@@ -314,10 +339,10 @@ $(document).ready(function () {
 
     b_bill = new RbDoc({
         sDocType: 'B_BIL',
-        docFormPrefix:"b_bill",
+        docFormPrefix: "b_bill",
         sDocTypeListTitle: 'Накладные (закуп)',
         sDocTypeTitle: 'Накладная (закуп)',
-        checkFields: ["doc_num","doc_date","doc_manager","doc_firm"],
+        checkFields: ["doc_num", "doc_date", "doc_manager", "doc_firm"],
         tips: $(".validateTips"),
         printList: [
             {title: "Печатать", viewName: "PrnBBil"}
@@ -328,6 +353,18 @@ $(document).ready(function () {
         }
     });
 
+    d_cmp = new RbDocDCmp({
+        sDocType: 'D_CMP',
+        docFormPrefix: "d_cmp",
+        sDocTypeListTitle: 'Разбивки комплектов',
+        sDocTypeTitle: 'Разбивка комплектов',
+        checkFields: ["doc_num", "doc_date", "doc_manager", "doc_firm"],
+        tips: $(".validateTips"),
+        statusList: {
+            "подписан": "подписан",
+            "удален": "удален"
+        }
+    });
     $("#dialog-confirm").dialog({
         autoOpen: false
     });

@@ -325,8 +325,12 @@ class RbOpers extends RbObject
             }
         }
 
-        if (isset($oper_type))
-            $query->where("op.oper_type='" . $oper_type . "'");
+        if (isset($oper_type)) {
+            if (is_array($oper_type))
+                $query->where("op.oper_type in ('" . implode("', '", $oper_type) . "')");
+            elseif (is_string($oper_type))
+                $query->where("op.oper_type='" . $oper_type . "'");
+        }
 
         if (isset($prod_type))
             $query->where("rrp.product_type=" . $prod_type);
@@ -402,9 +406,10 @@ class RbOpers extends RbObject
             $res->data = RbOpers::getOpersArrayByQuery($dateStart, $dateEnd, null, $custId, $prodId, 1, $firmSubstr, $managerSubstr, 'ASC');
             foreach ($res->data as &$o) {
                 if (isset($o["productId"]) && $o["productId"] != "" && isset($o["oper_date"]) && $o["oper_date"] != "") {
-                    $buyPriceHist = RbOpers::getOpersArrayByQuery(null, $o["oper_date"], "закуп", null, (int)$o["productId"], 1, null, null, "DESC", 1);//todo добавить фильтр закуп,d_cmp
+                    $buyPriceHist = RbOpers::getOpersArrayByQuery(null, $o["oper_date"], array("закуп", "декомплект"), null, (int)$o["productId"], 1, null, null, "DESC", 1);
                     $o["buyPrice"] = $buyPriceHist[0]["product_price"];
                     $o["buyDocId"] = $buyPriceHist[0]["docId"];
+                    $o["buyOperType"] = $buyPriceHist[0]["oper_type"];
                 }
             }
             $res->date_start = $dateStart;

@@ -2,7 +2,7 @@
 var d_cmp;
 
 function RbDocDCmp(o) {
-    RbDocDCmp.superclass.constructor.apply(this, arguments);
+    RbDoc.apply(this, arguments);
     this.product_to_decomplect = {};
 }
 extendObject(RbDocDCmp, RbDoc);
