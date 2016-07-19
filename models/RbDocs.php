@@ -91,7 +91,7 @@ class RbDocs extends RbObject
         try {
             $custId = $this->buffer->custId;
             $doc_products = $this->buffer->doc_products;
-            $doc_cust = $this->buffer->doc_cust;
+            $doc_cust = (array)$this->buffer->doc_cust;
             // проверить если пустой массив, то не сохранять
             $doc_cust ['cust_data'] = json_encode($doc_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
 
@@ -111,6 +111,7 @@ class RbDocs extends RbObject
             }
 
             foreach ($doc_products as &$p) {
+                $p = (array)$p;
                 if (!($p ["productId"] > 0)) { // создадим новый товар в справочнике
                     $pRef = array();
                     $pRef ["productId"] = $p ["productId"];
@@ -227,7 +228,7 @@ class RbDocs extends RbObject
 
     // =================================================================
     public function deleteObject($echoResponse = false)
-    {
+    {//todo а как же ведут себя подчиненные записи?
         $res = new stdClass ();
         try {
             $db = JFactory::getDBO();
@@ -252,13 +253,41 @@ class RbDocs extends RbObject
     }
 
     // =================================================================
+    public function deleteObjectHard($echoResponse = false)
+    {
+        $res = new stdClass ();
+        try {
+            parent::deleteObject($echoResponse);
+            $prod = new RbDocsProducts ($this->keyValue);
+            $prod->deleteObject($echoResponse);
+
+        } catch (Exception $e) {
+            $res->errorCode = 50;
+            $res->errorMsg = $e->getMessage();
+            if (!$res->errorMsg)
+                $res->errorMsg = "Не удалось удалить документ";
+            if (!$echoResponse) throw $e;
+            JLog::add(
+                get_class() . ":" . $e->getMessage() . " buffer=" . print_r($this->buffer, true),
+                JLog::ERROR, 'com_rbo');
+        }
+        if ($echoResponse) echo $this->response;
+    }
+
+    // =================================================================
     /* На входе требуется ключ документа откуда копируются данные и тип нового документа */
     public function copyDocTo($echoResponse = false)
     {
         $res = new stdClass ();
         try {
-            $this->keyValue = $this->buffer->doc_base;
+            $keyValue = $this->buffer->doc_base;
             $doc_type = $this->buffer->doc_type;
+            $doc_based_on_id = $this->docBasedOnExists($keyValue, $doc_type);
+            if ($doc_based_on_id) {//если есть такой документ, то удалим его
+                $docToDelete = new RbDocs ($doc_based_on_id, false);
+                $docToDelete->deleteObjectHard();
+            }
+            $this->keyValue = $keyValue;
             $this->readObject();
             $this->buffer->docId = null;
             $this->buffer->doc_base = $this->keyValue;
@@ -270,7 +299,6 @@ class RbDocs extends RbObject
             $this->buffer->doc_type = $doc_type;
             $this->buffer->doc_status = "";
             $this->createObject();
-
             $res->docId = $this->insertid;
 
         } catch (Exception $e) {
@@ -289,7 +317,7 @@ class RbDocs extends RbObject
     {
         if (strtotime($this->buffer->doc_date) < strtotime('1 November 2015')) return;
 
-        if ($this->buffer->doc_status == "подписан" && $this->buffer->doc_cust["cust_is_own_firm"]!="1") {
+        if ($this->buffer->doc_status == "подписан" && $this->buffer->doc_cust["cust_is_own_firm"] != "1") {
             switch ($this->buffer->doc_type) {
                 case "акт":
                 case "накл": {
@@ -343,7 +371,7 @@ class RbDocs extends RbObject
 
         $rboCustTableName = RbHelper::getTableName("rbo_cust");
         $sSelect = "SELECT docId, doc_num, doc_date, pay_date, rc.cust_name doc_cust, doc_sum, doc_status, doc_firm, doc_manager, doc_rem ";
-        $sRestOfQuery = " FROM ".$this->table_name." rd LEFT JOIN ".$rboCustTableName." rc ON rd.custId = rc.custId " .
+        $sRestOfQuery = " FROM " . $this->table_name . " rd LEFT JOIN " . $rboCustTableName . " rc ON rd.custId = rc.custId " .
             $sWhere . " ORDER BY rd.docId DESC";
 
         if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
@@ -354,11 +382,11 @@ class RbDocs extends RbObject
 
         $data_rows_assoc_list = $db->loadAssocList();
 
-        $db->setQuery('SELECT count(*) '.$sRestOfQuery);
+        $db->setQuery('SELECT count(*) ' . $sRestOfQuery);
         $iRecordsTotal = $db->loadResult();
 
         $db->setQuery("SELECT doc_base, docId, doc_num, doc_date, doc_type " .
-            "FROM ".$this->table_name." WHERE doc_base IN (SELECT docId " . $sRestOfQuery . ") AND doc_status!='удален'");
+            "FROM " . $this->table_name . " WHERE doc_base IN (SELECT docId " . $sRestOfQuery . ") AND doc_status!='удален'");
         $baseDocs = $db->loadAssocList();
 
         foreach ($data_rows_assoc_list as &$v) {
@@ -436,6 +464,30 @@ class RbDocs extends RbObject
             $docId = $db->loadResult();
             if ($docId > 0) return true;
             return false;
+        } catch (Exception $e) {
+            JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
+        }
+        return true;
+    }
+
+    // =================================================================
+    function docBasedOnExists($docId, $docType)
+    {
+        if (is_null($docId) || is_null(($docType))) return false;
+        $currentTime = new JDate ();
+        $year = $currentTime->format('Y', false);
+
+        try {
+            $db = JFactory::getDBO();
+            $query = $db->getQuery(true);
+            $query->select("docId");
+            $query->from($this->table_name);
+            $query->where("doc_type='" . $docType . "'");//здесь не нужно проверять $continuousNumbering
+            $query->where("DATE_FORMAT(doc_date,'%Y')=$year");
+            $query->where("doc_base=$docId");
+            $db->setQuery($query);
+            $docId = $db->loadResult();
+            return $docId;
         } catch (Exception $e) {
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
         }

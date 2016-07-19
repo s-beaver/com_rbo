@@ -190,6 +190,12 @@ RbDoc.prototype.attachPageElements = function () {
         return false;
     });
 
+    //обработчик нажатия кнопки добавления документа
+    $("#"+self.docFormPrefix+"\\.doc_status").change(function (event) {
+        self.setRW($("#"+self.docFormPrefix+"\\.doc_status").val());
+        return false;
+    });
+
 };
 
 // ===================================================================================
@@ -207,6 +213,11 @@ RbDoc.prototype.setRW = function (sStatus) {//todo проверять из statu
         return true;
     } else {
         this.checkFields.removeAttr("disabled");
+        var i=0;
+        $("[id^='" + self.docFormPrefix + "\\.edit_product']").each(function (x, elem) {
+            $(this).attr("href", "javascript:" + self.docFormPrefix + ".showProductForm(" + i + ")");
+            i++;
+        });
         //обработчик нажатия кнопки добавления товара в документ
         $("#" + self.docFormPrefix + "\\.prod_add_btn").off("click");
         $("#" + self.docFormPrefix + "\\.prod_add_btn").click(function (event) {
