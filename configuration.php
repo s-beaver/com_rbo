@@ -23,7 +23,7 @@ class RbConfig
             "f_bik" => "046577795", "f_rch" => "30101810900000000795", "f_kch" => "40702810962410000186",
             "f_stamp" => "icon-st-ooo.jpg"));
     public static $managers = array("Аня" => "Меньшенина Анна", "Володя" => "Николашвили Владимир",
-        "Алексей" => "Вяткин Алексей", "Николай" => "Грозных Николай");
+        "Алексей" => "Вяткин Алексей", "Николай" => "Грозных Николай", "Сергей" => "Ефремов Сергей");
     public static $documentNotifyEMails = array("s_efremov@mail.ru","asv_@mail.ru");
     public static $useJoomlaPrefixForDBTables = true;
     public static $prefixForDBTables = '';
