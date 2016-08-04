@@ -96,17 +96,20 @@ RbOper.prototype.attachOperModule = function () {
     });
 
     //добавляем фильтры и их обработчики
-    $("div.oper_filter").html('&nbsp;Укажите дату:&nbsp;<input type="text" id="oper_filter_date">&nbsp;Укажите тип:&nbsp;<select id="oper_filter_type"></select>');
+    $("div.oper_filter").html('&nbsp;Укажите дату:&nbsp;<input type="text" id="oper_filter_date">&nbsp;Период:&nbsp;<select id="oper_filter_period"></select>&nbsp;Укажите тип:&nbsp;<select id="oper_filter_type"></select>');
     $("#oper_filter_date").datepicker({
         showButtonPanel: true,
         dateFormat: "dd.mm.yy"
-    }).change(function (event) {
-        self.oTableAPI.ajax.url(comPath + "ajax.php?task=get_oper_list&date_filter=" + $("#oper_filter_date").val() + "&type_filter=" + $("#oper_filter_type").val()).load();
     });
+    refillSelect("oper_filter_period", getOperPeriodList(), true);
     refillSelect("oper_filter_type", getOperTypeList(), true);
-    $("#oper_filter_type").change(function (event) {
-        self.oTableAPI.ajax.url(comPath + "ajax.php?task=get_oper_list&date_filter=" + $("#oper_filter_date").val() + "&type_filter=" + $("#oper_filter_type").val()).load();
+    $("[id^='oper_filter_']").change(function (event) {
+        self.oTableAPI.ajax.url(comPath + "ajax.php?task=get_oper_list" +
+            "&date_filter=" + $("#oper_filter_date").val() +
+            "&period_filter=" + $("#oper_filter_period").val() +
+            "&type_filter=" + $("#oper_filter_type").val()).load()
     });
+
 
     $("#header_doclist_choose_list h2").html("Операции");
 

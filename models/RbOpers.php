@@ -114,6 +114,8 @@ class RbOpers extends RbObject
             $sSearch = $aSearch["value"];
         }
         $sDateFilter = $input->getString('date_filter', "");
+        $sPeriodFilter = $input->getString('period_filter', "day");
+        if (empty($sPeriodFilter)) $sPeriodFilter = "day";
         $sTypeFilter = $input->getString('type_filter', "");
 
         $query = $db->getQuery(true);
@@ -130,25 +132,38 @@ class RbOpers extends RbObject
             $db->quoteName($rboCustTableName, 'rc') . ' ON (' . $db->quoteName('so.custId') . ' = ' .
             $db->quoteName('rc.custId') . ')');
 
-        $query->where("so.oper_date>0");
+        $whereAND = array();
+        $whereAND[] = "so.oper_date>0"; //$query->where("so.oper_date>0");
         if (isset($sDateFilter) && $sDateFilter != "") {
-            $query->where("DATE_FORMAT(so.oper_date,'%d.%m.%Y')='$sDateFilter'");
+            $tz = RbHelper::getTimezone();
+            if (isset($sPeriodFilter) && $sPeriodFilter != "") {
+                $date = new JDate ($sDateFilter, $tz);
+                $date->modify('+1 ' . $sPeriodFilter);
+                $whereAND[] = "so.oper_date<'" . $date->format('Y-m-d') . "'";//$query->where("so.oper_date<'".$date->format('Y-m-d')."'");
+            }
+            $date = new JDate ($sDateFilter, $tz);
+            $whereAND[] = "so.oper_date>='" . $date->format('Y-m-d') . "'";//$query->where("so.oper_date>='".$date->format('Y-m-d')."'");
         }
         if (isset($sTypeFilter) && $sTypeFilter != "") {
-            $query->where("so.oper_type='$sTypeFilter'");
+            $whereAND[] = "so.oper_type='$sTypeFilter'";//$query->where("so.oper_type='$sTypeFilter'");
         }
-        $where = array();
+        $whereOR = array();
         if (!empty ($sSearch)) {
             $searchAr = preg_split("/[\s,]+/", $sSearch);// split the phrase by any number of commas or space characters
             foreach ($searchAr as $v) {
-                $where[] = "LOWER(so.product_name) LIKE '%" . strtolower($v) . "%'";
-                $where[] = "LOWER(so.oper_rem) LIKE '%" . strtolower($v) . "%'";
+                $whereOR[] = "LOWER(so.product_name) LIKE '%" . strtolower($v) . "%'";
+                $whereOR[] = "LOWER(so.oper_rem) LIKE '%" . strtolower($v) . "%'";
             }
         }
-        if (count($where) > 0) {
-            $cond = implode(" OR ", $where);
-            $query->where("(" . $cond . ")");
+        $cond = "";
+        if (count($whereAND) > 0) {
+            $cond = implode(" AND ", $whereAND);
         }
+        if (count($whereOR) > 0) {
+            if (count($whereAND) > 0) $cond = $cond . " AND ";
+            $cond = $cond . "(" . implode(" OR ", $whereOR) . ")";
+        }
+        $query->where($cond);
 
         if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
             $db->setQuery($query, intval($iDisplayStart), intval($iDisplayLength));//$query->setQuery instead in joomla 3
@@ -164,7 +179,8 @@ class RbOpers extends RbObject
         $query->clear();
         $query->select('count(*)');
         $query->from($db->quoteName($this->table_name, 'so'));
-        if (count($where) > 0) $query->where($where);
+        //if (count($whereAND) > 0) $query->where($whereAND);
+        if ($cond!="") $query->where($cond);
         $db->setQuery($query);
         $iRecordsTotal = $db->loadResult();
         $iRecordsFiltered = $iRecordsTotal;
