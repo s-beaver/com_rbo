@@ -48,7 +48,7 @@ RbOper.prototype.attachOperModule = function () {
         "jQueryUI": true,
         "processing": true,
         "serverSide": true,
-        "lengthMenu": [50, 100, 200],
+        "lengthMenu": [50, 100, 200, 500],
         "dom": '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"l<"oper_filter">fr>t<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"<"oper_totals">p>',
         "ajax": {
             "type": "POST",
