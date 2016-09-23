@@ -8,33 +8,34 @@
  * Перебирает следующие элементы формы: input, select, textarea и формирует
  * объект
  */
-function getFormData(formName, objPrefix) {
+function getFormData(formName, objPrefix, objToPrefix) {
     var s, o = {}, tagName, tagType;
-    o[objPrefix] = {};
+    objToPrefix = NullTo(objToPrefix,objPrefix);
+    o[objToPrefix] = {};
     $("#" + formName + " *").find("[id^='" + objPrefix + "']").each(function (x, elem) {
         s = $(this).attr("id");
         s = s.replace(objPrefix + ".", "");
         tagName = $(this).prop("tagName");
         switch (tagName.toUpperCase()) {
             case "LABEL":
-                o[objPrefix][s] = $(this).html();
+                o[objToPrefix][s] = $(this).html();
                 break;
 
             case "TEXTAREA":
-                o[objPrefix][s] = $(this).val();
+                o[objToPrefix][s] = $(this).val();
                 break;
 
             case "SELECT":
-                o[objPrefix][s] = $(this).find('option:selected').text();
-                o[objPrefix][s + "_value"] = $(this).find('option:selected').val();
+                o[objToPrefix][s] = $(this).find('option:selected').text();
+                o[objToPrefix][s + "_value"] = $(this).find('option:selected').val();
                 break;
 
             case "INPUT":
                 tagType = NullTo($(this).attr("type"), "");
                 if (tagType.toUpperCase() == "CHECKBOX")
-                    o[objPrefix][s] = $(this).prop("checked") ? "1" : "0";
+                    o[objToPrefix][s] = $(this).prop("checked") ? "1" : "0";
                 else
-                    o[objPrefix][s] = $(this).val();
+                    o[objToPrefix][s] = $(this).val();
                 break;
         }
     });

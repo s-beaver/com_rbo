@@ -273,8 +273,7 @@ RbDoc.prototype.getDocDataBeforeSave = function (docId) {
     if (self.oCust.flds.cust_name == "")
         $("#custId").val("-1");//значит мы сознательно удаляем покупателя из документа
 
-    var oData = getFormData(self.docFormPrefix + "\\.doc-form", self.docFormPrefix);
-    oData.rbo_docs = oData[self.docFormPrefix];
+    var oData = getFormData(self.docFormPrefix + "\\.doc-form", self.docFormPrefix, "rbo_docs");
     oData.rbo_docs.docId = docId;
     oData.rbo_docs.doc_type = self.sDocType;
     oData.rbo_docs.doc_base = $("#doc_baseId").val();// скрытое поле в форме выбора документа - основания
