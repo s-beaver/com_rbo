@@ -424,7 +424,7 @@ class RbOpers extends RbObject
 
         try {
             $res = new stdClass ();
-            $res->data = RbOpers::getOpersArrayByQuery($dateStart, $dateEnd, null, $custId, $prodId, 1, $firmSubstr, $managerSubstr, 'ASC', null);
+            $res->data = RbOpers::getOpersArrayByQuery($dateStart, $dateEnd, null, $custId, $prodId, 1, $firmSubstr, $managerSubstr, 'ASC', null, "cnt>0");
             foreach ($res->data as &$o) {
                 if (isset($o["productId"]) && $o["productId"] != "" && isset($o["oper_date"]) && $o["oper_date"] != "") {
                     $buyPriceHist = RbOpers::getOpersArrayByQuery(null, $o["oper_date"], array("закуп", "декомплект"), null, (int)$o["productId"], 1, null, null, "DESC", 1, "cnt>0");
