@@ -180,7 +180,7 @@ class RbOpers extends RbObject
         $query->select('count(*)');
         $query->from($db->quoteName($this->table_name, 'so'));
         //if (count($whereAND) > 0) $query->where($whereAND);
-        if ($cond!="") $query->where($cond);
+        if ($cond != "") $query->where($cond);
         $db->setQuery($query);
         $iRecordsTotal = $db->loadResult();
         $iRecordsFiltered = $iRecordsTotal;
@@ -244,7 +244,7 @@ class RbOpers extends RbObject
             return;
         }
 
-        $opers = RbOpers::getOpersArrayByQuery($date, $date, null, null, null, null, null, null, null, 500);
+        $opers = RbOpers::getOpersArrayByQuery($date, $date, null, null, null, null, null, null, null, 500, null);
         $res = "";
         $operTypeTotals = array();
         foreach ($opers as $key => $value) {
@@ -284,9 +284,11 @@ class RbOpers extends RbObject
      * @param $prod_type - 1- товар, 2 - услуга, null - любое
      * @param $firm - строка
      * @param $sort - DESC или пусто
+     * @param $limit - лимит возвращаемых записей
+     * @param $positive_cnt - возвращать операции с только положительными количествами
      * @return mixed
      */
-    static function getOpersArrayByQuery($d1, $d2, $oper_type, $custId, $prodId, $prod_type, $firm, $manager, $sort, $limit)
+    static function getOpersArrayByQuery($d1, $d2, $oper_type, $custId, $prodId, $prod_type, $firm, $manager, $sort, $limit, $positive_cnt)
     {
         $oper = new RbOpers ();
         $db = JFactory::getDBO();
@@ -323,6 +325,8 @@ class RbOpers extends RbObject
             $db->quoteName('rrp.productId') . ')');
         $query->where("oper_date>=STR_TO_DATE('$d1','%d.%m.%Y')");
         $query->where("oper_date<=STR_TO_DATE('$d2','%d.%m.%Y')");
+        if (isset($positive_cnt))
+            $query->where("product_cnt>0");
 
         if (isset($prodId)) {
             switch (gettype($prodId)) {
@@ -393,6 +397,7 @@ class RbOpers extends RbObject
 
         return $db->loadAssocList();
     }
+
     // =================================================================
     /** Получение товарной ведомости по параметрам:
      * - период
@@ -419,10 +424,10 @@ class RbOpers extends RbObject
 
         try {
             $res = new stdClass ();
-            $res->data = RbOpers::getOpersArrayByQuery($dateStart, $dateEnd, null, $custId, $prodId, 1, $firmSubstr, $managerSubstr, 'ASC');
+            $res->data = RbOpers::getOpersArrayByQuery($dateStart, $dateEnd, null, $custId, $prodId, 1, $firmSubstr, $managerSubstr, 'ASC', null);
             foreach ($res->data as &$o) {
                 if (isset($o["productId"]) && $o["productId"] != "" && isset($o["oper_date"]) && $o["oper_date"] != "") {
-                    $buyPriceHist = RbOpers::getOpersArrayByQuery(null, $o["oper_date"], array("закуп", "декомплект"), null, (int)$o["productId"], 1, null, null, "DESC", 1);
+                    $buyPriceHist = RbOpers::getOpersArrayByQuery(null, $o["oper_date"], array("закуп", "декомплект"), null, (int)$o["productId"], 1, null, null, "DESC", 1, "cnt>0");
                     $o["buyPrice"] = $buyPriceHist[0]["product_price"];
                     $o["buyDocId"] = $buyPriceHist[0]["docId"];
                     $o["buyOperType"] = $buyPriceHist[0]["oper_type"];
