@@ -19,6 +19,7 @@
             </optgroup>
             <optgroup label="Справочники">
                 <option value="<?php echo JRoute::_("index.php?option=com_rbo&view=products")?>">Справочник - товары</option>
+                <option value="<?php echo JRoute::_("index.php?option=com_rbo&view=priceimport")?>">Импорт прайсов</option>
                 <option value="<?php echo JRoute::_("index.php?option=com_rbo&view=customers")?>">Справочник - контрагенты</option>
             </optgroup>
             <optgroup label="Отчеты">

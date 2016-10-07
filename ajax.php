@@ -18,6 +18,7 @@ require_once JPATH_BASE . '/includes/framework.php';
 require_once "models/RbHelper.php";
 require_once "models/RbDocs.php";
 require_once "models/RbProducts.php";
+require_once "models/RbPriceImport.php";
 require_once "models/RbDocsProducts.php";
 require_once "models/RbCust.php";
 require_once "models/RbOpers.php";
@@ -164,6 +165,12 @@ switch ($cmd) {
     case "product_delete" : {
         $prd = new RbProducts ();
         $prd->deleteObject(true);
+        break;
+    }
+
+    // ==================================== price import ==========================
+    case "get_price_import_list" : {
+        RbPriceImport::getPriceImportList();
         break;
     }
 
