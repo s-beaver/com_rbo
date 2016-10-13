@@ -3,13 +3,29 @@ var prd;
 
 //===================================================================================
 function PriceImport(o) {
+    var loadingCSV = false;
 }
+
+//===================================================================================
+PriceImport.prototype.attachDocForm = function () {
+    var self = this;
+    //подключаем форму для редакции документов
+    this.oFormDlg = $("#priceimport\\.load-form");
+    this.oFormDlg.dialog({
+        autoOpen: false,
+        height: 200,
+        width: 400,
+        modal: true,
+        resizable: true
+    });
+
+};
 
 //===================================================================================
 PriceImport.prototype.attachProductModule = function () {
     var self = this;
+    self.attachDocForm();
 
-    //подключаем форму для редакции документов
     self.oTable = $('#TableProduct').dataTable({
         "jQueryUI": true,
         "processing": true,
@@ -51,6 +67,14 @@ PriceImport.prototype.attachProductModule = function () {
             "title": "Цена vip",
             "className": "center",
             "data": "product_price_vip"
+        },{
+            "title": "fId",
+            "className": "center",
+            "data": "productFoundId"
+        },{
+            "title": "fCnt",
+            "className": "center",
+            "data": "productFoundCount"
         }, {
             "title": "*",
             "className": "center",
@@ -76,16 +100,18 @@ PriceImport.prototype.attachProductModule = function () {
     $("#import_start").button();
     $("#import_save_changes").button();
     $("#import_cancel_changes").button();
-    //обработчик нажатия кнопки добавления товара
-    // $("#doc_add_btn").click(function (event) {
-    //     self.createProduct();
-    //     return false;
-    // });
+
+    //обработчик нажатия кнопки открытия csv файла
+    $("#import_open_csv").click(function (event) {
+        self.openCSV(self);
+        return false;
+    });
 
     $("#dialog-confirm").dialog({
         autoOpen: false
     });
 
+    $("#progressbar").hide();
 };
 
 //===================================================================================
@@ -93,6 +119,51 @@ PriceImport.prototype.readProduct = function (id) {
     var self = this;
 };
 
+
+//===================================================================================
+PriceImport.prototype.openCSV = function () {
+    var self = this;
+    var oBtns = {};
+
+    if (self.loadingCSV) return;
+    oBtns["Открыть"] = function () {
+        var formData = new FormData();
+        formData.append('import_csv', $('#priceimport_file').get(0).files[0]);
+
+        $("#progressbar").show();
+        self.loadingCSV = true;
+        $.ajax({
+            url: comPath + "ajax.php?task=import_open_csv",
+            type: 'POST',
+            data: formData,
+            processData: false,  // tell jQuery not to process the data
+            contentType: false,  // tell jQuery not to set contentType
+            success: function (data) {
+                $("#progressbar").hide();
+                self.oFormDlg.dialog("close");
+                self.oTableAPI.draw();
+                self.loadingCSV = false;
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $("#progressbar").hide();
+                alert("Статус: " + textStatus + " Ошибка: " + errorThrown)
+                self.loadingCSV = false;
+            }
+
+        });
+    };
+
+    oBtns["Отмена"] = function () {
+        self.oFormDlg.dialog("close");
+    };
+
+    self.oFormDlg.dialog({
+        title: "Открыть прайс (csv)",
+        buttons: oBtns
+    });
+
+    self.oFormDlg.dialog("open");
+};
 
 // ===================================================================================
 $(document).ready(function () {

@@ -151,3 +151,22 @@ INSERT INTO #__rbo_operstype VALUES
   ('затраты-аренда', NULL, -1, NULL, -1),
   ('затраты-коммун', NULL, -1, NULL, -1),
   ('затраты-связь', NULL, -1, NULL, -1);
+
+CREATE TABLE #__rbo_price_import (
+  id int(11) NOT NULL,
+  product_code varchar(255) DEFAULT NULL,
+  product_name varchar(255) DEFAULT NULL,
+  product_price double(10, 3) DEFAULT NULL,
+  product_price1 double(10, 3) DEFAULT NULL,
+  product_price2 double(10, 3) DEFAULT NULL,
+  product_price3 double(10, 3) DEFAULT NULL,
+  product_price_vip double(10, 3) DEFAULT NULL,
+  productFoundCount int(11) DEFAULT NULL,
+  productFoundId int(11) DEFAULT NULL,
+  imported int(11) DEFAULT NULL,
+  PRIMARY KEY (id)
+)
+  ENGINE = INNODB
+  AVG_ROW_LENGTH = 247
+  CHARACTER SET utf8
+  COLLATE utf8_general_ci;

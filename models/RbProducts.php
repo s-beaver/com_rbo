@@ -18,6 +18,7 @@ class RbProducts extends RbObject
         $this->flds ["product_in_stock"] = array("type" => "numeric");
         $this->flds ["product_price"] = array("type" => "numeric");
         $this->flds ["product_price1"] = array("type" => "numeric");
+        $this->flds ["product_price_bucks"] = array("type" => "numeric");
         $this->flds ["product_type"] = array("type" => "numeric");
         $this->flds ["price_name"] = array("type" => "string");
 

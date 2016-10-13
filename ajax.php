@@ -174,6 +174,12 @@ switch ($cmd) {
         break;
     }
 
+    case "import_open_csv" : {
+        $pi = new RbPriceImport ();
+        $pi->loadPriceFromCSV($_FILES['import_csv']['tmp_name']);
+        break;
+    }
+
     // ==================================== customer ==========================
     case "cust_search" : {
         $cust = new RbCust ();

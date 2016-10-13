@@ -19,10 +19,22 @@ class RbObject
     }
 
     // =================================================================
+    /**
+     * @param $table_name
+     */
     public function setTableName($table_name)
     {
         $this->buffer_root_name = $table_name;
         $this->table_name = RbHelper::getTableName($table_name);
+    }
+
+    /**
+     * @return string
+     */
+    // =================================================================
+    public function getTableName()
+    {
+        return $this->table_name;
     }
 
     // =================================================================
@@ -192,7 +204,7 @@ class RbObject
         $query = $db->getQuery(true);
 
         $query->select($this->getFieldsForSelectClause());
-        $query->from($this->table_name);
+        $query->from($this->getTableName());
         $query->where($this->getWhereClause());
 
         try {
@@ -222,7 +234,7 @@ class RbObject
                 $result = true;
                 foreach ($this->buffer as $key => $value) {
                     $query->clear();
-                    $query->update($db->quoteName($this->table_name));
+                    $query->update($db->quoteName($this->getTableName()));
                     $query->set($this->getSetForUpdateClause($db, $value));
                     $query->where($this->getWhereClause());
                     $db->setQuery($query);
@@ -230,7 +242,7 @@ class RbObject
                 }
                 if (!$result) throw new Exception ('Ошибка при обновлении записи в БД');
             } else {
-                $query->update($db->quoteName($this->table_name));
+                $query->update($db->quoteName($this->getTableName()));
                 $query->set($this->getSetForUpdateClause($db, $this->buffer));
                 $query->where($this->getWhereClause());
                 $db->setQuery($query);
@@ -260,7 +272,7 @@ class RbObject
                 foreach ($this->buffer as $key => $value) {
                     $query->clear();
                     $ins = $this->getArraysForInsert($db, $value);
-                    $query->insert($db->quoteName($this->table_name));
+                    $query->insert($db->quoteName($this->getTableName()));
                     $query->columns($ins [0]);
                     $query->values($ins [1]);
                     $db->setQuery($query);
@@ -270,7 +282,7 @@ class RbObject
                 if (!$result) throw new Exception ('Ошибка при создании записи в БД');
             } else {
                 $ins = $this->getArraysForInsert($db, $this->buffer);
-                $query->insert($db->quoteName($this->table_name));
+                $query->insert($db->quoteName($this->getTableName()));
                 $query->columns($ins [0]);
                 $query->values($ins [1]);
                 $db->setQuery($query);
@@ -293,7 +305,7 @@ class RbObject
     {
         $db = JFactory::getDBO();
         $query = $db->getQuery(true);
-        $query->delete($db->quoteName($this->table_name));
+        $query->delete($db->quoteName($this->getTableName()));
         $query->where($this->getWhereClause());
         $db->setQuery($query);
         $this->response = $db->execute();

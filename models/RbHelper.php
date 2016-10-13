@@ -74,5 +74,14 @@ class RbHelper
             return RbConfig::$prefixForDBTables . $table_name . RbConfig::$suffixForDBTables;
     }
 
+    // =================================================================
+    static function executeQuery($SQL)
+    {
+        $db = JFactory::getDBO();
+        $query = $db->getQuery(true);
+        $query->setQuery($SQL);
+        return $db->execute();
+    }
+
 }
 

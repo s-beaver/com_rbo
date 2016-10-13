@@ -7,7 +7,7 @@
     <script src="<?php echo JRBO_PATH ?>/models/js/RbForm.js"></script>
     <script src="<?php echo JRBO_PATH ?>/models/js/PriceImport.js"></script>
     <link rel="stylesheet" href="<?php echo JRBO_PATH ?>/css/rbo.css"/>
-
+    <link rel="stylesheet" href="<?php echo JRBO_PATH ?>/css/font-awesome-4.6.3/css/font-awesome.min.css">
     <style>
     </style>
 
@@ -26,6 +26,15 @@
 
 <table id="TableProduct" class="display compact"></table>
 
-<div class="version"><?php echo RbHelper::getVersion()?></div>
+<div id="priceimport.load-form" title="Открыть прайс (csv)">
+    <form enctype="multipart/form-data" action="" method="POST">
+        <input type="hidden" name="MAX_FILE_SIZE" value="30000"/>
+        <input id="priceimport_file" type="file"/>
+        <div style="text-align: center"><i id="progressbar" class="fa fa-cog fa-spin fa-2x fa-fw"></i></div>
+        <span class="sr-only">Loading...</span>
+    </form>
+</div>
+
+<div class="version"><?php echo RbHelper::getVersion() ?></div>
 </body>
 </html>
