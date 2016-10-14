@@ -29,6 +29,17 @@
 
 <table id="TableProduct" class="display compact"></table>
 
+<div id="priceimport.load-ini" title="Настройка импорта (ini)">
+    <form id="priceimport.load-ini-form" method="post" action="">
+        <fieldset>
+            <input type="file" id="priceimport_ini_file" />
+            <div style="width: 100%; height: 100%;">
+                <textarea name="priceimport.settings" id="priceimport.settings" style="width: 100%; height: 400px;"></textarea>
+            </div>
+        </fieldset>
+    </form>
+</div>
+
 <div id="priceimport.load-form" title="Открыть прайс (csv)">
     <form enctype="multipart/form-data" action="" method="POST">
         <input type="hidden" name="MAX_FILE_SIZE" value="30000"/>

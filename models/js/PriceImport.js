@@ -3,18 +3,27 @@ var prd;
 
 //===================================================================================
 function PriceImport(o) {
-    var loadingCSV = false;
+    this.loadingCSV = false;
+    this.fileReader = new FileReader();
 }
 
 //===================================================================================
 PriceImport.prototype.attachDocForm = function () {
     var self = this;
-    //подключаем форму для редакции документов
-    this.oFormDlg = $("#priceimport\\.load-form");
-    this.oFormDlg.dialog({
+    this.oFormLoadDlg = $("#priceimport\\.load-form");
+    this.oFormLoadDlg.dialog({
         autoOpen: false,
         height: 200,
         width: 400,
+        modal: true,
+        resizable: true
+    });
+
+    this.oFormINIDlg = $("#priceimport\\.load-ini");
+    this.oFormINIDlg.dialog({
+        autoOpen: false,
+        height: 600,
+        width: 700,
         modal: true,
         resizable: true
     });
@@ -95,15 +104,26 @@ PriceImport.prototype.attachProductModule = function () {
     });
 
     $("#header_doclist_adddoc").html("");
-    $("#import_open_csv").button();
     $("#import_open_settings").button();
+    $("#import_open_csv").button();
     $("#import_start").button();
     $("#import_save_changes").button();
     $("#import_cancel_changes").button();
 
+    //обработчик нажатия кнопки открытия ini файла
+    $("#import_open_settings").click(function (event) {
+        self.editINI();
+        return false;
+    });
+
+    $("#priceimport_ini_file").change(function (event) {
+        self.readINI();
+        return false;
+    });
+
     //обработчик нажатия кнопки открытия csv файла
     $("#import_open_csv").click(function (event) {
-        self.openCSV(self);
+        self.openCSV();
         return false;
     });
 
@@ -112,6 +132,7 @@ PriceImport.prototype.attachProductModule = function () {
     });
 
     $("#progressbar").hide();
+
 };
 
 //===================================================================================
@@ -119,6 +140,36 @@ PriceImport.prototype.readProduct = function (id) {
     var self = this;
 };
 
+
+//===================================================================================
+PriceImport.prototype.editINI = function () {
+    var self = this;
+    self.fileReader.onload = function(e) {
+        $("#priceimport\\.settings").val(e.target.result);
+    };
+    var oBtns = {};
+
+    oBtns["Сохранить настройки"] = function () {
+
+    };
+
+    oBtns["Отмена"] = function () {
+        self.oFormINIDlg.dialog("close");
+    };
+
+    self.oFormINIDlg.dialog({
+        title: "Настройка импорта (ini)",
+        buttons: oBtns
+    });
+
+    self.oFormINIDlg.dialog("open");
+};
+
+//===================================================================================
+PriceImport.prototype.readINI = function () {
+    var self = this;
+    self.fileReader.readAsText($('#priceimport_ini_file').get(0).files[0]);
+};
 
 //===================================================================================
 PriceImport.prototype.openCSV = function () {
@@ -140,7 +191,7 @@ PriceImport.prototype.openCSV = function () {
             contentType: false,  // tell jQuery not to set contentType
             success: function (data) {
                 $("#progressbar").hide();
-                self.oFormDlg.dialog("close");
+                self.oFormLoadDlg.dialog("close");
                 self.oTableAPI.draw();
                 self.loadingCSV = false;
             },
@@ -154,15 +205,15 @@ PriceImport.prototype.openCSV = function () {
     };
 
     oBtns["Отмена"] = function () {
-        self.oFormDlg.dialog("close");
+        self.oFormLoadDlg.dialog("close");
     };
 
-    self.oFormDlg.dialog({
+    self.oFormLoadDlg.dialog({
         title: "Открыть прайс (csv)",
         buttons: oBtns
     });
 
-    self.oFormDlg.dialog("open");
+    self.oFormLoadDlg.dialog("open");
 };
 
 // ===================================================================================
