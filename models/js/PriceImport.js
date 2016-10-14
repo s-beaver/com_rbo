@@ -146,7 +146,7 @@ PriceImport.prototype.openCSV = function () {
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 $("#progressbar").hide();
-                alert("Статус: " + textStatus + " Ошибка: " + errorThrown)
+                alert("Статус: " + textStatus + " Ошибка: " + errorThrown);
                 self.loadingCSV = false;
             }
 
