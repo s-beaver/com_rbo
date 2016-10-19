@@ -89,13 +89,14 @@ class RbProducts extends RbObject
         $query->clear();
         $query->select($prodRef->getFieldsForSelectClause());
         $query->from($db->quoteName($prodRef->table_name));
-        if ($searchWithFilter=="1" && isset(RbConfig::$currentPriceName) && strcmp(RbConfig::$currentPriceName, "") != 0) {
+        if ($searchWithFilter == "1" && isset(RbConfig::$currentPriceName) && strcmp(RbConfig::$currentPriceName, "") != 0) {
             $query->where("(price_name='" . RbConfig::$currentPriceName . "' OR product_in_stock>0)", "AND");
         }
 
         $searchAr = preg_split("/[\s,]+/", $searchSubstr);// split the phrase by any number of commas or space characters
         foreach ($searchAr as $v) {
-            $query->where("LOWER(product_name) LIKE '%" . strtolower($v) . "%'");
+            if (!strpos($v, "\\"))
+                $query->where("LOWER(product_name) LIKE '%" . strtolower($v) . "%'");
         }
 
         try {
