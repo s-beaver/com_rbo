@@ -77,10 +77,10 @@ class RbHelper
     // =================================================================
     static function executeQuery($SQL)
     {
-        $db = JFactory::getDBO();
-        $query = $db->getQuery(true);
-        $query->setQuery($SQL);
-        return $db->execute();
+        $db = JFactory::getDbo();
+        $db->setQuery($SQL);
+        $result = $db->execute();
+        return $result;
     }
 
 }

@@ -76,11 +76,11 @@ PriceImport.prototype.attachProductModule = function () {
             "title": "Цена vip",
             "className": "center",
             "data": "product_price_vip"
-        },{
+        }, {
             "title": "fId",
             "className": "center",
             "data": "productFoundId"
-        },{
+        }, {
             "title": "fCnt",
             "className": "center",
             "data": "productFoundCount"
@@ -126,6 +126,11 @@ PriceImport.prototype.attachProductModule = function () {
         self.openCSV();
         return false;
     });
+    //обработчик нажатия кнопки открытия csv файла
+    $("#import_start").click(function (event) {
+        self.importPrice();
+        return false;
+    });
 
     $("#dialog-confirm").dialog({
         autoOpen: false
@@ -142,15 +147,28 @@ PriceImport.prototype.readProduct = function (id) {
 
 
 //===================================================================================
-PriceImport.prototype.editINI = function () {
+PriceImport.prototype.showINIForm = function () {
     var self = this;
-    self.fileReader.onload = function(e) {
-        $("#priceimport\\.settings").val(e.target.result);
-    };
     var oBtns = {};
 
     oBtns["Сохранить настройки"] = function () {
-
+        $.ajax({
+            url: comPath + "ajax.php?task=import_save_ini",
+            dataType: 'json',
+            type: "POST",
+            data: {
+                "iniFileContent": $("#priceimport\\.settings").val()
+            },
+            success: function (p) {
+                if (!IsNull(p) && !IsNull(p.error)) {
+                    alert("Статус: " + NullTo(p.error.code, "") + " Ошибка: " + NullTo(p.error.message, ""));
+                }
+                self.oFormINIDlg.dialog("close");
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert("Статус: " + textStatus + " Ошибка: " + errorThrown);
+            }
+        });
     };
 
     oBtns["Отмена"] = function () {
@@ -163,6 +181,36 @@ PriceImport.prototype.editINI = function () {
     });
 
     self.oFormINIDlg.dialog("open");
+};
+
+//===================================================================================
+PriceImport.prototype.editINI = function () {
+    var self = this;
+    self.fileReader.onload = function (e) {
+        $("#priceimport\\.settings").val(e.target.result);
+    };
+
+    $.ajax({
+        url: comPath + "ajax.php?task=import_read_ini",
+        dataType: 'json',
+        type: "POST",
+        data: {},
+        success: function (p) {
+            if (IsNull(p)) return;
+            if (IsNull(p.lines)) return;
+            if (!IsArray(p.lines)) return;
+            var iniFromServer = "";
+            for (var i = 0; i < p.lines.length; i++) {
+                iniFromServer += p.lines[i];
+            }
+            $("#priceimport\\.settings").val(iniFromServer);
+            self.showINIForm();
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            self.showINIForm();
+        }
+    });
+
 };
 
 //===================================================================================
@@ -214,6 +262,31 @@ PriceImport.prototype.openCSV = function () {
     });
 
     self.oFormLoadDlg.dialog("open");
+};
+
+//===================================================================================
+PriceImport.prototype.importPrice = function () {
+    var self = this;
+
+    if (self.loadingCSV) return;
+    self.loadingCSV = true;
+    $.ajax({
+        url: comPath + "ajax.php?task=import_import_price",
+        type: 'POST',
+        contentType: false,  // tell jQuery not to set contentType
+        success: function (data) {
+            $("#progressbar").hide();
+            self.oTableAPI.draw();
+            self.loadingCSV = false;
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            $("#progressbar").hide();
+            alert("Статус: " + textStatus + " Ошибка: " + errorThrown);
+            self.oTableAPI.draw();
+            self.loadingCSV = false;
+        }
+
+    });
 };
 
 // ===================================================================================

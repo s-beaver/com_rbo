@@ -174,9 +174,25 @@ switch ($cmd) {
         break;
     }
 
+    case "import_read_ini" : {
+        RbPriceImport::readINIFile();
+        break;
+    }
+
+    case "import_save_ini" : {
+        RbPriceImport::saveINIFile();
+        break;
+    }
+
     case "import_open_csv" : {
         $pi = new RbPriceImport ();
         $pi->loadPriceFromCSV($_FILES['import_csv']['tmp_name']);
+        break;
+    }
+
+    case "import_import_price" : {
+        $pi = new RbPriceImport ();
+        $pi->importPrice();
         break;
     }
 

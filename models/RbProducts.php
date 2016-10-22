@@ -5,7 +5,7 @@ class RbProducts extends RbObject
 {
 
     // =================================================================
-    public function __construct($keyValue)
+    public function __construct($keyValue = null)
     {
         parent::__construct($keyValue);
 
@@ -37,9 +37,9 @@ class RbProducts extends RbObject
     }
 
     // =================================================================
-    public function updateObject($echoResponse = false)
+    public function updateObject($echoResponse = false, $priceCheck = true)
     {
-        if (isset(RbConfig::$currentPriceName) && strcmp(RbConfig::$currentPriceName, "") != 0) {
+        if ($priceCheck && isset(RbConfig::$currentPriceName) && strcmp(RbConfig::$currentPriceName, "") != 0) {
             $this->buffer = ( object )$this->buffer;
             $this->buffer->price_name = RbConfig::$currentPriceName;
         }

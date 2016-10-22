@@ -1,11 +1,16 @@
 <?php
 require_once "models/RbObject.php";
 
+define('IMPORT_SETTINGS_FILE', realpath(dirname(__FILE__) . "/../") . "/import_settings.ini");
+define('TEMP_PRICE_TABLE', '#__rbo_products_import');
+define('PRICE_TABLE', '#__rbo_products');
+
+
 class RbPriceImport extends RbObject
 {
 
     // =================================================================
-    public function __construct($keyValue)
+    public function __construct($keyValue = null)
     {
         parent::__construct($keyValue);
 
@@ -28,6 +33,35 @@ class RbPriceImport extends RbObject
     }
 
     // =================================================================
+    static function readINIFile()
+    {
+        $settings = new stdClass ();
+        if (!$settings->lines = file(IMPORT_SETTINGS_FILE)) return null;
+        echo json_encode($settings, JSON_UNESCAPED_UNICODE);
+    }
+
+    // =================================================================
+    static function saveINIFile()
+    {
+        $input = JFactory::getApplication()->input;
+        $iniContent = $input->get("iniFileContent", null, null);
+        if (empty($iniContent)) {
+            die(json_encode(array('error' => array(
+                'message' => 'Empty ini file',
+                'code' => 1,
+            )), JSON_UNESCAPED_UNICODE));
+        }
+        if (file_put_contents(IMPORT_SETTINGS_FILE, $iniContent)) {
+            echo json_encode(array('message' => 'SUCCESS'), JSON_UNESCAPED_UNICODE);
+        } else {
+            die(json_encode(array('error' => array(
+                'message' => 'Error while writing ini file',
+                'code' => 2,
+            )), JSON_UNESCAPED_UNICODE));
+        }
+    }
+
+    // =================================================================
     static function getPriceImportList()
     {
         $input = JFactory::getApplication()->input;
@@ -39,7 +73,7 @@ class RbPriceImport extends RbObject
         if (!is_null($aSearch)) {
             $sSearch = $aSearch["value"];
         }
-        $db = JFactory::getDBO();
+        $db = JFactory::getDbo();
         $query = $db->getQuery(true);
 
         $prodRef = new RbPriceImport ();
@@ -90,7 +124,7 @@ class RbPriceImport extends RbObject
         $settings = new stdClass ();
         for ($ln = 0; $ln < count($lines); $ln++) {
             $line = preg_split("/=/", $lines[$ln]);
-            $line[1] = preg_replace(array("/\"/","/\r/","/\n/"),"",$line[1]);
+            $line[1] = preg_replace(array("/\"/", "/\r/", "/\n/"), "", $line[1]);
             if (count($line) != 2) continue;
             switch ($line[0]) {
                 case "PRICE_NAME": {
@@ -122,7 +156,7 @@ class RbPriceImport extends RbObject
                     $settings->convert->rulesTo = array();
                     for ($i = 1; $i < count($parts); $i++) {
                         $a = explode("->", $parts[$i]);
-                        $a[1] = preg_replace("/\'/","",$a[1]);
+                        $a[1] = preg_replace("/\'/", "", $a[1]);
                         array_push($settings->convert->rulesFrom, $a[0]);
                         array_push($settings->convert->rulesTo, $a[1]);
                     }
@@ -145,14 +179,15 @@ class RbPriceImport extends RbObject
     public function loadPriceFromCSV($fileName)
     {
         //todo убрать возможность запускать повторно, пока не выполнена текущая загрузка
-        $settings = $this->readImportSettings(realpath(dirname(__FILE__)) . "/../import_settings.ini");
+        $settings = $this->readImportSettings(IMPORT_SETTINGS_FILE);
         if (empty($settings)) return;
 
         $prd = new RbProducts ();
-        $db = JFactory::getDBO();
+        $db = JFactory::getDbo();
         $query = $db->getQuery(true);
         try {
             //читаем файл
+            $lines = array();
             if (is_uploaded_file($fileName)) {
                 $lines = file($fileName);
                 if (count($lines) == 0) return;
@@ -196,7 +231,8 @@ class RbPriceImport extends RbObject
                 $query->clear();
                 $query->select('count(*) as cnt,productId');
                 $query->from($db->quoteName($prd->getTableName(), "rp"));
-                $query->where("rp.product_name='" . $buffer[$settings->columnToSearch] . "'");//todo проверять текущий прайс?
+                $query->where("rp.product_name='" . $buffer[$settings->searchColumn] . "'");
+                $query->order($db->quoteName('rp.price_name') . " DESC");
                 $db->setQuery($query);
                 $productFound = $db->loadAssoc();
 
@@ -223,6 +259,54 @@ class RbPriceImport extends RbObject
                     throw new Exception('Could not insert ' . $lines[$ln]);
             }
 
+        } catch (Exception $e) {
+            JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
+        }
+    }
+
+    public function importPrice()
+    {
+        //Создание точки восстановления
+        $result = RbHelper::executeQuery("DROP TABLE IF EXISTS " . TEMP_PRICE_TABLE);
+        $result = $result && RbHelper::executeQuery("CREATE TABLE " . TEMP_PRICE_TABLE . " SELECT * FROM " . PRICE_TABLE);
+
+        //Импорт прайса
+        $db = JFactory::getDbo();
+        $query = $db->getQuery(true);
+        $query->clear();
+        $select = $this->getFieldsForSelectClause();
+        $query->select($select);
+        $query->from($db->quoteName($this->table_name));
+        $db->setQuery($query);
+        try {
+            $price = $db->loadAssocList();
+            $input = JFactory::getApplication()->input;
+            $settings = $this->readImportSettings(IMPORT_SETTINGS_FILE);
+            if (empty($settings)) return;
+            foreach ($price as &$p) {
+                $p = (array)$p;
+
+                if (!($p ["productFoundId"] > 0)) {
+                    continue;
+                }
+
+                $pRef = array();
+                foreach ($settings->dbFlds as $k => $v) {
+                    if (strcmp(substr($v, 0, 1), "$") == 0) {
+                        $value = $settings->bucksRate * $p[substr($v,1,strlen($v)-1)];
+                    } elseif (!(array_search($v, $settings->csvColumns)===false)) {
+                        $value = $p[$v];
+                    } else {
+                        $value = $v;
+                    }
+                    $pRef[$k] = $value;
+                }
+                $pRef["price_name"] = JFactory::getDate()->format('Ymd'); // https://php.net/manual/en/function.date.php
+                $input->set("rbo_products", $pRef);
+                $prodRef = new RbProducts ($p ["productFoundId"]);
+                $prodRef->updateObject(false, false);
+                //обновим имя прайса в конфигурации
+            }
         } catch (Exception $e) {
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
         }
