@@ -59,7 +59,17 @@ PriceImport.prototype.attachProductModule = function () {
         }, {
             "title": "Цена",
             "className": "center",
-            "data": "product_price"
+            "data": function (source, type, val) {
+                var v = source.product_price;
+                if (IsNull(v)) return "";
+                if (/\d+\s\(-.+\)/.test(v)) {
+                    return "<div style='background-color: green'>" + source.product_price + "</div>";
+                }
+                if (/\d+\s\([^-].+/.test(v)) {
+                    return "<div style='background-color: red'>" + source.product_price + "</div>";
+                }
+                return source.product_price;
+            }
         }, {
             "title": "Цена 1",
             "className": "center",

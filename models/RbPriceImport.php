@@ -16,17 +16,23 @@ class RbPriceImport extends RbObject
 
         $this->is_multiple = false;
         $this->setTableName("rbo_price_import");
-        $this->flds ["id"] = array("type" => "numeric", "is_key" => true);
-        $this->flds ["product_code"] = array("type" => "string");
-        $this->flds ["product_name"] = array("type" => "string");
-        $this->flds ["product_price"] = array("type" => "numeric");
-        $this->flds ["product_price1"] = array("type" => "numeric");
-        $this->flds ["product_price2"] = array("type" => "numeric");
-        $this->flds ["product_price3"] = array("type" => "numeric");
-        $this->flds ["product_price_vip"] = array("type" => "numeric");
-        $this->flds ["productFoundCount"] = array("type" => "numeric");
-        $this->flds ["productFoundId"] = array("type" => "numeric");
-        $this->flds ["imported"] = array("type" => "numeric");
+        $this->flds ["id"] = ["type" => "numeric", "is_key" => true];
+        $this->flds ["product_code"] = ["type" => "string"];
+        $this->flds ["product_name"] = ["type" => "string"];
+        $this->flds ["product_price"] = ["type" => "numeric"];
+        $this->flds ["product_price1"] = ["type" => "numeric"];
+        $this->flds ["product_price2"] = ["type" => "numeric"];
+        $this->flds ["product_price3"] = ["type" => "numeric"];
+        $this->flds ["product_price_vip"] = ["type" => "numeric"];
+        $this->flds ["productFoundCount"] = ["type" => "numeric"];
+        $this->flds ["productFoundId"] = ["type" => "numeric"];
+        $this->flds ["imported"] = ["type" => "numeric"];
+
+        $this->checkForChange = [
+            "product_price" => "product_price",
+            "product_price_bucks" => "product_price1",
+            "product_price1" => "\$product_price1"
+        ];
 
         $this->getInputBuffer();
         if (!isset ($keyValue)) $this->keyValue = $this->buffer->id;
@@ -62,7 +68,7 @@ class RbPriceImport extends RbObject
     }
 
     // =================================================================
-    static function getPriceImportList()
+    public function getPriceImportList()
     {
         $input = JFactory::getApplication()->input;
         $iDisplayStart = $input->getInt('start', -1);
@@ -73,13 +79,18 @@ class RbPriceImport extends RbObject
         if (!is_null($aSearch)) {
             $sSearch = $aSearch["value"];
         }
+        $prod = new RbProducts();
         $db = JFactory::getDbo();
         $query = $db->getQuery(true);
 
         $prodRef = new RbPriceImport ();
         $query->clear();
-        $query->select($prodRef->getFieldsForSelectClause());
-        $query->from($db->quoteName($prodRef->table_name, "rp"));
+        $query->select($prodRef->getFieldsForSelectClause("rp"));
+        foreach ($this->checkForChange as $prodFld => $priceFld) {
+            $query->select($db->quoteName("prod." . $prodFld, "prod_" . $prodFld));
+        }
+        $query->from($db->quoteName($prodRef->getTableName(), "rp"));
+        $query->join("LEFT", $db->quoteName($prod->getTableName(), 'prod') . ' ON (' . $db->quoteName('rp.productFoundId') . ' = ' . $db->quoteName('prod.productId') . ')');
 
         $where = array();
         if (!empty ($sSearch)) {
@@ -98,6 +109,19 @@ class RbPriceImport extends RbObject
             }
 
             $data_rows_assoc_list = $db->loadAssocList();
+
+            $settings = $this->readImportSettings(IMPORT_SETTINGS_FILE);
+            foreach ($data_rows_assoc_list as &$row) {
+                foreach ($this->checkForChange as $prodFld => $priceFld) {//todo $this->checkForChange заменить на settings
+                    if (strcmp(substr($priceFld, 0, 1), "$") == 0) {
+                        $diff = $settings->bucksRate * $row[substr($priceFld, 1, strlen($priceFld) - 1)] - $row["prod_" . $prodFld];
+                    } else
+                        $diff = $row[$priceFld] - $row["prod_" . $prodFld];
+                    if ($diff != 0)
+                        $row[$priceFld] = $row[$priceFld] . " (" . $diff . ")";
+                }
+
+            }
 
             $query->clear();
             $query->select('count(*)');
@@ -293,8 +317,8 @@ class RbPriceImport extends RbObject
                 $pRef = array();
                 foreach ($settings->dbFlds as $k => $v) {
                     if (strcmp(substr($v, 0, 1), "$") == 0) {
-                        $value = $settings->bucksRate * $p[substr($v,1,strlen($v)-1)];
-                    } elseif (!(array_search($v, $settings->csvColumns)===false)) {
+                        $value = $settings->bucksRate * $p[substr($v, 1, strlen($v) - 1)];
+                    } elseif (!(array_search($v, $settings->csvColumns) === false)) {
                         $value = $p[$v];
                     } else {
                         $value = $v;
@@ -305,8 +329,10 @@ class RbPriceImport extends RbObject
                 $input->set("rbo_products", $pRef);
                 $prodRef = new RbProducts ($p ["productFoundId"]);
                 $prodRef->updateObject(false, false);
-                //обновим имя прайса в конфигурации
             }
+            $result = $result && RbHelper::executeQuery("DELETE FROM " . PRICE_TABLE . " WHERE productFoundId is not null");
+            //обновим имя прайса в конфигурации??
+
         } catch (Exception $e) {
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
         }

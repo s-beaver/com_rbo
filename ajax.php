@@ -170,7 +170,8 @@ switch ($cmd) {
 
     // ==================================== price import ==========================
     case "get_price_import_list" : {
-        RbPriceImport::getPriceImportList();
+        $pi = new RbPriceImport ();
+        $pi->getPriceImportList();
         break;
     }
 
