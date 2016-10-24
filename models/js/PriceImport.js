@@ -94,16 +94,12 @@ PriceImport.prototype.attachProductModule = function () {
             "title": "fCnt",
             "className": "center",
             "data": "productFoundCount"
-        }, {
-            "title": "*",
-            "className": "center",
-            "data": "imported"
         }],
         language: dataTablesLanguage
     });
     self.oTableAPI = self.oTable.api();
 
-    $("#header_doclist_choose_list h2").html("Импорт прайсов");
+    $("#header_doclist_choose_list h2").html('Импорт прайсов');
 
     //подключаем меню перехода в другой раздел
     $("#links").selectmenu({
@@ -114,31 +110,27 @@ PriceImport.prototype.attachProductModule = function () {
     });
 
     $("#header_doclist_adddoc").html("");
-    $("#import_open_settings").button();
-    $("#import_open_csv").button();
-    $("#import_start").button();
-    $("#import_save_changes").button();
-    $("#import_cancel_changes").button();
 
-    //обработчик нажатия кнопки открытия ini файла
-    $("#import_open_settings").click(function (event) {
+    $("#import_open_settings").button().click(function (event) {
         self.editINI();
         return false;
     });
 
-    $("#priceimport_ini_file").change(function (event) {
-        self.readINI();
-        return false;
-    });
-
-    //обработчик нажатия кнопки открытия csv файла
-    $("#import_open_csv").click(function (event) {
+    $("#import_open_csv").button().click(function (event) {
         self.openCSV();
         return false;
     });
-    //обработчик нажатия кнопки открытия csv файла
-    $("#import_start").click(function (event) {
+
+    $("#import_start").button().click(function (event) {
         self.importPrice();
+        return false;
+    });
+
+    $("#import_save_changes").button();
+    $("#import_cancel_changes").button();
+
+    $("#priceimport_ini_file").change(function (event) {
+        self.readINI();
         return false;
     });
 
@@ -146,7 +138,10 @@ PriceImport.prototype.attachProductModule = function () {
         autoOpen: false
     });
 
-    $("#progressbar").hide();
+    $("#progressbar").progressbar({
+        value: false,
+        disabled: true
+    }).hide();
 
 };
 
@@ -241,6 +236,7 @@ PriceImport.prototype.openCSV = function () {
 
         $("#progressbar").show();
         self.loadingCSV = true;
+        self.oFormLoadDlg.dialog("close");
         $.ajax({
             url: comPath + "ajax.php?task=import_open_csv",
             type: 'POST',
@@ -249,7 +245,6 @@ PriceImport.prototype.openCSV = function () {
             contentType: false,  // tell jQuery not to set contentType
             success: function (data) {
                 $("#progressbar").hide();
-                self.oFormLoadDlg.dialog("close");
                 self.oTableAPI.draw();
                 self.loadingCSV = false;
             },
@@ -280,6 +275,7 @@ PriceImport.prototype.importPrice = function () {
 
     if (self.loadingCSV) return;
     self.loadingCSV = true;
+    $("#progressbar").show();
     $.ajax({
         url: comPath + "ajax.php?task=import_import_price",
         type: 'POST',

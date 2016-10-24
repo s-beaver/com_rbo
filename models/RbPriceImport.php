@@ -4,7 +4,8 @@ require_once "models/RbObject.php";
 define('IMPORT_SETTINGS_FILE', realpath(dirname(__FILE__) . "/../") . "/import_settings.ini");
 define('TEMP_PRICE_TABLE', '#__rbo_products_import');
 define('PRICE_TABLE', '#__rbo_products');
-
+//todo показывать только измененные
+//todo добавить actions для строк, у которых не найден товар в текущем справочнике товаров: удалить, добавить в справочник
 
 class RbPriceImport extends RbObject
 {
@@ -26,13 +27,6 @@ class RbPriceImport extends RbObject
         $this->flds ["product_price_vip"] = ["type" => "numeric"];
         $this->flds ["productFoundCount"] = ["type" => "numeric"];
         $this->flds ["productFoundId"] = ["type" => "numeric"];
-        $this->flds ["imported"] = ["type" => "numeric"];
-
-        $this->checkForChange = [
-            "product_price" => "product_price",
-            "product_price_bucks" => "product_price1",
-            "product_price1" => "\$product_price1"
-        ];
 
         $this->getInputBuffer();
         if (!isset ($keyValue)) $this->keyValue = $this->buffer->id;
@@ -70,6 +64,7 @@ class RbPriceImport extends RbObject
     // =================================================================
     public function getPriceImportList()
     {
+        $settings = $this->readImportSettings(IMPORT_SETTINGS_FILE);
         $input = JFactory::getApplication()->input;
         $iDisplayStart = $input->getInt('start', -1);
         $iDisplayLength = $input->getInt('length', -1);
@@ -86,7 +81,7 @@ class RbPriceImport extends RbObject
         $prodRef = new RbPriceImport ();
         $query->clear();
         $query->select($prodRef->getFieldsForSelectClause("rp"));
-        foreach ($this->checkForChange as $prodFld => $priceFld) {
+        foreach ($settings->checkForChange as $prodFld => $priceFld) {
             $query->select($db->quoteName("prod." . $prodFld, "prod_" . $prodFld));
         }
         $query->from($db->quoteName($prodRef->getTableName(), "rp"));
@@ -96,7 +91,7 @@ class RbPriceImport extends RbObject
         if (!empty ($sSearch)) {
             $searchAr = preg_split("/[\s,]+/", $sSearch);
             foreach ($searchAr as $v) {
-                $where[] = "LOWER(product_name) LIKE '%" . strtolower($v) . "%'";
+                $where[] = "LOWER(rp.product_name) LIKE '%" . strtolower($v) . "%'";
             }
         }
         if (count($where) > 0) $query->where($where);
@@ -110,9 +105,8 @@ class RbPriceImport extends RbObject
 
             $data_rows_assoc_list = $db->loadAssocList();
 
-            $settings = $this->readImportSettings(IMPORT_SETTINGS_FILE);
             foreach ($data_rows_assoc_list as &$row) {
-                foreach ($this->checkForChange as $prodFld => $priceFld) {//todo $this->checkForChange заменить на settings
+                foreach ($settings->checkForChange as $prodFld => $priceFld) {
                     if (strcmp(substr($priceFld, 0, 1), "$") == 0) {
                         $diff = $settings->bucksRate * $row[substr($priceFld, 1, strlen($priceFld) - 1)] - $row["prod_" . $prodFld];
                     } else
@@ -191,7 +185,11 @@ class RbPriceImport extends RbObject
                     if (preg_match("/^CSV_COL(\d+)$/", $line[0], $matches) == 1) {
                         $settings->csvColumns[--$matches[1]] = $line[1];
                     } elseif (preg_match("/^DB_(.+)$/", $line[0], $matches) == 1) {
-                        $settings->dbFlds[$matches[1]] = $line[1];
+                        $params = preg_split("/,/", $line[1]);
+                        $settings->dbFlds[$matches[1]] = $params[0];
+                        if (count($params) > 1 && $params[1] == "check") {
+                            $settings->checkForChange[$matches[1]] = $params[0];
+                        }
                     }
                 }
             }
@@ -229,7 +227,8 @@ class RbPriceImport extends RbObject
             for ($ln = 0; $ln < count($lines); $ln++) {
                 if (is_int($settings->skipRows) && $settings->skipRows > 0 && $ln < $settings->skipRows) continue;
 
-                $columns = explode(";", $lines[$ln]);
+//                $columns = explode(";", $lines[$ln]);
+                $columns = str_getcsv($lines[$ln],";");
                 if (count($columns) != count($settings->csvColumns)) {
                     //записать в лог
                     continue;
@@ -239,7 +238,7 @@ class RbPriceImport extends RbObject
                 for ($i = 0; $i < count($settings->csvColumns); $i++) {
                     $buffer[$settings->csvColumns[$i]] = $columns[$i];
                 }
-                if (empty($buffer[$settings->columnCheckLineValid])) {
+                if (isset($settings->columnCheckLineValid) && empty($buffer[$settings->columnCheckLineValid])) {
                     continue; //это не товар, а заголовок группы
                 }
                 if (!empty($settings->convert)) {
@@ -267,7 +266,7 @@ class RbPriceImport extends RbObject
                 $ins[1] = $ins[1] . "," . ($ln + 1);
 
                 //добавим ссылку на найденный товар
-                if (!empty($productFound)) {
+                if (!empty($productFound) && $productFound["cnt"]>0) {
                     $ins[0][] = "productFoundCount";
                     $ins[1] = $ins[1] . "," . $productFound["cnt"];
 
@@ -316,11 +315,11 @@ class RbPriceImport extends RbObject
 
                 $pRef = array();
                 foreach ($settings->dbFlds as $k => $v) {
-                    if (strcmp(substr($v, 0, 1), "$") == 0) {
+                    if (strcmp(substr($v, 0, 1), "$") == 0) {//преоразуем в рубли
                         $value = $settings->bucksRate * $p[substr($v, 1, strlen($v) - 1)];
-                    } elseif (!(array_search($v, $settings->csvColumns) === false)) {
+                    } elseif (!(array_search($v, $settings->csvColumns) === false)) {//если в settings указано название поля
                         $value = $p[$v];
-                    } else {
+                    } else {//если в settings указана константа
                         $value = $v;
                     }
                     $pRef[$k] = $value;
@@ -330,7 +329,7 @@ class RbPriceImport extends RbObject
                 $prodRef = new RbProducts ($p ["productFoundId"]);
                 $prodRef->updateObject(false, false);
             }
-            $result = $result && RbHelper::executeQuery("DELETE FROM " . PRICE_TABLE . " WHERE productFoundId is not null");
+            $result = $result && RbHelper::executeQuery("DELETE FROM " . $db->quoteName($this->table_name) . " WHERE productFoundId is not null");
             //обновим имя прайса в конфигурации??
 
         } catch (Exception $e) {
