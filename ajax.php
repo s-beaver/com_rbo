@@ -197,6 +197,12 @@ switch ($cmd) {
         break;
     }
 
+    case "import_product_add" : {
+        $pi = new RbPriceImport ();
+        $pi->addProduct();
+        break;
+    }
+
     // ==================================== customer ==========================
     case "cust_search" : {
         $cust = new RbCust ();

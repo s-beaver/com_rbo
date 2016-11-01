@@ -1,15 +1,15 @@
 <?php
 require_once "models/RbObject.php";
 
+/**
+ *
+ */
 define('IMPORT_SETTINGS_FILE', realpath(dirname(__FILE__) . "/../") . "/import_settings.ini");
 define('TEMP_PRICE_TABLE', '#__rbo_products_import');
 define('PRICE_TABLE', '#__rbo_products');
-//todo показывать только измененные
-//todo добавить actions для строк, у которых не найден товар в текущем справочнике товаров: удалить, добавить в справочник
 
 class RbPriceImport extends RbObject
 {
-
     // =================================================================
     public function __construct($keyValue = null)
     {
@@ -104,17 +104,11 @@ class RbPriceImport extends RbObject
             }
 
             $data_rows_assoc_list = $db->loadAssocList();
+            $data_rows = array();
 
             foreach ($data_rows_assoc_list as &$row) {
-                foreach ($settings->checkForChange as $prodFld => $priceFld) {
-                    if (strcmp(substr($priceFld, 0, 1), "$") == 0) {
-                        $diff = $settings->bucksRate * $row[substr($priceFld, 1, strlen($priceFld) - 1)] - $row["prod_" . $prodFld];
-                    } else
-                        $diff = $row[$priceFld] - $row["prod_" . $prodFld];
-                    if ($diff != 0)
-                        $row[$priceFld] = $row[$priceFld] . " (" . $diff . ")";
-                }
-
+                $this->checkProductChanged($settings, $row, $row);
+                array_push($data_rows, $row);
             }
 
             $query->clear();
@@ -128,7 +122,7 @@ class RbPriceImport extends RbObject
             $res->draw = (integer)$iDraw;
             $res->recordsTotal = $iRecordsTotal;
             $res->recordsFiltered = $iRecordsTotal;
-            $res->data = $data_rows_assoc_list;
+            $res->data = $data_rows;
             echo json_encode($res);
         } catch (Exception $e) {
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
@@ -198,6 +192,26 @@ class RbPriceImport extends RbObject
     }
 
     // =================================================================
+    private function checkProductChanged($settings, $rowFrom, &$rowTo)
+    {
+        $changed = false;
+        foreach ($settings->checkForChange as $prodFld => $priceFld) {
+            if (strcmp(substr($priceFld, 0, 1), "$") == 0) {
+                $diff = $settings->bucksRate * $rowFrom[substr($priceFld, 1, strlen($priceFld) - 1)] - $rowFrom["prod_" . $prodFld];
+            } else
+                $diff = $rowFrom[$priceFld] - $rowFrom["prod_" . $prodFld];
+            if (abs($diff) > 0.5) {
+                if (isset($rowTo))
+                    $rowTo[$priceFld] = $rowFrom[$priceFld] . " (" . $diff . ")";
+                $changed = true;
+            }
+        }
+        if ($changed) {
+        }
+        return $changed;
+    }
+
+    // =================================================================
     public function loadPriceFromCSV($fileName)
     {
         //todo убрать возможность запускать повторно, пока не выполнена текущая загрузка
@@ -227,8 +241,7 @@ class RbPriceImport extends RbObject
             for ($ln = 0; $ln < count($lines); $ln++) {
                 if (is_int($settings->skipRows) && $settings->skipRows > 0 && $ln < $settings->skipRows) continue;
 
-//                $columns = explode(";", $lines[$ln]);
-                $columns = str_getcsv($lines[$ln],";");
+                $columns = str_getcsv($lines[$ln], ";");
                 if (count($columns) != count($settings->csvColumns)) {
                     //записать в лог
                     continue;
@@ -241,6 +254,7 @@ class RbPriceImport extends RbObject
                 if (isset($settings->columnCheckLineValid) && empty($buffer[$settings->columnCheckLineValid])) {
                     continue; //это не товар, а заголовок группы
                 }
+
                 if (!empty($settings->convert)) {
                     foreach ($settings->convert->columns as $columnName) {
                         $buffer[$columnName] = preg_replace(
@@ -252,12 +266,19 @@ class RbPriceImport extends RbObject
                 }
 
                 $query->clear();
-                $query->select('count(*) as cnt,productId');
-                $query->from($db->quoteName($prd->getTableName(), "rp"));
-                $query->where("rp.product_name='" . $buffer[$settings->searchColumn] . "'");
-                $query->order($db->quoteName('rp.price_name') . " DESC");
+                $query->select($prd->getFieldsForSelectClause());
+                $query->from($db->quoteName($prd->getTableName()));
+                $query->where("product_name='" . $buffer[$settings->searchColumn] . "'");
+                $query->order($db->quoteName('price_name') . " DESC");
                 $db->setQuery($query);
                 $productFound = $db->loadAssoc();
+                foreach ($productFound as $columnName => $value) {
+                    $buffer["prod_" . $columnName] = $value;
+                }
+
+                if (!$this->checkProductChanged($settings, $buffer)) {
+                    continue;
+                }
 
                 $query->clear();
                 $ins = $this->getArraysForInsert($db, $buffer);
@@ -266,10 +287,7 @@ class RbPriceImport extends RbObject
                 $ins[1] = $ins[1] . "," . ($ln + 1);
 
                 //добавим ссылку на найденный товар
-                if (!empty($productFound) && $productFound["cnt"]>0) {
-                    $ins[0][] = "productFoundCount";
-                    $ins[1] = $ins[1] . "," . $productFound["cnt"];
-
+                if (!empty($productFound)) {
                     $ins[0][] = "productFoundId";
                     $ins[1] = $ins[1] . "," . $productFound["productId"];
                 }
@@ -287,6 +305,7 @@ class RbPriceImport extends RbObject
         }
     }
 
+    // =================================================================
     public function importPrice()
     {
         //Создание точки восстановления
@@ -313,29 +332,74 @@ class RbPriceImport extends RbObject
                     continue;
                 }
 
-                $pRef = array();
-                foreach ($settings->dbFlds as $k => $v) {
-                    if (strcmp(substr($v, 0, 1), "$") == 0) {//преоразуем в рубли
-                        $value = $settings->bucksRate * $p[substr($v, 1, strlen($v) - 1)];
-                    } elseif (!(array_search($v, $settings->csvColumns) === false)) {//если в settings указано название поля
-                        $value = $p[$v];
-                    } else {//если в settings указана константа
-                        $value = $v;
-                    }
-                    $pRef[$k] = $value;
-                }
+                $pRef = $this->convertByRate($settings, $p);
                 $pRef["price_name"] = JFactory::getDate()->format('Ymd'); // https://php.net/manual/en/function.date.php
                 $input->set("rbo_products", $pRef);
                 $prodRef = new RbProducts ($p ["productFoundId"]);
                 $prodRef->updateObject(false, false);
             }
             $result = $result && RbHelper::executeQuery("DELETE FROM " . $db->quoteName($this->table_name) . " WHERE productFoundId is not null");
-            //обновим имя прайса в конфигурации??
 
         } catch (Exception $e) {
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
         }
     }
+
+    // =================================================================
+    public function addProduct()
+    {
+        $input = JFactory::getApplication()->input;
+        $lineNumber = $input->getInt("importLineNumber", -1);
+        if ($lineNumber == -1) return;
+
+        $db = JFactory::getDbo();
+        $query = $db->getQuery(true);
+        $query->clear();
+        $select = $this->getFieldsForSelectClause();
+        $query->select($select);
+        $query->from($db->quoteName($this->table_name));
+        $query->where("id=" . $lineNumber);
+        $db->setQuery($query);
+        $pFound = $db->loadAssocList();
+        if (!isset($pFound)) return;
+        $p = $pFound[0];
+
+        $input = JFactory::getApplication()->input;
+        $settings = $this->readImportSettings(IMPORT_SETTINGS_FILE);
+        if (empty($settings)) return;
+        $pRef = $this->convertByRate($settings, (array)$p);
+        $pRef["price_name"] = JFactory::getDate()->format('Ymd'); // https://php.net/manual/en/function.date.php
+        $input->set("rbo_products", $pRef);
+        if ($p ["productFoundId"] > 0) {
+            $prodRef = new RbProducts ($p ["productFoundId"]);
+            $prodRef->updateObject();
+        } else {
+            $prodRef = new RbProducts ();
+            $prodRef->createObject();
+        }
+//        $prodRef->insertid;
+
+        RbHelper::executeQuery("DELETE FROM " . $db->quoteName($this->table_name) . " WHERE id=" . $lineNumber);
+        echo json_encode(array('message' => 'SUCCESS'), JSON_UNESCAPED_UNICODE);
+    }
+
+    // =================================================================
+    private function convertByRate($settings, $p)
+    {
+        $pRef = array();
+        foreach ($settings->dbFlds as $k => $v) {
+            if (strcmp(substr($v, 0, 1), "$") == 0) {//преобразуем в рубли
+                $value = $settings->bucksRate * $p[substr($v, 1, strlen($v) - 1)];
+            } elseif (!(array_search($v, $settings->csvColumns) === false)) {//если в settings указано название поля
+                $value = $p[$v];
+            } else {//если в settings указана константа
+                $value = $v;
+            }
+            $pRef[$k] = $value;
+        }
+        return $pRef;
+    }
+
 
 }
 

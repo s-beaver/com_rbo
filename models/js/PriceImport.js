@@ -48,7 +48,7 @@ PriceImport.prototype.attachProductModule = function () {
             "title": "Ключ",
             "className": "center",
             "data": function (source, type, val) {
-                return "<a href='javascript:prd.readProduct(" + source.id + ")'>#" + source.id + "</a>";
+                return "<a href='javascript:prd.addProduct(" + source.id + ")'>#" + source.id + "</a>";
             }
         }, {
             "title": "Наименование",
@@ -146,8 +146,27 @@ PriceImport.prototype.attachProductModule = function () {
 };
 
 //===================================================================================
-PriceImport.prototype.readProduct = function (id) {
+PriceImport.prototype.addProduct = function (id) {
     var self = this;
+    var idData = {
+        "importLineNumber": id
+    };
+    $.ajax({
+        url: comPath + "ajax.php?task=import_product_add",
+        dataType: 'json',
+        type: "POST",
+        data: idData,
+        success: function (p) {
+            if (!IsNull(p) && !IsNull(p.error)) {
+                alert("Статус: " + NullTo(p.error.code, "") + " Ошибка: " + NullTo(p.error.message, ""));
+            }
+            self.oTableAPI.draw();
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert("Статус: " + textStatus + " Ошибка: " + errorThrown);
+            self.oTableAPI.draw();
+        }
+    });
 };
 
 

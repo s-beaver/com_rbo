@@ -29,20 +29,16 @@ class RbProducts extends RbObject
     // =================================================================
     public function createObject($echoResponse = false)
     {
-        if (isset(RbConfig::$currentPriceName) && strcmp(RbConfig::$currentPriceName, "") != 0) {
-            $this->buffer = ( object )$this->buffer;
-            $this->buffer->price_name = RbConfig::$currentPriceName;
-        }
+        $this->buffer = ( object )$this->buffer;
+        $this->buffer->price_name = JFactory::getDate()->format('Ymd');
         parent::createObject($echoResponse);
     }
 
     // =================================================================
     public function updateObject($echoResponse = false, $priceCheck = true)
     {
-        if ($priceCheck && isset(RbConfig::$currentPriceName) && strcmp(RbConfig::$currentPriceName, "") != 0) {
-            $this->buffer = ( object )$this->buffer;
-            $this->buffer->price_name = RbConfig::$currentPriceName;
-        }
+        $this->buffer = ( object )$this->buffer;
+        $this->buffer->price_name = JFactory::getDate()->format('Ymd');
         parent::updateObject($echoResponse);
     }
 
@@ -50,8 +46,8 @@ class RbProducts extends RbObject
     static function updateOrCreateProduct(& $prodId, $prod_data)
     {
         $prod_data = ( object )$prod_data;
-        if (isset ($prod_data) && isset(RbConfig::$currentPriceName) && strcmp(RbConfig::$currentPriceName, "") != 0) {
-            $prod_data->price_name = RbConfig::$currentPriceName;
+        if (isset ($prod_data)) {
+            $prod_data->price_name = JFactory::getDate()->format('Ymd');
         }
         $input = JFactory::getApplication()->input;
         $input->set("rbo_products", $prod_data);
@@ -89,8 +85,8 @@ class RbProducts extends RbObject
         $query->clear();
         $query->select($prodRef->getFieldsForSelectClause());
         $query->from($db->quoteName($prodRef->table_name));
-        if ($searchWithFilter == "1" && isset(RbConfig::$currentPriceName) && strcmp(RbConfig::$currentPriceName, "") != 0) {
-            $query->where("(price_name='" . RbConfig::$currentPriceName . "' OR product_in_stock>0)", "AND");
+        if ($searchWithFilter == "1") {
+            $query->where("product_in_stock>0", "AND");
         }
 
         $searchAr = preg_split("/[\s,]+/", $searchSubstr);// split the phrase by any number of commas or space characters
@@ -134,9 +130,7 @@ class RbProducts extends RbObject
         $query->select($prodRef->getFieldsForSelectClause());
         $query->from($db->quoteName($prodRef->table_name, "rp"));
         $query->order($db->quoteName('rp.productId') . " DESC");
-        if (isset(RbConfig::$currentPriceName) && strcmp(RbConfig::$currentPriceName, "") != 0) {
-            $query->where("(price_name='" . RbConfig::$currentPriceName . "' OR product_in_stock>0)", "AND");
-        }
+        $query->where("product_in_stock>0", "AND");
 
         $where = array();
         if ($sInStockFilter != -1) {
