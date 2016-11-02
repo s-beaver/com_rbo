@@ -533,13 +533,13 @@ RbDoc.prototype.custSearch = function () {
 // ===================================================================================
 RbDoc.prototype.showProductForm = function (x) {// x-номер редактируемой строки, x=null-добавляем
     var self = this;
+    var p = {};
 
     if (IsNull(x)) {
         self.editing_lineNo = -1;
-        var p = {};
     } else {
         self.editing_lineNo = x;
-        var p = self.apiTableProducts.row(x).data();
+        p = self.apiTableProducts.row(x).data();
     }
     self.lines_before_update = self.apiTableProducts.rows().data().length;
 

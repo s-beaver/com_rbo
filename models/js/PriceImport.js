@@ -5,6 +5,8 @@ var prd;
 function PriceImport(o) {
     this.loadingCSV = false;
     this.fileReader = new FileReader();
+    this.oProduct = new RboProduct();//объект для выбора/редакции товарами
+    this.oProduct.attachProductModule();
 }
 
 //===================================================================================
@@ -87,13 +89,9 @@ PriceImport.prototype.attachProductModule = function () {
             "className": "center",
             "data": "product_price_vip"
         }, {
-            "title": "fId",
+            "title": "Найден товар",
             "className": "center",
             "data": "productFoundId"
-        }, {
-            "title": "fCnt",
-            "className": "center",
-            "data": "productFoundCount"
         }],
         language: dataTablesLanguage
     });

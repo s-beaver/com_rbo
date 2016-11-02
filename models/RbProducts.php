@@ -85,9 +85,9 @@ class RbProducts extends RbObject
         $query->clear();
         $query->select($prodRef->getFieldsForSelectClause());
         $query->from($db->quoteName($prodRef->table_name));
-        if ($searchWithFilter == "1") {
-            $query->where("product_in_stock>0", "AND");
-        }
+//        if ($searchWithFilter == "1") {пока уберем проверку на наличие на складе
+//            $query->where("product_in_stock>0", "AND");
+//        }
 
         $searchAr = preg_split("/[\s,]+/", $searchSubstr);// split the phrase by any number of commas or space characters
         foreach ($searchAr as $v) {
@@ -130,7 +130,7 @@ class RbProducts extends RbObject
         $query->select($prodRef->getFieldsForSelectClause());
         $query->from($db->quoteName($prodRef->table_name, "rp"));
         $query->order($db->quoteName('rp.productId') . " DESC");
-        $query->where("product_in_stock>0", "AND");
+//        $query->where("product_in_stock>0", "AND");пока уберем проверку на наличие на складе
 
         $where = array();
         if ($sInStockFilter != -1) {
