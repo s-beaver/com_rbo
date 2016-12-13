@@ -1,5 +1,5 @@
 'use strict';
-var prd;
+var pim;
 
 //===================================================================================
 function PriceImport(o) {
@@ -7,6 +7,9 @@ function PriceImport(o) {
     this.fileReader = new FileReader();
     this.oProduct = new RboProduct();//объект для выбора/редакции товарами
     this.oProduct.attachProductModule();
+
+    // this.oRefProduct = new RefProducts();//объект для
+    // this.oRefProduct.attachProductModule();
 }
 
 //===================================================================================
@@ -50,7 +53,7 @@ PriceImport.prototype.attachProductModule = function () {
             "title": "Ключ",
             "className": "center",
             "data": function (source, type, val) {
-                return "<a href='javascript:prd.addProduct(" + source.id + ")'>#" + source.id + "</a>";
+                return "<a href='javascript:pim.addProduct(" + source.id + ")'>#" + source.id + "</a>";
             }
         }, {
             "title": "Наименование",
@@ -315,10 +318,10 @@ PriceImport.prototype.importPrice = function () {
 // ===================================================================================
 $(document).ready(function () {
 
-    prd = new PriceImport({
+    pim = new PriceImport({
         checkFields: ["product_price", "product_price1"],
         tips: $(".validateTips")
     });
-    prd.attachProductModule();
+    pim.attachProductModule();
 
 });
