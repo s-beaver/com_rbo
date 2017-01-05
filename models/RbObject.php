@@ -134,7 +134,7 @@ class RbObject
                     break;
                 }
                 case "numeric": {
-                    if (is_null($value) || empty($value)) {
+                    if (is_null($value) /*|| empty($value)*/) {//поставил комментарии потому что 0 превращалось в null
                         $setAr [] = $db->quoteName($key) . "=NULL";
                     } else {
                         $setAr [] = $db->quoteName($key) . "=$value";

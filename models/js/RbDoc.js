@@ -296,25 +296,6 @@ RbDoc.prototype.saveDoc = function (docId) {
 
     var oData = self.getDocDataBeforeSave(docId);
 
-    /*oData = {
-        "rbo_docs": {
-            "docId": docId,
-            "doc_type": self.sDocType,
-            "doc_num": $("#" + self.docFormPrefix + "\\.doc_num").val(),
-            "doc_date": $("#" + self.docFormPrefix + "\\.doc_date").val(),
-            "pay_date": $("#" + self.docFormPrefix + "\\.pay_date").val(),
-            "doc_sum": $("#" + self.docFormPrefix + "\\.doc_sum").val(),
-            "doc_base": $("#doc_baseId").val(),// скрытое поле в форме выбора документа - основания
-            "doc_status": $("#" + self.docFormPrefix + "\\.doc_status").val(),
-            "doc_manager": $("#" + self.docFormPrefix + "\\.doc_manager").val(),
-            "custId": $("#custId").val(),// скрытое поле в форме выбора клиента
-            "doc_cust": self.oCust.flds,
-            "doc_firm": $("#" + self.docFormPrefix + "\\.doc_firm").val(),
-            "doc_rem": $("#" + self.docFormPrefix + "\\.doc_rem").val(),
-            "doc_products": pAr
-        }
-    };*/
-
     var taskCmd = "doc_create";
     if (!IsNull(docId) && docId > 0)
         taskCmd = "doc_update";
@@ -388,29 +369,8 @@ RbDoc.prototype.createDoc = function () {
 // ===================================================================================
 RbDoc.prototype.deleteDoc = function (docId) {
     var self = this;
-    $.ajax({
-        dataType: 'json',
-        type: "POST",
-        data: {
-            "rbo_docs": {
-                "docId": docId,
-                "doc_type": self.sDocType
-            }
-        },
-        url: comPath + "ajax.php?task=doc_delete",
-        success: function (doc_data) {
-            if (doc_data.errorCode > 0) {
-                Msg(doc_data.errorMsg, "Ок", null, "#dialog-confirm", "Ошибка");
-            } else {
-                self.oTableAPI.draw();
-            }
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            alert("Статус: " + textStatus + " Ошибка: " + errorThrown)
-        }
-    });
-
-    self.oFormDlg.dialog("close");
+    $("#" + self.docFormPrefix + "\\.doc_status").val("удален");
+    self.saveDoc(docId);
 };
 
 // ===================================================================================

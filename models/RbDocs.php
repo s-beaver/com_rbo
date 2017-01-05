@@ -110,6 +110,14 @@ class RbDocs extends RbObject
                 $this->buffer->custId = $cust->insertid;
             }
 
+            //При удалении старых операций требуется "отменить" изменение остатков товаров
+            $prod = new RbDocsProducts ($this->keyValue);
+            $prod->readObject();
+            foreach ($prod->buffer as &$p) {
+                $prodRef = new RbProducts ($p->productId);
+                $prodRef->updateProductInStock($p, true /*обратная операция*/);
+            }
+
             foreach ($doc_products as &$p) {
                 $p = (array)$p;
                 if (!($p ["productId"] > 0)) { // создадим новый товар в справочнике
@@ -118,6 +126,7 @@ class RbDocs extends RbObject
                     $pRef ["product_code"] = $p ["product_code"];
                     $pRef ["product_name"] = $p ["product_name"];
                     $pRef ["product_price"] = $p ["product_price"];
+                    $pRef ["product_in_stock"] = 0;
 
                     $input->set("rbo_products", $pRef);
                     $prodRef = new RbProducts ();
@@ -126,6 +135,9 @@ class RbDocs extends RbObject
                 }
                 $p ["docId"] = $this->keyValue;
                 $this->setOpersFromDocByStatus($p);
+
+                $prodRef = new RbProducts ($p["productId"]);
+                $prodRef->updateProductInStock($p);
             }
             parent::updateObject();
 
@@ -199,6 +211,7 @@ class RbDocs extends RbObject
                     $pRef ["product_code"] = $p ["product_code"];
                     $pRef ["product_name"] = $p ["product_name"];
                     $pRef ["product_price"] = $p ["product_price"];
+                    $pRef ["product_in_stock"] = 0;
 
                     $input->set("rbo_products", $pRef);
                     $prodRef = new RbProducts ();
@@ -207,6 +220,9 @@ class RbDocs extends RbObject
                 }
                 $p ["docId"] = $docId;
                 $this->setOpersFromDocByStatus($p);
+
+                $prodRef = new RbProducts ($p["productId"]);
+                $prodRef->updateProductInStock($p);
             }
 
             $input->set("rbo_opers", $doc_products);
@@ -228,6 +244,14 @@ class RbDocs extends RbObject
 
     // =================================================================
     public function deleteObject($echoResponse = false)
+    {
+        $this->readObject($echoResponse);
+        $this->buffer->doc_status = 'удален';
+        $this->updateObject($echoResponse);
+    }
+
+    // =================================================================
+    public function deleteObjectOld($echoResponse = false)
     {//todo а как же ведут себя подчиненные записи?
         $res = new stdClass ();
         try {

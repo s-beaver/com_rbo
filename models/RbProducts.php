@@ -43,6 +43,24 @@ class RbProducts extends RbObject
     }
 
     // =================================================================
+    public function updateProductInStock($oper, $invertUpdate = false)
+    {
+        $oper = (object)$oper;
+        if (empty($oper->oper_date)) return; //не "проведенная" операция
+        if (!is_array(RbConfig::$operstype[$oper->oper_type])) return;
+        $signMove = RbConfig::$operstype[$oper->oper_type][signMove];
+        if (empty($signMove)) return;
+        $signMove = (integer)$signMove;
+        if ($invertUpdate) $signMove = -$signMove;
+
+        parent::readObject();
+        if (empty($this->buffer->product_in_stock)) $this->buffer->product_in_stock = 0;
+        $this->buffer->product_in_stock = (integer)$this->buffer->product_in_stock + ((integer)$oper->product_cnt * $signMove);
+
+        parent::updateObject();
+    }
+
+    // =================================================================
     static function updateOrCreateProduct(& $prodId, $prod_data)
     {
         $prod_data = ( object )$prod_data;
