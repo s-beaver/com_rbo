@@ -18,6 +18,7 @@ class RbPriceImport extends RbObject
         $this->is_multiple = false;
         $this->setTableName("rbo_price_import");
         $this->flds ["id"] = ["type" => "numeric", "is_key" => true];
+        $this->flds ["product_category"] = ["type" => "string"];
         $this->flds ["product_code"] = ["type" => "string"];
         $this->flds ["product_name"] = ["type" => "string"];
         $this->flds ["product_price"] = ["type" => "numeric"];
