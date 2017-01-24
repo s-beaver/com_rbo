@@ -45,7 +45,7 @@ class RbHelper
     static function sendEMail($subj, $body)
     {
         $mailer = &JFactory::getMailer();
-        $mailer->setSender(array("max@robik.ru","Robik.ru"));
+        $mailer->setSender(array("max@robik.ru", "Robik.ru"));
         $mailer->addRecipient(RbConfig::$documentNotifyEMails);
         $mailer->setSubject($subj);
         $mailer->setBody($body);
@@ -61,10 +61,23 @@ class RbHelper
     // =================================================================
     static function getVersion()
     {
-        return file_get_contents(RBO_PATH.'/.version');
+        return file_get_contents(RBO_PATH . '/.version');
     }
 
     // =================================================================
+    static function translit($s)
+    {
+        if (empty($s)) return "";
+        $del = array("ь", "ъ", ",", ":", "\"", "'", "!", "#", "@", "%", "&", "?", "*", "(", ")", "{", "}", "[", "]", "\\", "/", ";", "<", ">", "|", "+", "-");
+        $rus = array("  ", " ", "а", "б", "в", "г", "д", "е", "ё", "ж", "з", "и", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ы", "э", "ю", "я", "№");
+        $eng = array(" ", "_", "a", "b", "v", "g", "d", "e", "e", "j", "z", "i", "i", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "h", "c", "ch", "sh", "sh", "i", "e", "u", "ya", "N");
+
+        $res = str_replace($del, "", strtolower($s));
+        $res = str_replace($rus, $eng, $res);
+        return $res;
+    }
+
+// =================================================================
     static function getTableName($table_name)
     {
         if (RbConfig::$useJoomlaPrefixForDBTables) {
@@ -74,13 +87,43 @@ class RbHelper
             return RbConfig::$prefixForDBTables . $table_name . RbConfig::$suffixForDBTables;
     }
 
-    // =================================================================
+// =================================================================
     static function executeQuery($SQL)
     {
         $db = JFactory::getDbo();
         $db->setQuery($SQL);
         $result = $db->execute();
         return $result;
+    }
+
+// =================================================================
+    static function insertQuery($SQL)
+    {
+        $db = JFactory::getDbo();
+        $db->setQuery($SQL);
+        $result = $db->execute();
+        if (!$result) return null;
+        return $db->insertid();
+    }
+
+// =================================================================
+    static function SQLGet($SQL)
+    {
+        $db = JFactory::getDbo();
+        $db->setQuery($SQL);
+        $result = $db->execute();
+        if (!$result) return null;
+        return $db->loadResult();
+    }
+
+// =================================================================
+    static function SQLGetAssocList($SQL)
+    {
+        $db = JFactory::getDbo();
+        $db->setQuery($SQL);
+        $result = $db->execute();
+        if (!$result) return null;
+        return $db->loadAssocList();
     }
 
 }

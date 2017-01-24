@@ -2,7 +2,7 @@
 
 class RbConfig
 {
-    public static $firms = array(
+        public static $firms = array(
         "ИП" => array("f_name" => "ИП Ефремов Сергей Александрович",
             "f_fullname" => "Индивидуальный предприниматель Ефремов Сергей Александрович",
             "f_inn" => "667204292729", "f_kpp" => "", "f_okpo" => "0152102248",

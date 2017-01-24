@@ -18,6 +18,7 @@ class RbPriceImport extends RbObject
         $this->is_multiple = false;
         $this->setTableName("rbo_price_import");
         $this->flds ["id"] = ["type" => "numeric", "is_key" => true];
+//        $this->flds ["product_code"] = ["type" => "string"];
         $this->flds ["product_category"] = ["type" => "string"];
         $this->flds ["product_code"] = ["type" => "string"];
         $this->flds ["product_name"] = ["type" => "string"];
@@ -401,6 +402,174 @@ class RbPriceImport extends RbObject
         return $pRef;
     }
 
+    // =================================================================
+    /*
+        $chainedCategory делим на части (|).
+        Проверяем есть ли каждая из частей в j3_virtuemart_categories_ru_ru (category_name) если нет - добавляем.
+        Получаем virtuemart_category_id для каждой из частей.
+        Проверяем в таблице j3_virtuemart_category_categories что есть все записи цепочки по полям
+        category_parent_id и category_child_id
+        Если такой нет - добавляем нехватающую
+        Сохраняем ключ последней категории
+    */
+    public static function getVMCategory($chainedCategory, &$cachedCatList)
+    {
+        if (!empty ($chainedCategory)) {
+            $catsAr = preg_split("/\|/", $chainedCategory);
+            $catList = array();
+            foreach ($catsAr as &$catName) {
+                $catName = trim($catName);
+                if (is_null($cachedCatList[$catName])) {
+                    $id = RbHelper::SQLGet("select virtuemart_category_id from #__virtuemart_categories_ru_ru where category_name ='$catName'");
+                    if (is_null($id)) {
+                        $id = RbHelper::insertQuery("insert into #__virtuemart_categories() values ()");
+                        $slug = RbHelper::translit($catName);
+                        RbHelper::executeQuery("insert into #__virtuemart_categories_ru_ru(virtuemart_category_id,category_name,slug) values ($id,'$catName','$slug')");
+                    }
+                    $cachedCatList[$catName] = $id;
+                    array_push($catList, array("category_id" => $id, "category_name" => $catName));
+                } else {
+                    array_push($catList, array("category_id" => $cachedCatList[$catName], "category_name" => $catName));
+                }
+            }
 
+//                    RbHelper::executeQuery("insert into #__virtuemart_category_categories(category_parent_id,category_child_id) values (0,$id)");
+            for ($i = 0; $i < count($catList); $i++) {//с 1 это правильно
+                $cid = $catList[$i]["category_id"];
+                $pid = ($i == 0) ? 0 : $catList[$i - 1]["category_id"];
+                $res = RbHelper::SQLGet("select count(*) from #__virtuemart_category_categories where category_parent_id=$pid and category_child_id=$cid");
+                if (is_null($res) || $res == 0) {
+                    RbHelper::insertQuery("insert into #__virtuemart_category_categories(category_parent_id,category_child_id) values ($pid,$cid)");
+                }
+            }
+            return $catList[count($catList) - 1]["category_id"];
+        }
+
+    }
+
+// =================================================================
+    /* Проверяем есть ли товар с указанным названием в таблице j3_virtuemart_products_ru_ru (product_name)
+       Проверяем прикреплен ли товар к нужной категории (сохраненный ключ последней категории).
+       Если нет - пишем в лог и переприкрепляем к нужной категории
+
+        Если товара нет, то создаем его, добавляем в таблицы j3_virtuemart_products_ru_ru, j3_virtuemart_products
+
+       Если не удалось создать товар то исключение
+    */
+    public
+    static function getVMProduct($productName, $productSKU, $categoryId)
+    {
+        $productName = trim($productName);
+        $productSKU = trim($productSKU);
+        $productIdList = RbHelper::SQLGetAssocList("select virtuemart_product_id from #__virtuemart_products_ru_ru where product_name='$productName'");
+        $productId = null;
+        if (empty($productIdList)) {
+            if (is_null($productSKU)) $productSKU = "";
+            $productId = RbHelper::insertQuery("insert into #__virtuemart_products(product_sku,published) values ('$productSKU',1)");
+            //добавить производителя
+            $slug = RbHelper::translit($productName);
+            RbHelper::executeQuery("insert into #__virtuemart_products_ru_ru(virtuemart_product_id,product_name,slug) values ($productId,'$productName','$slug')");
+        } else {
+            if (count($productIdList) != 1) { //пишем в лог что товар не один
+                JLog::add("Надено несколько товаров (" . count($productIdList) . ") с названием $productName", JLog::ALERT, 'com_rbo_vm');
+            }
+            $productId = $productIdList[0]["virtuemart_product_id"];
+        }
+        $res = RbHelper::SQLGet("select id from #__virtuemart_product_categories where virtuemart_product_id=$productId and virtuemart_category_id=$categoryId");
+        if (empty($res)) {
+            RbHelper::executeQuery("delete from #__virtuemart_product_categories where virtuemart_product_id=$productId ");
+            RbHelper::executeQuery("insert into #__virtuemart_product_categories(virtuemart_product_id,virtuemart_category_id) values ($productId,$categoryId)");
+        }
+        return $productId;
+    }
+
+// =================================================================;
+    /*Обновляем цены в j3_virtuemart_product_prices. Находим запись запросом и подменяем в ней только цену, если не нашли, то создаем новую*/
+    public
+    static function setVMProductPrices(
+        $productId,
+        $priceGroupList, //ассоциативный массив: название группы - ключ в БД
+        $pricesAr //ассоциативный массив: название колонки цен - цена
+    )
+    {
+        foreach ($pricesAr as $priceName => &$priceVal) {
+            $priceVal = preg_replace(array("/,/", "/\s/", "\xA0"), array(".", "", ""), $priceVal);
+            if (empty($priceVal)) continue;
+            $priceId = RbHelper::SQLGet("select virtuemart_product_price_id from #__virtuemart_product_prices where virtuemart_product_id=$productId and virtuemart_shoppergroup_id=" . $priceGroupList[$priceName]);
+            if (empty($priceId)) {
+                $priceId = RbHelper::insertQuery("insert into #__virtuemart_product_prices () values ()");
+            }
+            RbHelper::executeQuery("update #__virtuemart_product_prices set virtuemart_product_id=$productId, virtuemart_shoppergroup_id=" . $priceGroupList[$priceName] . ", product_price=$priceVal where virtuemart_product_price_id=$priceId");
+        }
+        //product_currency
+    }
+
+// =================================================================
+    public static function importVMFromCSV($fileName)
+    {
+        $skuCol = 0; //артикул
+        $catCol = 8; //категория
+        $nameCol = 1; //наименование
+        $priceCols = array(
+            "Розница" => 3,
+            "1 Оптовая У.Е." => 4,
+            "2 Базовая У.Е." => 5,
+            "3 Партнер У.Е." => 6,
+            "Цена VIP У.Е" => 7
+        );
+
+        $res = RbHelper::SQLGetAssocList("select virtuemart_shoppergroup_id,shopper_group_name from #__virtuemart_shoppergroups");
+        $priceGroupList = array();
+        foreach ($res as $v) {
+            $priceGroupList[$v["shopper_group_name"]] = $v["virtuemart_shoppergroup_id"];
+        }
+
+        try {//читаем файл
+            $lines = array();
+            if (is_uploaded_file($fileName)) {
+                $lines = file($fileName);
+                if (count($lines) == 0) return;
+            }
+
+            $cachedCatList = array();
+            $line = 0;
+            for ($ln = 0; $ln < count($lines); $ln++) {
+                $line++;
+                $columns = str_getcsv($lines[$ln], ";");
+                if (empty($columns[$nameCol])) continue;
+                if (empty($columns[$catCol])) continue;
+                $vmCategoryId = RbPriceImport::getVMCategory($columns[$catCol], $cachedCatList);
+                if (is_null($vmCategoryId)) { //пишем в лог и пропускаем
+                    JLog::add("Не удалось создать категорию " . $columns[$catCol], JLog::ALERT, 'com_rbo_vm');
+                }
+
+                $vmProductId = RbPriceImport::getVMProduct($columns[$nameCol], $columns[$skuCol], $vmCategoryId);
+
+                $pricesAr = array();
+                foreach ($priceCols as $colName => $colPos) {
+                    $pricesAr[$colName] = $columns[$colPos];
+                }
+                RbPriceImport::setVMProductPrices($vmProductId, $priceGroupList, $pricesAr);
+            }
+
+        } catch (Exception $e) {
+            JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo_import');
+            die(json_encode(array('error' => array(
+                'message' => "Ошибка в строке $line. " . $e->getMessage(),
+                'code' => 1,
+            )), JSON_UNESCAPED_UNICODE));
+        }
+        echo json_encode(array('success' => array(
+            'message' => "Обработано " . count($lines) . " строк",
+        )), JSON_UNESCAPED_UNICODE);
+
+    }
 }
 
+//DELETE FROM `test.robik.ru`.j3_virtuemart_products;
+//DELETE FROM `test.robik.ru`.j3_virtuemart_products_ru_ru;
+//DELETE FROM `test.robik.ru`.j3_virtuemart_product_categories;
+//DELETE FROM `test.robik.ru`.j3_virtuemart_categories;
+//DELETE FROM `test.robik.ru`.j3_virtuemart_categories_ru_ru;
+//DELETE FROM `test.robik.ru`.j3_virtuemart_category_categories;
+//DELETE FROM `test.robik.ru`.j3_virtuemart_product_prices;

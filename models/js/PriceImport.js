@@ -263,8 +263,18 @@ PriceImport.prototype.openCSV = function () {
             data: formData,
             processData: false,  // tell jQuery not to process the data
             contentType: false,  // tell jQuery not to set contentType
-            success: function (data) {
+            success: function (p) {
+                if (typeof(p)=="string") {
+                    p = JSON.parse(p);
+                }
                 $("#progressbar").hide();
+                if (!IsNull(p) && !IsNull(p.error)) {
+                    alert("Статус: " + NullTo(p.error.code, "") + " Ошибка: " + NullTo(p.error.message, ""));
+                }
+                if (!IsNull(p) && !IsNull(p.success)) {
+                    alert(NullTo(p.success.message, ""));
+                }
+
                 self.oTableAPI.draw();
                 self.loadingCSV = false;
             },
