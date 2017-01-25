@@ -130,7 +130,7 @@ RbDoc.prototype.attachPageElements = function () {
             "className": "center",
             "data": function (source, type, val) {//"doc_status"
                 var status = NullTo(source.doc_status,"");
-                if (!IsEmpty(source.pay_date) && source.pay_date!='0000-00-00') status = "оплачен";
+                if (status!="удален" && !IsEmpty(source.pay_date) && source.pay_date!='0000-00-00') status = "оплачен";
                 return status;
             }
         }, {

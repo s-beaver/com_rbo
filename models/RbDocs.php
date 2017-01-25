@@ -390,7 +390,7 @@ class RbDocs extends RbObject
 
         $sWhere = " WHERE doc_type='" . $doc_type . "'";
         if (isset ($sSearch) && $sSearch != "") {
-            $sWhere .= " AND rc.cust_name LIKE '%" . $sSearch . "%'";
+            $sWhere .= " AND (rc.cust_name LIKE '%" . $sSearch . "%' OR doc_num=" . (integer)$sSearch . ")";
         }
 
         $rboCustTableName = RbHelper::getTableName("rbo_cust");
