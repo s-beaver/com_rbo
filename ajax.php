@@ -186,8 +186,12 @@ switch ($cmd) {
     }
 
     case "import_open_csv" : {
-        $pi = new RbPriceImport ();
-        $pi->importVMFromCSV($_FILES['import_csv']['tmp_name']);
+        RbPriceImport::importVMFromCSV($_FILES['import_csv']['tmp_name']);
+        break;
+    }
+
+    case "import_csv_in_stock" : {
+        RbPriceImport::importInStockFromCSV($_FILES['import_csv']['tmp_name']);
         break;
     }
 

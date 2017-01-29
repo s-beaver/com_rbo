@@ -122,6 +122,11 @@ PriceImport.prototype.attachProductModule = function () {
         return false;
     });
 
+    $("#import_in_stock_csv").button().click(function (event) {
+        self.openInStockCSV();
+        return false;
+    });
+
     $("#import_start").button().click(function (event) {
         self.importPrice();
         return false;
@@ -263,6 +268,61 @@ PriceImport.prototype.openCSV = function () {
             data: formData,
             processData: false,  // tell jQuery not to process the data
             contentType: false,  // tell jQuery not to set contentType
+            success: function (p) {
+                if (typeof(p)=="string") {
+                    p = JSON.parse(p);
+                }
+                $("#progressbar").hide();
+                if (!IsNull(p) && !IsNull(p.error)) {
+                    Msg("Статус: " + NullTo(p.error.code, "") + " Ошибка: " + NullTo(p.error.message, ""), "Ок", null, "#dialog-confirm", "Ошибка");
+                }
+                if (!IsNull(p) && !IsNull(p.success)) {
+                    Msg(NullTo(p.success.message, ""), "Ок", null, "#dialog-confirm", "Сообщение");
+                }
+
+                self.oTableAPI.draw();
+                self.loadingCSV = false;
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $("#progressbar").hide();
+                alert("Статус: " + textStatus + " Ошибка: " + errorThrown);
+                self.loadingCSV = false;
+            }
+
+        });
+    };
+
+    oBtns["Отмена"] = function () {
+        self.oFormLoadDlg.dialog("close");
+    };
+
+    self.oFormLoadDlg.dialog({
+        title: "Открыть прайс (csv)",
+        buttons: oBtns
+    });
+
+    self.oFormLoadDlg.dialog("open");
+};
+
+//===================================================================================
+PriceImport.prototype.openInStockCSV = function () {
+    var self = this;
+    var oBtns = {};
+
+    if (self.loadingCSV) return;
+    oBtns["Открыть"] = function () {
+        var formData = new FormData();
+        formData.append('import_csv', $('#priceimport_file').get(0).files[0]);
+
+        $("#progressbar").show();
+        self.loadingCSV = true;
+        self.oFormLoadDlg.dialog("close");
+        $.ajax({
+            url: comPath + "ajax.php?task=import_csv_in_stock",
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
             success: function (p) {
                 if (typeof(p)=="string") {
                     p = JSON.parse(p);

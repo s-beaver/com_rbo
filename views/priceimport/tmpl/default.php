@@ -20,9 +20,10 @@
 
 <div>
 <!--  В кнопке можно показывать название прайса из ini-файла. При нажатии на кнопку открывается форма, содержащая редактор-->
-    <button class="ui-button ui-widget ui-corner-all" id="import_open_settings">Настройка импорта (ini)</button>
+    <!--button class="ui-button ui-widget ui-corner-all" id="import_open_settings">Настройка импорта (ini)</button-->
     <button class="ui-button ui-widget ui-corner-all" id="import_open_csv">Открыть прайс (csv)</button>
-    <button class="ui-button ui-widget ui-corner-all" id="import_start">Начать импорт</button>
+    <button class="ui-button ui-widget ui-corner-all" id="import_in_stock_csv">Импорт остатков(csv)</button>
+    <!--button class="ui-button ui-widget ui-corner-all" id="import_start">Начать импорт</button-->
 <!--    <button class="ui-button ui-widget ui-corner-all" id="import_save_changes">Сохранить изменения</button>-->
 <!--    <button class="ui-button ui-widget ui-corner-all" id="import_cancel_changes">Отменить изменения</button>-->
 </div>

@@ -493,8 +493,8 @@ class RbPriceImport extends RbObject
     )
     {
         foreach ($pricesAr as $priceName => &$priceVal) {
-            $priceVal = mb_ereg_replace("\s","", $priceVal);
-            $priceVal = str_replace(",",".",$priceVal);
+            $priceVal = mb_ereg_replace("\s", "", $priceVal);
+            $priceVal = str_replace(",", ".", $priceVal);
             //$priceVal = preg_replace(array("/,/", "/\s/", "/\xA0/"), array(".", "", ""), $priceVal);
             if (empty($priceVal)) {
                 JLog::add("Пропущена пустая цена '$priceName'", JLog::ALERT, 'com_rbo_vm');
@@ -569,7 +569,64 @@ class RbPriceImport extends RbObject
             }
 
         } catch (Exception $e) {
-            JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo_import');
+            JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo_vm');
+            die(json_encode(array('error' => array(
+                'message' => "Ошибка в строке $line. " . $e->getMessage(),
+                'code' => 1,
+            )), JSON_UNESCAPED_UNICODE));
+        }
+        echo json_encode(array('success' => array(
+            'message' => "Обработано " . count($lines) . " строк",
+        )), JSON_UNESCAPED_UNICODE);
+
+    }
+
+// =================================================================
+    public static function importInStockFromCSV($fileName)
+    {
+        $nameCol = 0;
+        $inStockCol = 1;
+
+        JLog::addLogger(
+            array(
+                'text_file' => 'com_rbo_import_in_stock.php'
+            ),
+            JLog::ALL,
+            array('com_rbo_iis')
+        );
+
+        try {
+            $lines = array();
+            if (is_uploaded_file($fileName)) {
+                $lines = file($fileName);
+                if (count($lines) == 0) return;
+            }
+
+            $line = 0;
+            for ($ln = 0; $ln < count($lines); $ln++) {
+                $line++;
+                $columns = str_getcsv($lines[$ln], ";");
+                JLog::add("Строка $line =" . implode(",", $columns), JLog::INFO, 'com_rbo_iis');
+                if (empty($columns[$nameCol])) continue;
+                if (empty($columns[$inStockCol])) continue;
+                $productName = trim($columns[$nameCol]);
+                $productIdList = RbHelper::SQLGetAssocList("select productId from #__rbo_products where product_name='$productName'");
+                if (empty($productIdList)) {
+                    JLog::add("Не удалось найти товар '$productName'", JLog::ERROR, 'com_rbo_iis');
+                    continue;
+                }
+                if (count($productIdList) > 1) {
+                    JLog::add("Найдено несколько товаров (" . count($productIdList) . ") с названием $productName", JLog::ERROR, 'com_rbo_iis');
+                    continue;
+                }
+                $productId = $productIdList[0]["productId"];
+                $productInStock = (integer)(trim($columns[$inStockCol]));
+                RbHelper::executeQuery("update #__rbo_products set product_in_stock=$productInStock where productId=$productId");
+                JLog::add("Установлен остаток для товара ($productName)=$productInStock" , JLog::INFO, 'com_rbo_iis');
+            }
+
+        } catch (Exception $e) {
+            JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo_iis');
             die(json_encode(array('error' => array(
                 'message' => "Ошибка в строке $line. " . $e->getMessage(),
                 'code' => 1,
