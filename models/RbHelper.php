@@ -72,7 +72,7 @@ class RbHelper
         $rus = array("  ", " ", "а", "б", "в", "г", "д", "е", "ё", "ж", "з", "и", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ы", "э", "ю", "я", "№");
         $eng = array(" ", "_", "a", "b", "v", "g", "d", "e", "e", "j", "z", "i", "i", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "h", "c", "ch", "sh", "sh", "i", "e", "u", "ya", "N");
 
-        $res = str_replace($del, "", strtolower($s));
+        $res = str_replace($del, "", mb_strtolower($s));
         $res = str_replace($rus, $eng, $res);
         return $res;
     }

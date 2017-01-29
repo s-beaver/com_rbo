@@ -269,10 +269,10 @@ PriceImport.prototype.openCSV = function () {
                 }
                 $("#progressbar").hide();
                 if (!IsNull(p) && !IsNull(p.error)) {
-                    alert("Статус: " + NullTo(p.error.code, "") + " Ошибка: " + NullTo(p.error.message, ""));
+                    Msg("Статус: " + NullTo(p.error.code, "") + " Ошибка: " + NullTo(p.error.message, ""), "Ок", null, "#dialog-confirm", "Ошибка");
                 }
                 if (!IsNull(p) && !IsNull(p.success)) {
-                    alert(NullTo(p.success.message, ""));
+                    Msg(NullTo(p.success.message, ""), "Ок", null, "#dialog-confirm", "Сообщение");
                 }
 
                 self.oTableAPI.draw();

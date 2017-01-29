@@ -93,7 +93,7 @@ class RbPriceImport extends RbObject
         if (!empty ($sSearch)) {
             $searchAr = preg_split("/[\s,]+/", $sSearch);
             foreach ($searchAr as $v) {
-                $where[] = "LOWER(rp.product_name) LIKE '%" . strtolower($v) . "%'";
+                $where[] = "LOWER(rp.product_name) LIKE '%" . mb_strtolower($v) . "%'";
             }
         }
         if (count($where) > 0) $query->where($where);
@@ -425,6 +425,7 @@ class RbPriceImport extends RbObject
                         $id = RbHelper::insertQuery("insert into #__virtuemart_categories() values ()");
                         $slug = RbHelper::translit($catName);
                         RbHelper::executeQuery("insert into #__virtuemart_categories_ru_ru(virtuemart_category_id,category_name,slug) values ($id,'$catName','$slug')");
+                        JLog::add("Создана категория=$catName", JLog::INFO, 'com_rbo_vm');
                     }
                     $cachedCatList[$catName] = $id;
                     array_push($catList, array("category_id" => $id, "category_name" => $catName));
@@ -433,7 +434,6 @@ class RbPriceImport extends RbObject
                 }
             }
 
-//                    RbHelper::executeQuery("insert into #__virtuemart_category_categories(category_parent_id,category_child_id) values (0,$id)");
             for ($i = 0; $i < count($catList); $i++) {//с 1 это правильно
                 $cid = $catList[$i]["category_id"];
                 $pid = ($i == 0) ? 0 : $catList[$i - 1]["category_id"];
@@ -456,8 +456,7 @@ class RbPriceImport extends RbObject
 
        Если не удалось создать товар то исключение
     */
-    public
-    static function getVMProduct($productName, $productSKU, $categoryId)
+    public static function getVMProduct($productName, $productSKU, $categoryId)
     {
         $productName = trim($productName);
         $productSKU = trim($productSKU);
@@ -469,6 +468,7 @@ class RbPriceImport extends RbObject
             //добавить производителя
             $slug = RbHelper::translit($productName);
             RbHelper::executeQuery("insert into #__virtuemart_products_ru_ru(virtuemart_product_id,product_name,slug) values ($productId,'$productName','$slug')");
+            JLog::add("Создана товар=$productName", JLog::INFO, 'com_rbo_vm');
         } else {
             if (count($productIdList) != 1) { //пишем в лог что товар не один
                 JLog::add("Надено несколько товаров (" . count($productIdList) . ") с названием $productName", JLog::ALERT, 'com_rbo_vm');
@@ -479,27 +479,35 @@ class RbPriceImport extends RbObject
         if (empty($res)) {
             RbHelper::executeQuery("delete from #__virtuemart_product_categories where virtuemart_product_id=$productId ");
             RbHelper::executeQuery("insert into #__virtuemart_product_categories(virtuemart_product_id,virtuemart_category_id) values ($productId,$categoryId)");
+            JLog::add("Товар '$productName' привязан к категории=$categoryId", JLog::INFO, 'com_rbo_vm');
         }
         return $productId;
     }
 
 // =================================================================;
     /*Обновляем цены в j3_virtuemart_product_prices. Находим запись запросом и подменяем в ней только цену, если не нашли, то создаем новую*/
-    public
-    static function setVMProductPrices(
+    public static function setVMProductPrices(
         $productId,
         $priceGroupList, //ассоциативный массив: название группы - ключ в БД
         $pricesAr //ассоциативный массив: название колонки цен - цена
     )
     {
         foreach ($pricesAr as $priceName => &$priceVal) {
-            $priceVal = preg_replace(array("/,/", "/\s/", "\xA0"), array(".", "", ""), $priceVal);
-            if (empty($priceVal)) continue;
+            $priceVal = mb_ereg_replace("\s","", $priceVal);
+            $priceVal = str_replace(",",".",$priceVal);
+            //$priceVal = preg_replace(array("/,/", "/\s/", "/\xA0/"), array(".", "", ""), $priceVal);
+            if (empty($priceVal)) {
+                JLog::add("Пропущена пустая цена '$priceName'", JLog::ALERT, 'com_rbo_vm');
+                continue;
+            }
             $priceId = RbHelper::SQLGet("select virtuemart_product_price_id from #__virtuemart_product_prices where virtuemart_product_id=$productId and virtuemart_shoppergroup_id=" . $priceGroupList[$priceName]);
             if (empty($priceId)) {
                 $priceId = RbHelper::insertQuery("insert into #__virtuemart_product_prices () values ()");
+                JLog::add("Добавлена цена '$priceName'", JLog::ALERT, 'com_rbo_vm');
             }
+            JLog::add("update #__virtuemart_product_prices set virtuemart_product_id=$productId, virtuemart_shoppergroup_id=" . $priceGroupList[$priceName] . ", product_price=$priceVal where virtuemart_product_price_id=$priceId", JLog::ALERT, 'com_rbo_vm');
             RbHelper::executeQuery("update #__virtuemart_product_prices set virtuemart_product_id=$productId, virtuemart_shoppergroup_id=" . $priceGroupList[$priceName] . ", product_price=$priceVal where virtuemart_product_price_id=$priceId");
+            JLog::add("Обновлена цена '$priceName'=$priceVal", JLog::ALERT, 'com_rbo_vm');
         }
         //product_currency
     }
@@ -518,11 +526,19 @@ class RbPriceImport extends RbObject
             "Цена VIP У.Е" => 7
         );
 
+        JLog::addLogger(
+            array(
+                'text_file' => 'com_rbo_vm.php'
+            ),
+            JLog::ALL,
+            array('com_rbo_vm')
+        );
         $res = RbHelper::SQLGetAssocList("select virtuemart_shoppergroup_id,shopper_group_name from #__virtuemart_shoppergroups");
         $priceGroupList = array();
         foreach ($res as $v) {
             $priceGroupList[$v["shopper_group_name"]] = $v["virtuemart_shoppergroup_id"];
         }
+        JLog::add("Получены ценовые категории=" . implode(",", $priceGroupList), JLog::INFO, 'com_rbo_vm');
 
         try {//читаем файл
             $lines = array();
@@ -536,12 +552,12 @@ class RbPriceImport extends RbObject
             for ($ln = 0; $ln < count($lines); $ln++) {
                 $line++;
                 $columns = str_getcsv($lines[$ln], ";");
+                JLog::add("Строка $line =" . implode(",", $columns), JLog::INFO, 'com_rbo_vm');
                 if (empty($columns[$nameCol])) continue;
                 if (empty($columns[$catCol])) continue;
                 $vmCategoryId = RbPriceImport::getVMCategory($columns[$catCol], $cachedCatList);
-                if (is_null($vmCategoryId)) { //пишем в лог и пропускаем
+                if (is_null($vmCategoryId))  //пишем в лог и пропускаем
                     JLog::add("Не удалось создать категорию " . $columns[$catCol], JLog::ALERT, 'com_rbo_vm');
-                }
 
                 $vmProductId = RbPriceImport::getVMProduct($columns[$nameCol], $columns[$skuCol], $vmCategoryId);
 
@@ -564,6 +580,7 @@ class RbPriceImport extends RbObject
         )), JSON_UNESCAPED_UNICODE);
 
     }
+
 }
 
 //DELETE FROM `test.robik.ru`.j3_virtuemart_products;

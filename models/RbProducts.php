@@ -110,7 +110,7 @@ class RbProducts extends RbObject
         $searchAr = preg_split("/[\s,]+/", $searchSubstr);// split the phrase by any number of commas or space characters
         foreach ($searchAr as $v) {
             if (!strpos($v, "\\"))
-                $query->where("LOWER(product_name) LIKE '%" . strtolower($v) . "%'");
+                $query->where("LOWER(product_name) LIKE '%" . mb_strtolower($v) . "%'");
         }
 
         try {
@@ -157,7 +157,7 @@ class RbProducts extends RbObject
         } elseif (!empty ($sSearch)) {
             $searchAr = preg_split("/[\s,]+/", $sSearch);// split the phrase by any number of commas or space characters
             foreach ($searchAr as $v) {
-                $where[] = "LOWER(product_name) LIKE '%" . strtolower($v) . "%'";
+                $where[] = "LOWER(product_name) LIKE '%" . mb_strtolower($v) . "%'";
             }
         }
         if (count($where) > 0) $query->where($where);

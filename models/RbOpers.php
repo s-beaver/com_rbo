@@ -151,8 +151,8 @@ class RbOpers extends RbObject
         if (!empty ($sSearch)) {
             $searchAr = preg_split("/[\s,]+/", $sSearch);// split the phrase by any number of commas or space characters
             foreach ($searchAr as $v) {
-                $whereOR[] = "LOWER(so.product_name) LIKE '%" . strtolower($v) . "%'";
-                $whereOR[] = "LOWER(so.oper_rem) LIKE '%" . strtolower($v) . "%'";
+                $whereOR[] = "LOWER(so.product_name) LIKE '%" . mb_strtolower($v) . "%'";
+                $whereOR[] = "LOWER(so.oper_rem) LIKE '%" . mb_strtolower($v) . "%'";
             }
         }
         $cond = "";
