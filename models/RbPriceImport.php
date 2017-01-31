@@ -638,6 +638,61 @@ class RbPriceImport extends RbObject
 
     }
 
+// =================================================================
+    public static function importInStockFromCSV1($fileName)
+    {
+        JLog::addLogger(
+            array(
+                'text_file' => 'com_rbo_import_in_stock.php'
+            ),
+            JLog::ALL,
+            array('com_rbo_iis')
+        );
+
+        try {
+            $lines = array();
+            if (is_uploaded_file($fileName)) {
+                $lines = file($fileName);
+                if (count($lines) == 0) return;
+            }
+
+            $line = 0;
+            for ($ln = 0; $ln < count($lines); $ln++) {
+                $line++;
+                $columns = str_getcsv($lines[$ln], ";");
+                JLog::add("Строка $line =" . implode(",", $columns), JLog::INFO, 'com_rbo_iis');
+                if (empty($columns[1])) continue;
+                $productName = trim($columns[1]);
+                $productIdList = RbHelper::SQLGetAssocList("select productId from #__rbo_products where product_name='$productName'");
+                $productId = $productIdList[0]["productId"];
+                if (count($productIdList) > 1) {
+                    JLog::add("Найдено несколько товаров (" . count($productIdList) . ") с названием $productName", JLog::ERROR, 'com_rbo_iis');
+                    continue;
+                }
+                $catId = (integer)(trim($columns[0]));
+                $product_price = str_replace(",", ".", trim($columns[2]));
+                $product_price1 = str_replace(",", ".", trim($columns[3]));
+                $product_type = trim($columns[4]);
+                if (empty($productIdList)) {
+                    $productId = RbHelper::insertQuery("insert into #__rbo_products(product_name) values ('$productName')");
+                }
+                RbHelper::executeQuery("update #__rbo_products set categoryId=$catId, product_name='$productName',product_price=$product_price,product_price1=$product_price1,product_type=$product_type where productId=$productId");
+                JLog::add("Обновлен товар $productName", JLog::INFO, 'com_rbo_iis');
+            }
+
+        } catch (Exception $e) {
+            JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo_iis');
+            die(json_encode(array('error' => array(
+                'message' => "Ошибка в строке $line. " . $e->getMessage(),
+                'code' => 1,
+            )), JSON_UNESCAPED_UNICODE));
+        }
+        echo json_encode(array('success' => array(
+            'message' => "Обработано " . count($lines) . " строк",
+        )), JSON_UNESCAPED_UNICODE);
+
+    }
+
 }
 
 //DELETE FROM `test.robik.ru`.j3_virtuemart_products;
