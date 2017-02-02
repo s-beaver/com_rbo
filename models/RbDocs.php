@@ -183,13 +183,6 @@ class RbDocs extends RbObject
             $this->buffer->modified_on = null;
             // $this->buffer->doc_type = $this->docType;//надо передавать через буфер
             if (empty($this->buffer->doc_num)) $this->buffer->doc_num = $this->getNextDocNumber();
-
-
-
-            if ($this->buffer->doc_num>500)
-                JLog::add("after getNextDocNumber: "+json_encode($this->buffer, JSON_UNESCAPED_UNICODE), JLog::ERROR, 'com_rbo');
-
-
             if (empty($this->buffer->doc_date)) $this->buffer->doc_date = RbHelper::getCurrentTimeForDb();
 
             $input = JFactory::getApplication()->input;
@@ -459,16 +452,13 @@ class RbDocs extends RbObject
                 $query->where("doc_type='" . $this->buffer->doc_type . "'");
             }
             $query->where("DATE_FORMAT(doc_date,'%Y')=$year");
+            $query->where("doc_base IS NULL");
             $db->setQuery($query);
             $newNumber = $db->loadResult();
             if (is_null($newNumber)) $newNumber = 0;
             $res = new stdClass ();
             $res->new_num = $newNumber + 1;
             $res->new_date = $currentTime->format('d.m.Y', true);
-
-            if ($res->new_num>500)
-                JLog::add($query->__toString(), JLog::ERROR, 'com_rbo');
-
 
             if ($echoResponse)
                 echo json_encode($res);
