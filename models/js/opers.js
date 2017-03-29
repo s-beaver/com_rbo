@@ -283,7 +283,7 @@ RbOper.prototype.showOperForm = function (oper_data) {
     setFormData(self.docFormPrefix + "\\.oper-form", "rbo_opers", oper_data);
 
     var pId = $('#rbo_opers\\.productId').val();
-    if (!(pId > 0)) self.productSearchOff();
+    //if (!(pId > 0)) self.productSearchOff();
 
     //установим поля контрагента
     self.oCust.setCustFlds('saved', oper_data.oper_cust);
