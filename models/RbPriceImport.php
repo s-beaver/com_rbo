@@ -77,7 +77,7 @@ class RbPriceImport extends RbObject
             $sSearch = $aSearch["value"];
         }
         $prod = new RbProducts();
-        $db = JFactory::getDbo();
+        $db = JFactory::getDBO();
         $query = $db->getQuery(true);
 
         $prodRef = new RbPriceImport ();
@@ -221,7 +221,7 @@ class RbPriceImport extends RbObject
         if (empty($settings)) return;
 
         $prd = new RbProducts ();
-        $db = JFactory::getDbo();
+        $db = JFactory::getDBO();
         $query = $db->getQuery(true);
         try {
             //читаем файл
@@ -315,7 +315,7 @@ class RbPriceImport extends RbObject
         $result = $result && RbHelper::executeQuery("CREATE TABLE " . TEMP_PRICE_TABLE . " SELECT * FROM " . PRICE_TABLE);
 
         //Импорт прайса
-        $db = JFactory::getDbo();
+        $db = JFactory::getDBO();
         $query = $db->getQuery(true);
         $query->clear();
         $select = $this->getFieldsForSelectClause();
@@ -354,7 +354,7 @@ class RbPriceImport extends RbObject
         $lineNumber = $input->getInt("importLineNumber", -1);
         if ($lineNumber == -1) return;
 
-        $db = JFactory::getDbo();
+        $db = JFactory::getDBO();
         $query = $db->getQuery(true);
         $query->clear();
         $select = $this->getFieldsForSelectClause();

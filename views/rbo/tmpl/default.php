@@ -38,6 +38,7 @@
         <ul id="selectable">
             <li><a href='<?php echo JRoute::_('index.php?option=com_rbo&view=products')?>'>Справочник - товары</a></li>
             <li><a href='<?php echo JRoute::_('index.php?option=com_rbo&view=priceimport')?>'>Импорт прайсов</a></li>
+            <li><a href='<?php echo JRoute::_('index.php?option=com_rbo&view=docbstk')?>'>Накладные инвентаризации</a></li>
             <li><a href='<?php echo JRoute::_('index.php?option=com_rbo&view=customers')?>'>Справочник - контрагенты</a></li>
         </ul>
 

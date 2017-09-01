@@ -24,6 +24,8 @@
                 </option>
                 <option value="<?php echo JRoute::_("index.php?option=com_rbo&view=priceimport") ?>">Импорт прайсов
                 </option>
+                <option value="<?php echo JRoute::_("index.php?option=com_rbo&view=docbstk") ?>">Накладные инвентаризации
+                </option>
                 <option value="<?php echo JRoute::_("index.php?option=com_rbo&view=customers") ?>">Справочник -
                     контрагенты
                 </option>

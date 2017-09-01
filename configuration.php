@@ -47,6 +47,7 @@ class RbConfig
         "затраты-аренда" => array("signMove" => -1),
         "затраты-коммун" => array("signMove" => -1),
         "затраты-связь" => array("signMove" => -1),
-        "ддс" => array("signMove" => 0)
+        "ддс" => array("signMove" => 0),
+        "инвентар" => array("signMove" => 0)
     );
 }

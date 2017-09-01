@@ -111,6 +111,7 @@ class RbDocs extends RbObject
             }
 
             //При удалении старых операций требуется "отменить" изменение остатков товаров
+            //todo Учесть документ инвентаризацию 
             $prod = new RbDocsProducts ($this->keyValue);
             $prod->readObject();
             foreach ($prod->buffer as &$p) {
@@ -355,6 +356,10 @@ class RbDocs extends RbObject
                 }
                 case "D_CMP": {
                     $product["oper_type"] = "декомплект";
+                    break;
+                }
+                case "B_STK": {
+                    $product["oper_type"] = "инвентар";
                     break;
                 }
                 default:

@@ -90,7 +90,7 @@ class RbHelper
 // =================================================================
     static function executeQuery($SQL)
     {
-        $db = JFactory::getDbo();
+        $db = JFactory::getDBO();
         $db->setQuery($SQL);
         $result = $db->execute();
         return $result;
@@ -99,7 +99,7 @@ class RbHelper
 // =================================================================
     static function insertQuery($SQL)
     {
-        $db = JFactory::getDbo();
+        $db = JFactory::getDBO();
         $db->setQuery($SQL);
         $result = $db->execute();
         if (!$result) return null;
@@ -109,7 +109,7 @@ class RbHelper
 // =================================================================
     static function SQLGet($SQL)
     {
-        $db = JFactory::getDbo();
+        $db = JFactory::getDBO();
         $db->setQuery($SQL);
         $result = $db->execute();
         if (!$result) return null;
@@ -119,7 +119,7 @@ class RbHelper
 // =================================================================
     static function SQLGetAssocList($SQL)
     {
-        $db = JFactory::getDbo();
+        $db = JFactory::getDBO();
         $db->setQuery($SQL);
         $result = $db->execute();
         if (!$result) return null;
