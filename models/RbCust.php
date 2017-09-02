@@ -4,8 +4,11 @@ require_once "models/RbObject.php";
 class RbCust extends RbObject
 {
 
-    // =================================================================
-    public function __construct($keyValue)
+    /**
+     * RbCust constructor.
+     * @param null $keyValue
+     */
+    public function __construct($keyValue = null)
     {
         parent::__construct($keyValue);
 
@@ -28,17 +31,23 @@ class RbCust extends RbObject
         if (!isset ($keyValue)) $this->keyValue = $this->buffer->custId;
     }
 
-    // =================================================================
+    /**
+     * Очень странный метод. Используется только в RbOpers, тогда как аналогичные действия в RbDocs производятся по-другому
+     * @param $custId
+     * @param $doc_cust
+     * @return bool
+     */
     static function updateOrCreateCustomer(& $custId, $doc_cust)
     {
+        $result = true;
         $doc_cust = ( object )$doc_cust;
         $input = JFactory::getApplication()->input;
         $input->set("rbo_cust", $doc_cust);
         $cust = new RbCust ($custId);
         if ($custId > 0) {
             if (!isset ($doc_cust) || !isset ($doc_cust->cust_name) || $doc_cust->cust_name == '') return false;
-            if ($cust->buffer->_cust_data_changed) {
-                $cust->updateObject();
+            if ($cust->buffer->_cust_data_changed) {//_cust_data_changed - нигде не встречается???
+                $result = $result && $cust->updateObject();
             } else {
                 $cust->response = true;
             }
@@ -47,20 +56,23 @@ class RbCust extends RbObject
             $cust->response = true;
         } else {
             if (!isset ($doc_cust) || !isset ($doc_cust->cust_name) || $doc_cust->cust_name == '') return true;
-            $cust->createObject();
+            $result = $result && $cust->createObject();
             $custId = $cust->insertid;
         }
-        return $cust->response;
+//        return $cust->response;
+        return $result;
     }
 
-    // =================================================================
+    /**
+     * @return object
+     */
     public function getCustListBySubstr()
     {
         $input = JFactory::getApplication()->input;
         $searchSubstr = $input->get("search", null, null);
 
         if (!is_string($searchSubstr) || strlen($searchSubstr) < 2) {
-            return;
+            return null;
         }
         $db = JFactory::getDBO();
         $query = $db->getQuery(true);
@@ -72,22 +84,29 @@ class RbCust extends RbObject
         $query->where("cust_name LIKE '%" . $searchSubstr . "%'", "OR");
         // $query->where ("cust_data LIKE '%" . $searchSubstr . "%'", "OR");пока не хотим искать по данным
 
+        $res = new stdClass ();
         try {
             $db->setQuery($query, 0, 30);
             $buffer = $db->loadObjectList();
-            $res = new stdClass ();
+            foreach ($buffer as &$v) {
+                $v->cust_data = json_decode($v->cust_data);
+            }
+            $res->count = $db->getAffectedRows();
+            $res->result = $buffer;
         } catch (Exception $e) {
+            $res->errorCode = 110;
+            $res->errorMsg = $e->getMessage();
+            if (!$res->errorMsg)
+                $res->errorMsg = "Не удалось получить список контрагентов";
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
         }
-        foreach ($buffer as &$v) {
-            $v->cust_data = json_decode($v->cust_data);
-        }
-        $res->count = $db->getAffectedRows();
-        $res->result = $buffer;
-        echo json_encode($res);
+//        echo json_encode($res);
+        return $res;
     }
 
-    // =================================================================
+    /**
+     * @return object
+     */
     static function getCustList()
     {
         $input = JFactory::getApplication()->input;
@@ -118,6 +137,7 @@ class RbCust extends RbObject
         }
         if (count($where) > 0) $query->where($where);
 
+        $res = new stdClass ();
         try {
             if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
                 $db->setQuery($query, intval($iDisplayStart), intval($iDisplayLength));
@@ -134,15 +154,19 @@ class RbCust extends RbObject
             $db->setQuery($query);
             $iRecordsTotal = $db->loadResult();
 
-            $res = new stdClass ();
             $res->draw = (integer)$iDraw;
             $res->recordsTotal = $iRecordsTotal;
             $res->recordsFiltered = $iRecordsTotal;
             $res->data = $data_rows_assoc_list;
-            echo json_encode($res);
+//            echo json_encode($res);
         } catch (Exception $e) {
+            $res->errorCode = 110;
+            $res->errorMsg = $e->getMessage();
+            if (!$res->errorMsg)
+                $res->errorMsg = "Не удалось получить список контрагентов";
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
         }
+        return $res;
     }
 
 }

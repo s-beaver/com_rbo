@@ -44,127 +44,157 @@ switch ($cmd) {
     }
 
     // ==================================== doc ==========================
-    case "get_doc_list" : {
-        $docList = new RbDocs ();
-        $docList->getDocList(true);
-        break;
-    }
-
-    case "doc_read" : {
-        $doc = new RbDocs ();
-        $doc->readObject(true);
-        break;
-    }
-
-    case "doc_create" : {
-        $doc = new RbDocs ();
-        $doc->createObject(true);
-        break;
-    }
-
-    case "doc_update" : {
-        $doc = new RbDocs ();
-        $doc->updateObject(true);
-        break;
-    }
-
-    case "doc_delete" : {
-        $doc = new RbDocs ();
-        $doc->deleteObject(true);
-        break;
-    }
-
+    case "doc_create" :
+    case "doc_read" :
+    case "doc_update" :
+    case "doc_delete" :
     case "doc_copy" : {
         $doc = new RbDocs ();
-        $doc->copyDocTo(true);
+        $db = JFactory::getDbo();
+        $db->transactionStart();
+        $res = true;
+        switch ($cmd) {
+            case "doc_create" : {
+                $res = $doc->createObject();
+                break;
+            }
+            case "doc_read" : {
+                $res = $doc->readObject();
+                break;
+            }
+            case "doc_update" : {
+                $res = $doc->updateObject();
+                break;
+            }
+            case "doc_delete" : {
+                $res = $doc->deleteObject();
+                break;
+            }
+            case "doc_copy" : {
+                $res = $doc->copyDocTo();
+                break;
+            }
+        }
+        if ($res) {
+            $db->transactionCommit();
+        } else {
+            $db->transactionRollback();
+        }
+
+        $doc->echoResponse();
+        break;
+    }
+
+    case "get_doc_list" : {
+        $doc = new RbDocs ();
+        echo json_encode($doc->getDocList());
         break;
     }
 
     case "get_doc_num" : {
         $doc = new RbDocs ();
-        $doc->getNextDocNumber(true);
+        echo json_encode($doc->getNextDocNumber());
         break;
     }
 
     // ==================================== opers ==========================
-    case "get_oper_list" : {
-        $operList = new RbOpers ();
-        $operList->getOperList();
-        echo $operList->getResponse();
-        break;
-    }
-
-    case "oper_read" : {
-        $oper = new RbOpers ();
-        $oper->readObject();
-        echo $oper->getResponse();
-        break;
-    }
-
-    case "oper_create" : {
-        $oper = new RbOpers ();
-        $oper->createObject();
-        echo $oper->getResponse();
-        break;
-    }
-
-    case "oper_update" : {
-        $oper = new RbOpers ();
-        $oper->updateObject();
-        echo $oper->getResponse();
-        break;
-    }
-
+    case "oper_create" :
+    case "oper_read" :
+    case "oper_update" :
     case "oper_delete" : {
         $oper = new RbOpers ();
-        $oper->deleteObject();
-        echo $oper->getResponse();
+        $db = JFactory::getDbo();
+        $db->transactionStart();
+        $res = true;
+        switch ($cmd) {
+            case "oper_create" : {
+                $res = $oper->createObject();
+                break;
+            }
+            case "oper_read" : {
+                $res = $oper->readObject();
+                break;
+            }
+            case "oper_update" : {
+                $res = $oper->updateObject();
+                break;
+            }
+            case "oper_delete" : {
+                $res = $oper->deleteObject();
+                break;
+            }
+        }
+        if ($res) {
+            $db->transactionCommit();
+        } else {
+            $db->transactionRollback();
+        }
+
+        $oper->echoResponse();
+        break;
+    }
+
+    case "get_oper_list" : {
+        $operList = new RbOpers ();
+        echo json_encode($operList->getOperList());
         break;
     }
 
     case "oper_report" : {
         $oper = new RbOpers ();
-        $oper->getOperReport();
+        echo json_encode($oper->getOperReport());
         break;
     }
 
     case "report_prod_ved" : {
-        RbOpers::getProdVedomost();
+        echo json_encode(RbOpers::getProdVedomost());
         break;
     }
 
     // ==================================== product ==========================
     case "product_search" : {
-        RbProducts::getProductListForm();
+        echo json_encode(RbProducts::getProductListForm());
         break;
     }
 
     case "get_product_list" : {
-        RbProducts::getProductList();
+        echo json_encode(RbProducts::getProductList());
         break;
     }
 
-    case "product_read" : {
-        $prd = new RbProducts ();
-        $prd->readObject(true);
-        break;
-    }
-
-    case "product_create" : {
-        $prd = new RbProducts ();
-        $prd->createObject(true);
-        break;
-    }
-
-    case "product_update" : {
-        $prd = new RbProducts ();
-        $prd->updateObject(true);
-        break;
-    }
-
+    case "product_create" :
+    case "product_read" :
+    case "product_update" :
     case "product_delete" : {
-        $prd = new RbProducts ();
-        $prd->deleteObject(true);
+        $prod = new RbProducts ();
+        $db = JFactory::getDbo();
+        $db->transactionStart();
+        $res = true;
+        switch ($cmd) {
+            case "product_create" : {
+                $res = $prod->createObject();
+                break;
+            }
+            case "product_read" : {
+                $res = $prod->readObject();
+                break;
+            }
+            case "product_update" : {
+                $res = $prod->updateObject();
+                break;
+            }
+            case "product_delete" : {
+                $res = $prod->deleteObject();
+                break;
+            }
+        }
+        if ($res) {
+            $db->transactionCommit();
+        } else {
+            $db->transactionRollback();
+        }
+
+        $prod->echoResponse();
         break;
     }
 
@@ -210,42 +240,54 @@ switch ($cmd) {
     // ==================================== customer ==========================
     case "cust_search" : {
         $cust = new RbCust ();
-        $cust->getCustListBySubstr();
+        echo json_encode($cust->getCustListBySubstr());
         break;
     }
 
     case "get_cust_list" : {
-        RbCust::getCustList();
+        echo json_encode(RbCust::getCustList());
         break;
     }
 
-    case "cust_read" : {
-        $cst = new RbCust ();
-        $cst->readObject(true);
-        break;
-    }
-
-    case "cust_create" : {
-        $cst = new RbCust ();
-        $cst->createObject(true);
-        break;
-    }
-
-    case "cust_update" : {
-        $cst = new RbCust ();
-        $cst->updateObject(true);
-        break;
-    }
-
+    case "cust_create" :
+    case "cust_read" :
+    case "cust_update" :
     case "cust_delete" : {
-        $cst = new RbCust ();
-        $cst->deleteObject(true);
+        $cust = new RbCust ();
+        $db = JFactory::getDbo();
+        $db->transactionStart();
+        $res = true;
+        switch ($cmd) {
+            case "cust_create" : {
+                $res = $cust->createObject();
+                break;
+            }
+            case "cust_read" : {
+                $res = $cust->readObject();
+                break;
+            }
+            case "cust_update" : {
+                $res = $cust->updateObject();
+                break;
+            }
+            case "cust_delete" : {
+                $res = $cust->deleteObject();
+                break;
+            }
+        }
+        if ($res) {
+            $db->transactionCommit();
+        } else {
+            $db->transactionRollback();
+        }
+
+        $cust->echoResponse();
         break;
     }
 
     // ==================================== reports ==========================
     case   "report_in_stock": {
-        RbProducts::getProductInStock();
+        echo json_encode(RbProducts::getProductInStock());
         break;
     }
 

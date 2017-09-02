@@ -312,7 +312,7 @@ RbDoc.prototype.saveDoc = function (docId) {
                 self.oTableAPI.draw();
             }
         },
-        error: function (jqXHR, textStatus, errorThrown) {
+        error: function (jqXHR, textStatus, errorThrown) {//сюда приводит throw exception в php
             alert("Статус: " + textStatus + " Ошибка: " + errorThrown)
         }
     });
@@ -572,23 +572,3 @@ RbDocSale.prototype.readDoc = function (docId) {//todo удалить? дубл�
     });
 };
 
-// ===================================================================================
-// RbDocSale.prototype.createDoc = function () {//todo удалить? дублирует RbDoc?
-//     var self = this;
-//     $.ajax({
-//         dataType: 'json',
-//         type: "POST",
-//         data: {
-//             "rbo_docs": {
-//                 "doc_type": self.sDocType
-//             }
-//         },
-//         url: comPath + "ajax.php?task=get_doc_num",
-//         success: function (p) {
-//             var i = {};
-//             i.doc_num = p.new_num;
-//             i.doc_date = p.new_date;
-//             self.showDocForm(i);
-//         }
-//     });
-// };

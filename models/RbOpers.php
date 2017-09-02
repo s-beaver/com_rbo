@@ -6,8 +6,11 @@ require_once "models/RbHelper.php";
 class RbOpers extends RbObject
 {
 
-    // =================================================================
-    public function __construct($keyValue)
+    /**
+     * RbOpers constructor.
+     * @param null $keyValue
+     */
+    public function __construct($keyValue = null)
     {
         parent::__construct($keyValue);
 
@@ -39,161 +42,178 @@ class RbOpers extends RbObject
         if (!isset ($keyValue)) $this->keyValue = $this->buffer->operId;
     }
 
-    // =================================================================
+    /**
+     * @return bool
+     */
     public function readObject()
     {
-        parent::readObject();
+        $result = parent::readObject();
         $custId = $this->buffer->custId;
 
         $cust = new RbCust ($custId);
-        $cust->readObject();
+        $result = $result && $cust->readObject();
         $cust->buffer->cust_data = json_decode($cust->buffer->cust_data);
         $this->buffer->oper_cust = $cust->buffer;
 
-        $this->response = json_encode($this->buffer, JSON_UNESCAPED_UNICODE);
+//        $this->response = json_encode($this->buffer, JSON_UNESCAPED_UNICODE);
+        return $result;
     }
 
-    // =================================================================
+    /**
+     * @return bool
+     */
     public function updateObject()
     {
-        $response = true;
+        $result = true;
         $custId = $this->buffer->custId;
         $oper_cust = $this->buffer->oper_cust;
         $oper_cust ['cust_data'] = json_encode($oper_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
         $productId = $this->buffer->productId;
 
-        $response = $response && RbCust::updateOrCreateCustomer($custId, $oper_cust);
+        $result = $result && RbCust::updateOrCreateCustomer($custId, $oper_cust);
         $this->buffer->custId = $custId;
 
-        $response = $response && RbProducts::updateOrCreateProduct($productId, $this->buffer);
+        $result = $result && RbProducts::updateOrCreateProduct($productId, $this->buffer);
         $this->buffer->productId = $productId;
 
         $this->buffer->modified_by = JFactory::getUser()->username;
         $this->buffer->modified_on = RbHelper::getCurrentTimeForDb();
 
-        parent::updateObject();
+        $result = $result && parent::updateObject();
 
-        $this->response = $this->response && $response;
+//        $this->response = $this->response && $result;
+        return $result;
     }
 
-    // =================================================================
     public function createObject()
     {
-        $response = true;
+        $result = true;
         $custId = $this->buffer->custId;
         $oper_cust = $this->buffer->oper_cust;
         $oper_cust ['cust_data'] = json_encode($oper_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
         $productId = $this->buffer->productId;
 
-        $response = $response && RbCust::updateOrCreateCustomer($custId, $oper_cust);
+        $result = $result && RbCust::updateOrCreateCustomer($custId, $oper_cust);
         $this->buffer->custId = $custId;
 
-        $response = $response && RbProducts::updateOrCreateProduct($productId, $this->buffer);
+        $result = $result && RbProducts::updateOrCreateProduct($productId, $this->buffer);
         $this->buffer->productId = $productId;
 
         $this->buffer->created_by = JFactory::getUser()->username;
         $this->buffer->created_on = RbHelper::getCurrentTimeForDb();
 
-        parent::createObject();
+        $result = $result && parent::createObject();
 
-        $this->response = $this->response && $response;
+//        $this->response = $this->response && $result;
+        return $result;
     }
 
-    // =================================================================
+    /**
+     * @return object
+     */
     public function getOperList()
     {
         $db = JFactory::getDBO();
 
-        $input = JFactory::getApplication()->input;
-        $iDisplayStart = $input->getInt('start', -1);
-        $iDisplayLength = $input->getInt('length', -1);
-        $iDraw = $input->getString('draw', 1);
-        $aSearch = $input->get("search", null, "array");
-        $sSearch = null;
-        if (!is_null($aSearch)) {
-            $sSearch = $aSearch["value"];
-        }
-        $sDateFilter = $input->getString('date_filter', "");
-        $sPeriodFilter = $input->getString('period_filter', "day");
-        if (empty($sPeriodFilter)) $sPeriodFilter = "day";
-        $sTypeFilter = $input->getString('type_filter', "");
-
-        $query = $db->getQuery(true);
-
-        $query->clear();
-        $select = $this->getFieldsForSelectClause('so');
-        $select[] = "rc.cust_name cust_name";
-        $query->select($select);
-        $query->from($db->quoteName($this->table_name, 'so'));
-        $query->order($db->quoteName('so.oper_date') . " DESC");
-
-        $rboCustTableName = RbHelper::getTableName("rbo_cust");
-        $query->leftJoin(
-            $db->quoteName($rboCustTableName, 'rc') . ' ON (' . $db->quoteName('so.custId') . ' = ' .
-            $db->quoteName('rc.custId') . ')');
-
-        $whereAND = array();
-        $whereAND[] = "so.oper_date>0"; //$query->where("so.oper_date>0");
-        if (isset($sDateFilter) && $sDateFilter != "") {
-            $tz = RbHelper::getTimezone();
-            if (isset($sPeriodFilter) && $sPeriodFilter != "") {
-                $date = new JDate ($sDateFilter, $tz);
-                $date->modify('+1 ' . $sPeriodFilter);
-                $whereAND[] = "so.oper_date<'" . $date->format('Y-m-d') . "'";//$query->where("so.oper_date<'".$date->format('Y-m-d')."'");
-            }
-            $date = new JDate ($sDateFilter, $tz);
-            $whereAND[] = "so.oper_date>='" . $date->format('Y-m-d') . "'";//$query->where("so.oper_date>='".$date->format('Y-m-d')."'");
-        }
-        if (isset($sTypeFilter) && $sTypeFilter != "") {
-            $whereAND[] = "so.oper_type='$sTypeFilter'";//$query->where("so.oper_type='$sTypeFilter'");
-        }
-        $whereOR = array();
-        if (!empty ($sSearch)) {
-            $searchAr = preg_split("/[\s,]+/", $sSearch);// split the phrase by any number of commas or space characters
-            foreach ($searchAr as $v) {
-                $whereOR[] = "LOWER(so.product_name) LIKE '%" . mb_strtolower($v) . "%'";
-                $whereOR[] = "LOWER(so.oper_rem) LIKE '%" . mb_strtolower($v) . "%'";
-            }
-        }
-        $cond = "";
-        if (count($whereAND) > 0) {
-            $cond = implode(" AND ", $whereAND);
-        }
-        if (count($whereOR) > 0) {
-            if (count($whereAND) > 0) $cond = $cond . " AND ";
-            $cond = $cond . "(" . implode(" OR ", $whereOR) . ")";
-        }
-        $query->where($cond);
-
-        if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
-            $db->setQuery($query, intval($iDisplayStart), intval($iDisplayLength));//$query->setQuery instead in joomla 3
-        } else {
-            $db->setQuery($query);
-        }
-        $data_rows_assoc_list = $db->loadAssocList();
-
-        foreach ($data_rows_assoc_list as &$v) {
-            $v ['doc_date'] = JFactory::getDate($v ['doc_date'])->format('d.m.y'); // https://php.net/manual/en/function.date.php
-        }
-
-        $query->clear();
-        $query->select('count(*)');
-        $query->from($db->quoteName($this->table_name, 'so'));
-        //if (count($whereAND) > 0) $query->where($whereAND);
-        if ($cond != "") $query->where($cond);
-        $db->setQuery($query);
-        $iRecordsTotal = $db->loadResult();
-        $iRecordsFiltered = $iRecordsTotal;
-
         $res = new stdClass ();
-        $res->draw = (integer)$iDraw;
-        $res->recordsTotal = $iRecordsTotal;
-        $res->recordsFiltered = $iRecordsFiltered;
-        $res->data = $data_rows_assoc_list;
-        $this->response = json_encode($res);
+        try {
+            $input = JFactory::getApplication()->input;
+            $iDisplayStart = $input->getInt('start', -1);
+            $iDisplayLength = $input->getInt('length', -1);
+            $iDraw = $input->getString('draw', 1);
+            $aSearch = $input->get("search", null, "array");
+            $sSearch = null;
+            if (!is_null($aSearch)) {
+                $sSearch = $aSearch["value"];
+            }
+            $sDateFilter = $input->getString('date_filter', "");
+            $sPeriodFilter = $input->getString('period_filter', "day");
+            if (empty($sPeriodFilter)) $sPeriodFilter = "day";
+            $sTypeFilter = $input->getString('type_filter', "");
+
+            $query = $db->getQuery(true);
+
+            $query->clear();
+            $select = $this->getFieldsForSelectClause('so');
+            $select[] = "rc.cust_name cust_name";
+            $query->select($select);
+            $query->from($db->quoteName($this->table_name, 'so'));
+            $query->order($db->quoteName('so.oper_date') . " DESC");
+
+            $rboCustTableName = RbHelper::getTableName("rbo_cust");
+            $query->leftJoin(
+                $db->quoteName($rboCustTableName, 'rc') . ' ON (' . $db->quoteName('so.custId') . ' = ' .
+                $db->quoteName('rc.custId') . ')');
+
+            $whereAND = array();
+            $whereAND[] = "so.oper_date>0"; //$query->where("so.oper_date>0");
+            if (isset($sDateFilter) && $sDateFilter != "") {
+                $tz = RbHelper::getTimezone();
+                if (isset($sPeriodFilter) && $sPeriodFilter != "") {
+                    $date = new JDate ($sDateFilter, $tz);
+                    $date->modify('+1 ' . $sPeriodFilter);
+                    $whereAND[] = "so.oper_date<'" . $date->format('Y-m-d') . "'";//$query->where("so.oper_date<'".$date->format('Y-m-d')."'");
+                }
+                $date = new JDate ($sDateFilter, $tz);
+                $whereAND[] = "so.oper_date>='" . $date->format('Y-m-d') . "'";//$query->where("so.oper_date>='".$date->format('Y-m-d')."'");
+            }
+            if (isset($sTypeFilter) && $sTypeFilter != "") {
+                $whereAND[] = "so.oper_type='$sTypeFilter'";//$query->where("so.oper_type='$sTypeFilter'");
+            }
+            $whereOR = array();
+            if (!empty ($sSearch)) {
+                $searchAr = preg_split("/[\s,]+/", $sSearch);// split the phrase by any number of commas or space characters
+                foreach ($searchAr as $v) {
+                    $whereOR[] = "LOWER(so.product_name) LIKE '%" . mb_strtolower($v) . "%'";
+                    $whereOR[] = "LOWER(so.oper_rem) LIKE '%" . mb_strtolower($v) . "%'";
+                }
+            }
+            $cond = "";
+            if (count($whereAND) > 0) {
+                $cond = implode(" AND ", $whereAND);
+            }
+            if (count($whereOR) > 0) {
+                if (count($whereAND) > 0) $cond = $cond . " AND ";
+                $cond = $cond . "(" . implode(" OR ", $whereOR) . ")";
+            }
+            $query->where($cond);
+
+            if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
+                $db->setQuery($query, intval($iDisplayStart), intval($iDisplayLength));//$query->setQuery instead in joomla 3
+            } else {
+                $db->setQuery($query);
+            }
+            $data_rows_assoc_list = $db->loadAssocList();
+
+            foreach ($data_rows_assoc_list as &$v) {
+                $v ['doc_date'] = JFactory::getDate($v ['doc_date'])->format('d.m.y'); // https://php.net/manual/en/function.date.php
+            }
+
+            $query->clear();
+            $query->select('count(*)');
+            $query->from($db->quoteName($this->table_name, 'so'));
+            //if (count($whereAND) > 0) $query->where($whereAND);
+            if ($cond != "") $query->where($cond);
+            $db->setQuery($query);
+            $iRecordsTotal = $db->loadResult();
+            $iRecordsFiltered = $iRecordsTotal;
+
+            $res->draw = (integer)$iDraw;
+            $res->recordsTotal = $iRecordsTotal;
+            $res->recordsFiltered = $iRecordsFiltered;
+            $res->data = $data_rows_assoc_list;
+        } catch (Exception $e) {
+            $res->errorCode = 80;
+            $res->errorMsg = $e->getMessage();
+            if (!$res->errorMsg)
+                $res->errorMsg = "Не удалось получить список операций";
+        }
+
+//        $this->response = json_encode($res);
+        $this->buffer = $res;
+        return $res;
     }
 
-    // =================================================================
     /** Получение отчета по операциям. Варианты запуска:
      * - Отчет доход+затраты урупненный report_type = income_costs
      * - Отчет детализированный по доходам или по затратам report_type = income / costs
@@ -217,10 +237,10 @@ class RbOpers extends RbObject
             if ($this->buffer->report_type == "costs") {
                 $result->costs = RbOpers::getCostsOpers($this->buffer->year, $this->buffer->month, $this->buffer->oper_type);
             }
-            echo json_encode($result, JSON_UNESCAPED_UNICODE);
-            return;
+//            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            return $result;
         }
-        echo "";
+//        echo "";
     }
 
     // =================================================================
@@ -275,6 +295,7 @@ class RbOpers extends RbObject
     }
 
     // =================================================================
+
     /**
      * @param $d1 - строка даты в формате dd.mm.YYYY
      * @param $d2 - строка даты в формате dd.mm.YYYY
@@ -398,7 +419,6 @@ class RbOpers extends RbObject
         return $db->loadAssocList();
     }
 
-    // =================================================================
     /** Получение товарной ведомости по параметрам:
      * - период
      * - подстрока названия товара
@@ -422,8 +442,8 @@ class RbOpers extends RbObject
         $custId = $input->getString('custId', null);
         //JLog::add("Params: ".$dateStart."-".$dateEnd."-".$custId."-".$prodId."-".$firmSubstr, 'debug', 'com_rbo');
 
+        $res = new stdClass ();
         try {
-            $res = new stdClass ();
             $res->data = RbOpers::getOpersArrayByQuery($dateStart, $dateEnd, null, $custId, $prodId, 1, $firmSubstr, $managerSubstr, 'ASC', null, "cnt>0");
             foreach ($res->data as &$o) {
                 if (isset($o["productId"]) && $o["productId"] != "" && isset($o["oper_date"]) && $o["oper_date"] != "") {
@@ -435,36 +455,40 @@ class RbOpers extends RbObject
             }
             $res->date_start = $dateStart;
             $res->date_end = $dateEnd;
-            echo json_encode($res);
+//            echo json_encode($res);
         } catch (Exception $e) {
+            $res->errorCode = 70;
+            $res->errorMsg = $e->getMessage();
+            if (!$res->errorMsg)
+                $res->errorMsg = "Не построить товарную ведомость";
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
         }
-
+        return $res;
     }
 
-// =================================================================
     static function getIncomeOpers($year, $month, $cat, $oper_type = "продажа")
     {
-        $having = array();
-        $group_by = array();
-        if (isset($year)) array_push($having, "sYear = $year");
-        else array_push($group_by, "sYear");
-
-        if (isset($month)) array_push($having, "sMonth = $month");
-        else array_push($group_by, "sYear");
-
-        if (isset($cat)) array_push($having, "Cat = '$cat'");
-        else array_push($group_by, "Cat");
-
-        array_push($having, "oper_type = '$oper_type'");
-
-        $sql = file_get_contents(RBO_PATH . '/admin/income_opers.sql');
-        $sql = str_replace("%group_by%", implode(", ", $group_by), $sql);
-        $sql = str_replace("%having%", implode(" AND ", $having), $sql);
-
-        $db = JFactory::getDBO();
-        $db->setQuery($sql);
+        $data = null;
         try {
+            $having = array();
+            $group_by = array();
+            if (isset($year)) array_push($having, "sYear = $year");
+            else array_push($group_by, "sYear");
+
+            if (isset($month)) array_push($having, "sMonth = $month");
+            else array_push($group_by, "sYear");
+
+            if (isset($cat)) array_push($having, "Cat = '$cat'");
+            else array_push($group_by, "Cat");
+
+            array_push($having, "oper_type = '$oper_type'");
+
+            $sql = file_get_contents(RBO_PATH . '/admin/income_opers.sql');
+            $sql = str_replace("%group_by%", implode(", ", $group_by), $sql);
+            $sql = str_replace("%having%", implode(" AND ", $having), $sql);
+
+            $db = JFactory::getDBO();
+            $db->setQuery($sql);
             $data = $db->loadAssocList();
 
         } catch (Exception $e) {
@@ -474,12 +498,10 @@ class RbOpers extends RbObject
         return $data;
     }
 
-    // =================================================================
     static function getCostsOpers($year, $month, $oper_type)
     {
     }
 
-    // =================================================================
     /* @param $productId - ключ товара
      * @param $parties - массив объектов партий товара до выполнения операции {id,cnt,price}
      * @param $operation - объект, содержащий описание операции {oper_type,cnt,price}

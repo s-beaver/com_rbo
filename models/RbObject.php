@@ -12,13 +12,15 @@ class RbObject
     public $keyValue = 0; // если $is_multiple, то отсюда берется значение ключа для связи с родительской таблицей. Название ключа выбирается из flds
     public $insertid;
 
-    // =================================================================
+    /**
+     * RbObject constructor.
+     * @param $keyValue
+     */
     public function __construct($keyValue)
     {
         $this->keyValue = $keyValue;
     }
 
-    // =================================================================
     /**
      * @param $table_name
      */
@@ -31,13 +33,14 @@ class RbObject
     /**
      * @return string
      */
-    // =================================================================
     public function getTableName()
     {
         return $this->table_name;
     }
 
-    // =================================================================
+    /**
+     * Получение данных из input в $this->buffer
+     */
     public function getInputBuffer()
     { // должно приходить в виде массива
         $input = JFactory::getApplication()->input;
@@ -45,13 +48,27 @@ class RbObject
         $this->buffer = ( object )$inp_str; // не всегда ведь?
     }
 
-    // =================================================================
+    /**
+     * @return string
+     */
     public function getResponse()
     {
         return $this->response;
     }
 
-    // =================================================================
+    /**
+     * выдача $this->response в echo
+     */
+    public function echoResponse()
+    {
+        $this->response = json_encode($this->buffer, JSON_UNESCAPED_UNICODE);
+        echo $this->response;
+    }
+
+    /**
+     * @param null $prefix
+     * @return array
+     */
     public function getFieldsForSelectClause($prefix = null)
     {
         if (!isset ($prefix)) $prefix = '';
@@ -78,17 +95,24 @@ class RbObject
         return $flds_names;
     }
 
-    // =================================================================
+    /**
+     * @return null|string
+     */
     public function getWhereClause()
     {
         foreach ($this->flds as $fldname => $fldvalue) {
             if ($fldvalue ["is_key"]) return "$fldname=" . $this->keyValue;
         }
+        return null;
     }
 
-    // =================================================================
+    /**
+     * @deprecated
+     * @return int|string
+     * @throws Exception
+     */
     public function getKeyField()
-    { // deprecated
+    {
         $buffProp = get_object_vars($this->buffer);
         foreach ($buffProp as $key => $value) {
             if ($this->flds [$key] ["is_key"]) return $key;
@@ -98,9 +122,13 @@ class RbObject
         throw new Exception ('Не найдено ключевое поле');
     }
 
-    // =================================================================
-    public function getSetForUpdateClause($db, $buffer)
+    /**
+     * @param $buffer
+     * @return array
+     */
+    public function getSetForUpdateClause($buffer)
     { // заменить на перебор flds вместо buffer (см. ниже)
+        $db = JFactory::getDbo();
         $buffer = ( object )$buffer;
         $setFlds = get_object_vars($buffer);
         $setAr = array();
@@ -157,9 +185,13 @@ class RbObject
         return $setAr;
     }
 
-    // =================================================================
-    public function getArraysForInsert($db, $buffer)
+    /**
+     * @param $buffer
+     * @return array
+     */
+    public function getArraysForInsert($buffer)
     {
+        $db = JFactory::getDbo();
         $buffer = ( object )$buffer;
         $flds_names = array();
         $flds_vals = array();
@@ -197,17 +229,20 @@ class RbObject
         return array($flds_names, implode(",", $flds_vals));
     }
 
-    // =================================================================
-    public function readObject($echoResponse = false)
+    /**
+     * @return bool
+     */
+    public function readObject()
     {
+        $result = true;
         $db = JFactory::getDBO();
         $query = $db->getQuery(true);
 
-        $query->select($this->getFieldsForSelectClause());
-        $query->from($this->getTableName());
-        $query->where($this->getWhereClause());
-
         try {
+            $query->select($this->getFieldsForSelectClause());
+            $query->from($this->getTableName());
+            $query->where($this->getWhereClause());
+
             $db->setQuery($query);
             if ($this->is_multiple) {
                 $this->buffer = $db->loadObjectList(); // возвращает массив объектов
@@ -215,27 +250,28 @@ class RbObject
                 $this->buffer = $db->loadObject(); // возвращает объект
             }
         } catch (Exception $e) {
+            $result = false;
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
         }
-        if ($echoResponse) {
-            $this->response = json_encode($this->buffer, JSON_UNESCAPED_UNICODE);
-            echo $this->response;
-        }
+
+        return $result;
     }
 
-    // =================================================================
-    public function updateObject($echoResponse = false)
+    /**
+     * @return bool
+     */
+    public function updateObject()
     {
         $db = JFactory::getDBO();
         $query = $db->getQuery(true);
 
+        $result = true;
         try {
             if ($this->is_multiple) {
-                $result = true;
                 foreach ($this->buffer as $key => $value) {
                     $query->clear();
                     $query->update($db->quoteName($this->getTableName()));
-                    $query->set($this->getSetForUpdateClause($db, $value));
+                    $query->set($this->getSetForUpdateClause($value));
                     $query->where($this->getWhereClause());
                     $db->setQuery($query);
                     $result = $result && $db->execute();
@@ -243,35 +279,37 @@ class RbObject
                 if (!$result) throw new Exception ('Ошибка при обновлении записи в БД');
             } else {
                 $query->update($db->quoteName($this->getTableName()));
-                $query->set($this->getSetForUpdateClause($db, $this->buffer));
+                $query->set($this->getSetForUpdateClause($this->buffer));
                 $query->where($this->getWhereClause());
                 $db->setQuery($query);
                 $result = $db->execute();
             }
         } catch (Exception $e) {
+            $result = false;
             JLog::add(
                 get_class() . ":" . $e->getMessage() . " buffer=" . print_r($this->buffer, true),
                 JLog::ERROR, 'com_rbo');
         }
         $this->response = $result;
-        if ($echoResponse) {
-            echo $this->response;
-        }
+//        if ($echoResponse) { echo $this->response; }
+        return $result;
     }
 
-    // =================================================================
-    public function createObject($echoResponse = false)
+    /**
+     * @return bool
+     */
+    public function createObject()
     {
         $db = JFactory::getDBO();
         $query = $db->getQuery(true);
 
+        $result = true;
         try {
             if ($this->is_multiple) {
-                $result = true;
                 $this->insertid = array();
                 foreach ($this->buffer as $key => $value) {
                     $query->clear();
-                    $ins = $this->getArraysForInsert($db, $value);
+                    $ins = $this->getArraysForInsert($value);
                     $query->insert($db->quoteName($this->getTableName()));
                     $query->columns($ins [0]);
                     $query->values($ins [1]);
@@ -281,7 +319,7 @@ class RbObject
                 }
                 if (!$result) throw new Exception ('Ошибка при создании записи в БД');
             } else {
-                $ins = $this->getArraysForInsert($db, $this->buffer);
+                $ins = $this->getArraysForInsert($this->buffer);
                 $query->insert($db->quoteName($this->getTableName()));
                 $query->columns($ins [0]);
                 $query->values($ins [1]);
@@ -290,27 +328,37 @@ class RbObject
                 $this->insertid = $db->insertid();
             }
         } catch (Exception $e) {
+            $result = false;
             JLog::add(
                 get_class() . ":" . $e->getMessage() . " buffer=" . print_r($this->buffer, true),
                 JLog::ERROR, 'com_rbo');
         }
         $this->response = $result;
-        if ($echoResponse) {
-            echo $this->response;
-        }
+//        if ($echoResponse) { echo $this->response; }
+        return $result;
     }
 
-    // =================================================================
-    public function deleteObject($echoResponse = false)
+    /**
+     * @return bool
+     */
+    public function deleteObject()
     {
+        $result = true;
         $db = JFactory::getDBO();
-        $query = $db->getQuery(true);
-        $query->delete($db->quoteName($this->getTableName()));
-        $query->where($this->getWhereClause());
-        $db->setQuery($query);
-        $this->response = $db->execute();
-        if ($echoResponse) {
-            echo $this->response;
+        try {
+            $query = $db->getQuery(true);
+            $query->delete($db->quoteName($this->getTableName()));
+            $query->where($this->getWhereClause());
+            $db->setQuery($query);
+            $result = (bool)$db->execute();
+        } catch (Exception $e) {
+            $result = false;
+            JLog::add(
+                get_class() . ":" . $e->getMessage() . " buffer=" . print_r($this->buffer, true),
+                JLog::ERROR, 'com_rbo');
         }
+//        if ($echoResponse) { echo $this->response; }
+        $this->response = $result;
+        return $result;
     }
 }

@@ -283,7 +283,7 @@ class RbPriceImport extends RbObject
                 }
 
                 $query->clear();
-                $ins = $this->getArraysForInsert($db, $buffer);
+                $ins = $this->getArraysForInsert($buffer);
                 //добавим номер импортированной строки
                 $ins[0][] = "id";
                 $ins[1] = $ins[1] . "," . ($ln + 1);
@@ -338,7 +338,7 @@ class RbPriceImport extends RbObject
                 $pRef["price_name"] = JFactory::getDate()->format('Ymd'); // https://php.net/manual/en/function.date.php
                 $input->set("rbo_products", $pRef);
                 $prodRef = new RbProducts ($p ["productFoundId"]);
-                $prodRef->updateObject(false, false);
+                $prodRef->updateObject(false);
             }
             $result = $result && RbHelper::executeQuery("DELETE FROM " . $db->quoteName($this->table_name) . " WHERE productFoundId is not null");
 

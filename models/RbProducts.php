@@ -4,7 +4,10 @@ require_once "models/RbObject.php";
 class RbProducts extends RbObject
 {
 
-    // =================================================================
+    /**
+     * RbProducts constructor.
+     * @param null $keyValue
+     */
     public function __construct($keyValue = null)
     {
         parent::__construct($keyValue);
@@ -26,43 +29,59 @@ class RbProducts extends RbObject
         if (!isset ($keyValue)) $this->keyValue = $this->buffer->productId;
     }
 
-    // =================================================================
-    public function createObject($echoResponse = false)
+    /**
+     * @return bool
+     */
+    public function createObject()
     {
         $this->buffer = ( object )$this->buffer;
         $this->buffer->price_name = JFactory::getDate()->format('Ymd');
-        parent::createObject($echoResponse);
+        return parent::createObject();
     }
 
-    // =================================================================
-    public function updateObject($echoResponse = false, $priceCheck = true)
+    /**
+     * @param bool $priceCheck
+     * @return bool
+     */
+    public function updateObject($priceCheck = true)
     {
         $this->buffer = ( object )$this->buffer;
         $this->buffer->price_name = JFactory::getDate()->format('Ymd');
-        parent::updateObject($echoResponse);
+        return parent::updateObject();
     }
 
-    // =================================================================
+    /**
+     * @param $oper
+     * @param bool $invertUpdate
+     * @return bool
+     */
     public function updateProductInStock($oper, $invertUpdate = false)
     {
         $oper = (object)$oper;
-        if (empty($oper->oper_date)) return; //не "проведенная" операция
-        if (!is_array(RbConfig::$operstype[$oper->oper_type])) return;
-        $signMove = RbConfig::$operstype[$oper->oper_type][signMove];
-        if (empty($signMove)) return;
+        if (empty($oper->oper_date)) return true; //не "проведенная" операция
+        if (!is_array(RbConfig::$operstype[$oper->oper_type])) return false;
+        $signMove = RbConfig::$operstype[$oper->oper_type]["signMove"];
+        if (empty($signMove)) return false;
         $signMove = (integer)$signMove;
         if ($invertUpdate) $signMove = -$signMove;
 
-        parent::readObject();
+        $result = parent::readObject();
         if (empty($this->buffer->product_in_stock)) $this->buffer->product_in_stock = 0;
         $this->buffer->product_in_stock = (integer)$this->buffer->product_in_stock + ((integer)$oper->product_cnt * $signMove);
 
-        parent::updateObject();
+        $result = $result && parent::updateObject();
+        return $result;
     }
 
-    // =================================================================
+    /**
+     * Очень странный метод. Используется только в RbOpers, тогда как аналогичные действия в RbDocs производятся по-другому
+     * @param $prodId
+     * @param $prod_data
+     * @return bool
+     */
     static function updateOrCreateProduct(& $prodId, $prod_data)
     {
+        $result = true;
         $prod_data = ( object )$prod_data;
         if (isset ($prod_data)) {
             $prod_data->price_name = JFactory::getDate()->format('Ymd');
@@ -72,8 +91,8 @@ class RbProducts extends RbObject
         $prodRef = new RbProducts ($prodId);
         if ($prodId > 0) {
             if (!isset ($prod_data) || !isset ($prod_data->product_name) || $prod_data->product_name == '') return true;
-            if ($prodRef->buffer->_product_data_changed) {
-                $prodRef->updateObject();
+            if ($prodRef->buffer->_product_data_changed) { //_product_data_changed - нигде не встречается???
+                $result = $result && $prodRef->updateObject();
             } else {
                 $prodRef->response = true;
             }
@@ -82,13 +101,16 @@ class RbProducts extends RbObject
             $prodRef->response = true;
         } else {
             if (!isset ($prod_data) || !isset ($prod_data->product_name) || $prod_data->product_name == '') return true;
-            $prodRef->createObject();
+            $result = $result && $prodRef->createObject();
             $prodId = $prodRef->insertid;
         }
-        return $prodRef->response;
+//        return $prodRef->response;
+        return $result;
     }
 
-    // =================================================================
+    /**
+     * @return object
+     */
     static function getProductListForm()
     {
         $input = JFactory::getApplication()->input;
@@ -97,36 +119,43 @@ class RbProducts extends RbObject
         if (!is_string($searchSubstr) || strlen($searchSubstr) < 2) return;
 
         $db = JFactory::getDBO();
-        $query = $db->getQuery(true);
+        $res = new stdClass ();
+        try {
+            $query = $db->getQuery(true);
 
-        $prodRef = new RbProducts ();
-        $query->clear();
-        $query->select($prodRef->getFieldsForSelectClause());
-        $query->from($db->quoteName($prodRef->table_name));
+            $prodRef = new RbProducts ();
+            $query->clear();
+            $query->select($prodRef->getFieldsForSelectClause());
+            $query->from($db->quoteName($prodRef->table_name));
 //        if ($searchWithFilter == "1") {пока уберем проверку на наличие на складе
 //            $query->where("product_in_stock>0", "AND");
 //        }
 
-        $searchAr = preg_split("/[\s,]+/", $searchSubstr);// split the phrase by any number of commas or space characters
-        foreach ($searchAr as $v) {
-            if (!strpos($v, "\\"))
-                $query->where("LOWER(product_name) LIKE '%" . mb_strtolower($v) . "%'");
-        }
+            $searchAr = preg_split("/[\s,]+/", $searchSubstr);// split the phrase by any number of commas or space characters
+            foreach ($searchAr as $v) {
+                if (!strpos($v, "\\"))
+                    $query->where("LOWER(product_name) LIKE '%" . mb_strtolower($v) . "%'");
+            }
 
-        try {
             $db->setQuery($query, 0, 30);
             $buffer = $db->loadObjectList();
             $count = $db->getAffectedRows();
-            $res = new stdClass ();
             $res->count = $count;
             $res->result = $buffer;
-            echo json_encode($res);
+//            echo json_encode($res);
         } catch (Exception $e) {
+            $res->errorCode = 90;
+            $res->errorMsg = $e->getMessage();
+            if (!$res->errorMsg)
+                $res->errorMsg = "Не удалось получить список товаров/услуг";
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
         }
+        return $res;
     }
 
-    // =================================================================
+    /**
+     * @return object
+     */
     static function getProductList()
     {
         $input = JFactory::getApplication()->input;
@@ -162,6 +191,7 @@ class RbProducts extends RbObject
         }
         if (count($where) > 0) $query->where($where);
 
+        $res = new stdClass ();
         try {
             if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
                 $db->setQuery($query, intval($iDisplayStart), intval($iDisplayLength));
@@ -178,18 +208,21 @@ class RbProducts extends RbObject
             $db->setQuery($query);
             $iRecordsTotal = $db->loadResult();
 
-            $res = new stdClass ();
             $res->draw = (integer)$iDraw;
             $res->recordsTotal = $iRecordsTotal;
             $res->recordsFiltered = $iRecordsTotal;
             $res->data = $data_rows_assoc_list;
             echo json_encode($res);
         } catch (Exception $e) {
+            $res->errorCode = 90;
+            $res->errorMsg = $e->getMessage();
+            if (!$res->errorMsg)
+                $res->errorMsg = "Не удалось получить список товаров/услуг";
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
         }
+        return $res;
     }
 
-    // =================================================================
     static function getProductInStock()
     {
         $db = JFactory::getDBO();
@@ -203,17 +236,22 @@ class RbProducts extends RbObject
         //$query->where($db->quoteName('rp.product_type') . '=1');//пусть покажутся и услуги, если они неверно были оформлены
         $query->where($db->quoteName('rp.product_in_stock') . '!=0');
 
+        $res = new stdClass ();
         try {
             $db->setQuery($query);
 
-            $res = new stdClass ();
             $res->date = RbHelper::getCurrentTimeForDb();
             $res->products = $db->loadAssocList();
 
             echo json_encode($res);
         } catch (Exception $e) {
+            $res->errorCode = 100;
+            $res->errorMsg = $e->getMessage();
+            if (!$res->errorMsg)
+                $res->errorMsg = "Не удалось построить отчет по остаткам на складе";
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
         }
+        return $res;
     }
 }
 

@@ -10,8 +10,12 @@ class RbDocs extends RbObject
 {
     public $readBaseDocument = true;
 
-    // =================================================================
-    public function __construct($keyValue, $readBaseDocument)
+    /**
+     * RbDocs constructor.
+     * @param null $keyValue
+     * @param null $readBaseDocument
+     */
+    public function __construct($keyValue = null, $readBaseDocument = null)
     {
         parent::__construct($keyValue);
 
@@ -43,27 +47,29 @@ class RbDocs extends RbObject
         else $this->readBaseDocument = true;
     }
 
-    // =================================================================
-    public function readObject($echoResponse = false)
+    /**
+     * @return bool
+     */
+    public function readObject()
     {
         try {
-            parent::readObject();
+            $result = parent::readObject();
             $custId = $this->buffer->custId;
             $doc_base = $this->buffer->doc_base;
 
-            if ($this->readBaseDocument) {
-                if (!isset ($doc_base)) $doc_base = 0; // иначе объект возъмет из буфера, а там ключ самого себя
+            if ($doc_base && $this->readBaseDocument) {
+                if (!isset ($doc_base)) $doc_base = 0; // иначе объект возьмет из буфера, а там ключ самого себя
                 $doc_base_doc = new RbDocs ($doc_base, false);
-                $doc_base_doc->readObject();
+                $result = $result && $doc_base_doc->readObject();
                 $this->buffer->doc_base_doc = $doc_base_doc->buffer;
             }
 
             $prod = new RbDocsProducts ($this->keyValue);
-            $prod->readObject();
+            $result = $result && $prod->readObject();
             $this->buffer->doc_products = $prod->buffer;
 
             $cust = new RbCust ($custId);
-            $cust->readObject();
+            $result = $result && $cust->readObject();
             $cust->buffer->cust_data = json_decode($cust->buffer->cust_data);
             $this->buffer->doc_cust = $cust->buffer;
 
@@ -74,19 +80,24 @@ class RbDocs extends RbObject
             $this->buffer->doc_firm_details = $firm;
             $this->buffer->doc_manager_details = RbConfig::$managers [$this->buffer->doc_manager];
         } catch (Exception $e) {
+            $result = false;
             $this->buffer->errorCode = 10;
             $this->buffer->errorMsg = $e->getMessage();
             if (!$this->buffer->errorMsg)
                 $this->buffer->errorMsg = "Не удалось прочитать документ";
-            if (!$echoResponse) throw $e;
+//            if (!$echoResponse) throw $e;
         }
-        $this->response = json_encode($this->buffer, JSON_UNESCAPED_UNICODE);
-        if ($echoResponse) echo $this->response;
+//        $this->response = json_encode($this->buffer, JSON_UNESCAPED_UNICODE);
+//        if ($echoResponse) echo $this->response;
+        return $result;
     }
 
-    // =================================================================
-    public function updateObject($echoResponse = false)
+    /**
+     * @return bool
+     */
+    public function updateObject()
     {
+        $result = true;
         $res = new stdClass ();
         try {
             $custId = $this->buffer->custId;
@@ -98,25 +109,25 @@ class RbDocs extends RbObject
             $this->buffer->modified_by = JFactory::getUser()->username;
             $this->buffer->modified_on = RbHelper::getCurrentTimeForDb();
 
-            $input = JFactory::getApplication()->input;
+            $input = JFactory::getApplication()->input;//todo устарело?
             $input->set("rbo_cust", $doc_cust);
             $cust = new RbCust ($custId);
             if ($custId > 0) {
-                $cust->updateObject();
+                $result = $result && $cust->updateObject();
             } elseif ($custId == -1) {
                 $this->buffer->custId = 0;
             } else {
-                $cust->createObject();
+                $result = $result && $cust->createObject();
                 $this->buffer->custId = $cust->insertid;
             }
 
             //При удалении старых операций требуется "отменить" изменение остатков товаров
             //todo Учесть документ инвентаризацию 
             $prod = new RbDocsProducts ($this->keyValue);
-            $prod->readObject();
+            $result = $result && $prod->readObject();
             foreach ($prod->buffer as &$p) {
                 $prodRef = new RbProducts ($p->productId);
-                $prodRef->updateProductInStock($p, true /*обратная операция*/);
+                $result = $result && $prodRef->updateProductInStock($p, true /*обратная операция*/);
             }
 
             foreach ($doc_products as &$p) {
@@ -131,34 +142,37 @@ class RbDocs extends RbObject
 
                     $input->set("rbo_products", $pRef);
                     $prodRef = new RbProducts ();
-                    $prodRef->createObject();
+                    $result = $result && $prodRef->createObject();
                     $p ["productId"] = $prodRef->insertid;
                 }
                 $p ["docId"] = $this->keyValue;
                 $this->setOpersFromDocByStatus($p);
 
                 $prodRef = new RbProducts ($p["productId"]);
-                $prodRef->updateProductInStock($p);
+                $result = $result && $prodRef->updateProductInStock($p);
             }
-            parent::updateObject();
+            $result = $result && parent::updateObject();
 
             $input = JFactory::getApplication()->input;
             $input->set("rbo_opers", $doc_products);
             $prod = new RbDocsProducts ($this->keyValue);
-            $prod->deleteObject();
-            $prod->createObject();
+            $result = $result && $prod->deleteObject();
+            $result = $result && $prod->createObject();
 
             $res->docId = $this->buffer->docId;
 
         } catch (Exception $e) {
+            $result = false;
             $res->errorCode = 20;
             $res->errorMsg = $e->getMessage();
             if (!$res->errorMsg)
                 $res->errorMsg = "Не удалось обновить документ";
-            if (!$echoResponse) throw $e;
+//            if (!$echoResponse) throw $e;
         }
-        $this->response = json_encode($res);
-        if ($echoResponse) echo $this->response;
+        $this->buffer = $res;
+//        $this->response = json_encode($res);
+//        if ($echoResponse) echo $this->response;
+        return $result;
 
         /*
          * if ($this->response) {
@@ -168,9 +182,12 @@ class RbDocs extends RbObject
          */
     }
 
-    // =================================================================
-    public function createObject($echoResponse = false)
+    /**
+     * @return bool
+     */
+    public function createObject()
     {
+        $result = true;
         $res = new stdClass ();
         try {
             $custId = $this->buffer->custId;
@@ -183,25 +200,30 @@ class RbDocs extends RbObject
             $this->buffer->modified_by = null;
             $this->buffer->modified_on = null;
             // $this->buffer->doc_type = $this->docType;//надо передавать через буфер
-            if (empty($this->buffer->doc_num)) $this->buffer->doc_num = $this->getNextDocNumber();
+            if (empty($this->buffer->doc_num)) {
+                $newObj = $this->getNextDocNumber();
+                if ($newObj)
+                    $this->buffer->doc_num = $newObj->new_num;
+                else $result = false;
+            }
             if (empty($this->buffer->doc_date)) $this->buffer->doc_date = RbHelper::getCurrentTimeForDb();
 
             $input = JFactory::getApplication()->input;
             $input->set("rbo_cust", $doc_cust);
             $cust = new RbCust ($custId);
             if ($custId > 0) {
-                $cust->updateObject();
+                $result = $result && $cust->updateObject();
             } elseif ($custId == -1) {
                 $this->buffer->custId = 0;
             } else {
-                $cust->createObject();
+                $result = $result && $cust->createObject();
                 $this->buffer->custId = $cust->insertid;
             }
 
             if ($this->duplicateExists($this->buffer->doc_num)) {
                 throw new Exception("Документ с таким номером уже существует");
             }
-            parent::createObject();
+            $result = $result && parent::createObject();
 
             $docId = $this->insertid;
             foreach ($doc_products as &$p) {
@@ -216,44 +238,53 @@ class RbDocs extends RbObject
 
                     $input->set("rbo_products", $pRef);
                     $prodRef = new RbProducts ();
-                    $prodRef->createObject();
+                    $result = $result && $prodRef->createObject();
                     $p ["productId"] = $prodRef->insertid;
                 }
                 $p ["docId"] = $docId;
                 $this->setOpersFromDocByStatus($p);
 
                 $prodRef = new RbProducts ($p["productId"]);
-                $prodRef->updateProductInStock($p);
+                $result = $result && $prodRef->updateProductInStock($p);
             }
 
             $input->set("rbo_opers", $doc_products);
             $prod = new RbDocsProducts ($docId);
-            $prod->createObject();
-
+            $result = $result && $prod->createObject();
             $res->docId = $docId;
 
         } catch (Exception $e) {
+            $result = false;
             $res->errorCode = 30;
             $res->errorMsg = $e->getMessage();
             if (!$res->errorMsg)
                 $res->errorMsg = "Не удалось создать документ";
-            if (!$echoResponse) throw $e;
+//          throw $e; - приводит к в ветке error в $.ajax({error:{}})
         }
-        $this->response = json_encode($res);
-        if ($echoResponse) echo $this->response;
+        $this->buffer = $res;
+//        $this->response = json_encode($res);
+//        if ($echoResponse) echo $this->response;
+        return $result;
     }
 
-    // =================================================================
-    public function deleteObject($echoResponse = false)
+    /**
+     * @return bool
+     */
+    public function deleteObject()
     {
-        $this->readObject($echoResponse);
+        $result = true;
+        $result = $result && $this->readObject();
         $this->buffer->doc_status = 'удален';
-        $this->updateObject($echoResponse);
+        $result = $result && $this->updateObject();
+        return $result;
     }
 
-    // =================================================================
-    public function deleteObjectOld($echoResponse = false)
+    /**
+     * @return bool
+     */
+    public function deleteObjectOld()
     {//todo а как же ведут себя подчиненные записи?
+        $result = true;
         $res = new stdClass ();
         try {
             $db = JFactory::getDBO();
@@ -262,47 +293,61 @@ class RbDocs extends RbObject
             $query->set("doc_status='удален'");
             $query->where($this->getWhereClause());
             $db->setQuery($query);
-            $result = $db->execute();
+            $result = (bool)$db->execute();
             $this->response = $result;
         } catch (Exception $e) {
+            $result = false;
             $res->errorCode = 50;
             $res->errorMsg = $e->getMessage();
             if (!$res->errorMsg)
                 $res->errorMsg = "Не удалось удалить документ";
-            if (!$echoResponse) throw $e;
+//            if (!$echoResponse) throw $e;
             JLog::add(
                 get_class() . ":" . $e->getMessage() . " buffer=" . print_r($this->buffer, true),
                 JLog::ERROR, 'com_rbo');
         }
-        if ($echoResponse) echo $this->response;
+//        if ($echoResponse) echo $this->response;
+        $this->buffer = $res;
+        return $result;
     }
 
-    // =================================================================
-    public function deleteObjectHard($echoResponse = false)
+    /**
+     * @return bool
+     */
+    public function deleteObjectHard()
     {
+        $result = true;
         $res = new stdClass ();
         try {
-            parent::deleteObject($echoResponse);
+            $result = $result && parent::deleteObject();
             $prod = new RbDocsProducts ($this->keyValue);
-            $prod->deleteObject($echoResponse);
+            $result = $result && $prod->deleteObject();
 
         } catch (Exception $e) {
+            $result = false;
             $res->errorCode = 50;
             $res->errorMsg = $e->getMessage();
             if (!$res->errorMsg)
                 $res->errorMsg = "Не удалось удалить документ";
-            if (!$echoResponse) throw $e;
+//            if (!$echoResponse) throw $e;
             JLog::add(
                 get_class() . ":" . $e->getMessage() . " buffer=" . print_r($this->buffer, true),
                 JLog::ERROR, 'com_rbo');
         }
-        if ($echoResponse) echo $this->response;
+//        if ($echoResponse) echo $this->response;
+        $this->buffer = $res;
+        return $result;
     }
 
     // =================================================================
-    /* На входе требуется ключ документа откуда копируются данные и тип нового документа */
-    public function copyDocTo($echoResponse = false)
+
+    /**
+     * На входе требуется ключ документа откуда копируются данные и тип нового документа
+     * @return bool
+     */
+    public function copyDocTo()
     {
+        $result = true;
         $res = new stdClass ();
         try {
             $keyValue = $this->buffer->doc_base;
@@ -310,10 +355,10 @@ class RbDocs extends RbObject
             $doc_based_on_id = $this->docBasedOnExists($keyValue, $doc_type);
             if ($doc_based_on_id) {//если есть такой документ, то удалим его
                 $docToDelete = new RbDocs ($doc_based_on_id, false);
-                $docToDelete->deleteObjectHard();
+                $result = $result && $docToDelete->deleteObjectHard();
             }
             $this->keyValue = $keyValue;
-            $this->readObject();
+            $result = $result && $this->readObject();
             $this->buffer->docId = null;
             $this->buffer->doc_base = $this->keyValue;
             if (!RbConfig::$continuousNumbering) {
@@ -323,21 +368,26 @@ class RbDocs extends RbObject
             $this->buffer->doc_date = null;
             $this->buffer->doc_type = $doc_type;
             $this->buffer->doc_status = "";
-            $this->createObject();
+            $result = $result && $this->createObject();
             $res->docId = $this->insertid;
 
         } catch (Exception $e) {
+            $result = false;
             $res->errorCode = 40;
             $res->errorMsg = $e->getMessage();
             if (!$res->errorMsg)
                 $res->errorMsg = "Не удалось скопировать документ";
-            if (!$echoResponse) throw $e;
+//            if (!$echoResponse) throw $e;
         }
-        $this->response = json_encode($res);
-        if ($echoResponse) echo $this->response;
+//        $this->response = json_encode($res);
+//        if ($echoResponse) echo $this->response;
+        $this->buffer = $res;
+        return $result;
     }
 
-    // =================================================================
+    /**
+     * @param $product
+     */
     public function setOpersFromDocByStatus(&$product)
     {
         if (strtotime($this->buffer->doc_date) < strtotime('1 November 2015')) return;
@@ -377,73 +427,83 @@ class RbDocs extends RbObject
 
     }
 
-    // =================================================================
-    public function getDocList($echoResponse = false)
+    /**
+     * @return object
+     */
+    public function getDocList()
     {
         $db = JFactory::getDBO();
 
-        $input = JFactory::getApplication()->input;
-        $iDisplayStart = $input->getInt('start', -1);
-        $iDisplayLength = $input->getInt('length', -1);
-        $iDraw = $input->getString('draw', 1);
-        $doc_type = $input->getString('doc_type', "");
-        $aSearch = $input->get("search", null, "array");
-        $sSearch = null;
-        if (!is_null($aSearch)) {
-            $sSearch = $aSearch["value"];
-        }
+        $res = new stdClass ();
+        try {
+            $input = JFactory::getApplication()->input;
+            $iDisplayStart = $input->getInt('start', -1);
+            $iDisplayLength = $input->getInt('length', -1);
+            $iDraw = $input->getString('draw', 1);
+            $doc_type = $input->getString('doc_type', "");
+            $aSearch = $input->get("search", null, "array");
+            $sSearch = null;
+            if (!is_null($aSearch)) {
+                $sSearch = $aSearch["value"];
+            }
 
-        $sWhere = " WHERE doc_type='" . $doc_type . "'";
-        if (isset ($sSearch) && $sSearch != "") {
-            $sWhere .= " AND (rc.cust_name LIKE '%" . $sSearch . "%' OR doc_num=" . (integer)$sSearch . ")";
-        }
+            $sWhere = " WHERE doc_type='" . $doc_type . "'";
+            if (isset ($sSearch) && $sSearch != "") {
+                $sWhere .= " AND (rc.cust_name LIKE '%" . $sSearch . "%' OR doc_num=" . (integer)$sSearch . ")";
+            }
 
-        $rboCustTableName = RbHelper::getTableName("rbo_cust");
-        $sSelect = "SELECT docId, doc_num, doc_date, pay_date, rc.cust_name doc_cust, doc_sum, doc_status, doc_firm, doc_manager, doc_rem ";
-        $sRestOfQuery = " FROM " . $this->table_name . " rd LEFT JOIN " . $rboCustTableName . " rc ON rd.custId = rc.custId " .
-            $sWhere . " ORDER BY rd.docId DESC";
+            $rboCustTableName = RbHelper::getTableName("rbo_cust");
+            $sSelect = "SELECT docId, doc_num, doc_date, pay_date, rc.cust_name doc_cust, doc_sum, doc_status, doc_firm, doc_manager, doc_rem ";
+            $sRestOfQuery = " FROM " . $this->table_name . " rd LEFT JOIN " . $rboCustTableName . " rc ON rd.custId = rc.custId " .
+                $sWhere . " ORDER BY rd.docId DESC";
 
-        if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
-            $db->setQuery($sSelect . $sRestOfQuery, intval($iDisplayStart), intval($iDisplayLength));
-        } else {
-            $db->setQuery($sSelect . $sRestOfQuery);
-        }
+            if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
+                $db->setQuery($sSelect . $sRestOfQuery, intval($iDisplayStart), intval($iDisplayLength));
+            } else {
+                $db->setQuery($sSelect . $sRestOfQuery);
+            }
 
-        $data_rows_assoc_list = $db->loadAssocList();
+            $data_rows_assoc_list = $db->loadAssocList();
 
-        $db->setQuery('SELECT count(*) ' . $sRestOfQuery);
-        $iRecordsTotal = $db->loadResult();
+            $db->setQuery('SELECT count(*) ' . $sRestOfQuery);
+            $iRecordsTotal = $db->loadResult();
 
-        $db->setQuery("SELECT doc_base, docId, doc_num, doc_date, doc_type " .
-            "FROM " . $this->table_name . " WHERE doc_base IN (SELECT docId " . $sRestOfQuery . ") AND doc_status!='удален'");
-        $baseDocs = $db->loadAssocList();
+            $db->setQuery("SELECT doc_base, docId, doc_num, doc_date, doc_type " .
+                "FROM " . $this->table_name . " WHERE doc_base IN (SELECT docId " . $sRestOfQuery . ") AND doc_status!='удален'");
+            $baseDocs = $db->loadAssocList();
 
-        foreach ($data_rows_assoc_list as &$v) {
-            $v['doc_date'] = JFactory::getDate($v['doc_date'])->format('d.m.y'); // https://php.net/manual/en/function.date.php
-            $v['childs'] = array();
-            foreach ($baseDocs as $bd) {
-                if ($bd['doc_base'] == $v['docId']) {
-                    $childElem = new stdClass ();
-                    $childElem->docId = $bd['docId'];
-                    $childElem->doc_num = $bd['doc_num'];
-                    $childElem->doc_date = JFactory::getDate($bd['doc_date'])->format('d.m'); // https://php.net/manual/en/function.date.php
-                    $childElem->doc_type = $bd['doc_type'];
-                    $v['childs'][] = $childElem;
+            foreach ($data_rows_assoc_list as &$v) {
+                $v['doc_date'] = JFactory::getDate($v['doc_date'])->format('d.m.y'); // https://php.net/manual/en/function.date.php
+                $v['childs'] = array();
+                foreach ($baseDocs as $bd) {
+                    if ($bd['doc_base'] == $v['docId']) {
+                        $childElem = new stdClass ();
+                        $childElem->docId = $bd['docId'];
+                        $childElem->doc_num = $bd['doc_num'];
+                        $childElem->doc_date = JFactory::getDate($bd['doc_date'])->format('d.m'); // https://php.net/manual/en/function.date.php
+                        $childElem->doc_type = $bd['doc_type'];
+                        $v['childs'][] = $childElem;
+                    }
                 }
             }
-        }
 
-        $res = new stdClass ();
-        $res->draw = (integer)$iDraw;
-        $res->recordsTotal = $iRecordsTotal;
-        $res->recordsFiltered = $iRecordsTotal;
-        $res->data = $data_rows_assoc_list;
-        $this->response = json_encode($res);
-        if ($echoResponse) echo $this->response;
+            $res->draw = (integer)$iDraw;
+            $res->recordsTotal = $iRecordsTotal;
+            $res->recordsFiltered = $iRecordsTotal;
+            $res->data = $data_rows_assoc_list;
+        } catch (Exception $e) {
+            $res->errorCode = 60;
+            $res->errorMsg = $e->getMessage();
+            if (!$res->errorMsg)
+                $res->errorMsg = "Не удалось получить список документов";
+        }
+//        $this->response = json_encode($res);
+//        if ($echoResponse) echo $this->response;
+        $this->buffer = $res;
+        return $res;
     }
 
-    // =================================================================
-    function getNextDocNumber($echoResponse = false)
+    public function getNextDocNumber()
     {
         $currentTime = new JDate ();
         $year = $currentTime->format('Y', false);
@@ -465,32 +525,35 @@ class RbDocs extends RbObject
             $res->new_num = $newNumber + 1;
             $res->new_date = $currentTime->format('d.m.Y', true);
 
-            if ($echoResponse)
-                echo json_encode($res);
-            else
-                return $res->new_num;//todo все ответы преобразовать в json
+            $result = $res;
         } catch (Exception $e) {
+            $result = false;
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
-            if (!$echoResponse) throw $e;
+//            if (!$echoResponse) throw $e;
         }
-        if ($echoResponse) echo $this->response;
+//        if ($echoResponse) echo $this->response;
+        return $result;
     }
 
-    // =================================================================
-    function duplicateExists($docNum)//todo проверять статус документа. Если удален, то все ок
+    /**
+     * @param $docNum
+     * @return bool
+     */
+    function duplicateExists($docNum)
     {
         if (is_null($docNum)) return false;
         $currentTime = new JDate ();
         $year = $currentTime->format('Y', false);
 
+        $db = JFactory::getDBO();
         try {
-            $db = JFactory::getDBO();
             $query = $db->getQuery(true);
             $query->select("docId");
             $query->from($this->table_name);
             $query->where("doc_type='" . $this->buffer->doc_type . "'");//здесь не нужно проверять $continuousNumbering
             $query->where("DATE_FORMAT(doc_date,'%Y')=$year");
             $query->where("doc_num=$docNum");
+            $query->where("doc_status<>'удален'");
             $db->setQuery($query);
             $docId = $db->loadResult();
             if ($docId > 0) return true;
@@ -501,15 +564,19 @@ class RbDocs extends RbObject
         return true;
     }
 
-    // =================================================================
+    /**
+     * @param $docId
+     * @param $docType
+     * @return bool|mixed
+     */
     function docBasedOnExists($docId, $docType)
     {
         if (is_null($docId) || is_null(($docType))) return false;
         $currentTime = new JDate ();
         $year = $currentTime->format('Y', false);
 
+        $db = JFactory::getDBO();
         try {
-            $db = JFactory::getDBO();
             $query = $db->getQuery(true);
             $query->select("docId");
             $query->from($this->table_name);
@@ -525,7 +592,10 @@ class RbDocs extends RbObject
         return true;
     }
 
-    // =================================================================
+    /**
+     * @param $buffer
+     * @return string
+     */
     function docBuffer2Str($buffer)
     {
         $s = "";

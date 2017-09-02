@@ -5,8 +5,11 @@ require_once "models/RbHelper.php";
 class RbFirms extends RbObject
 {
 
-    // =================================================================
-    public function __construct($keyValue)
+    /**
+     * RbFirms constructor.
+     * @param null $keyValue
+     */
+    public function __construct($keyValue = null)
     {
         parent::__construct($keyValue);
 
@@ -23,7 +26,9 @@ class RbFirms extends RbObject
         if (!isset ($keyValue)) $this->keyValue = $this->buffer->operId;
     }
 
-    // =================================================================
+    /**
+     * @return object
+     */
     public function getFirmList()
     {
         $db = JFactory::getDBO();
@@ -46,6 +51,8 @@ class RbFirms extends RbObject
         } else {
             $db->setQuery($query);
         }
+
+        $res = new stdClass ();
         try {
             $data_rows_assoc_list = $db->loadAssocList();
 
@@ -56,16 +63,20 @@ class RbFirms extends RbObject
             $iRecordsTotal = $db->loadResult();
             $iRecordsFiltered = $iRecordsTotal;
 
-            $res = new stdClass ();
             $res->draw = (integer)$iDraw;
             $res->recordsTotal = $iRecordsTotal;
             $res->recordsFiltered = $iRecordsFiltered;
             $res->data = $data_rows_assoc_list;
-            $this->response = json_encode($res);
-            echo $this->response;
+//            $this->response = json_encode($res);
+//            echo $this->response;
         } catch (Exception $e) {
+            $res->errorCode = 120;
+            $res->errorMsg = $e->getMessage();
+            if (!$res->errorMsg)
+                $res->errorMsg = "Не удалось получить список фирм";
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
         }
+        return $res;
     }
 }
 
