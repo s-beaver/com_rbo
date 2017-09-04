@@ -2,16 +2,17 @@
 
 <html>
 <head>
-<?php include RBO_PATH.'/views/header.head.links.php'?>
-<script src="<?php echo JRBO_PATH?>/library/lib.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/js/RbForm.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/js/RbProduct.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/js/RbCust.js"></script>
-<script src="<?php echo JRBO_PATH?>/models/js/opers.js"></script>
-<link rel="stylesheet" href="<?php echo JRBO_PATH?>/css/rbo.css" />
+    <?php include RBO_PATH . '/views/header.head.links.php' ?>
+    <script src="<?php echo JRBO_PATH ?>/library/lib.js"></script>
+    <script src="<?php echo JRBO_PATH ?>/models/js/RbForm.js"></script>
+    <script src="<?php echo JRBO_PATH ?>/models/js/RbProduct.js"></script>
+    <script src="<?php echo JRBO_PATH ?>/models/js/RbCust.js"></script>
+    <script src="<?php echo JRBO_PATH ?>/models/js/opers.js"></script>
+    <link rel="stylesheet" href="<?php echo JRBO_PATH ?>/css/rbo.css"/>
+    <link rel="stylesheet" href="<?php echo JRBO_PATH ?>/css/font-awesome-4.6.3/css/font-awesome.min.css">
 
-<style>
-</style>
+    <style>
+    </style>
 
 </head>
 <body>

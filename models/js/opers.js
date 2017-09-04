@@ -32,6 +32,32 @@ function RbOper(o) {
 }
 
 //===================================================================================
+RbOper.prototype.showDoc = function (doc_type, docId) {
+    var o = getViewNameByDocType(doc_type);
+    if (IsNull(o)) return;
+    if (o.viewName == "") return;
+    if (docId > 0)
+        window.open('index.php?option=com_rbo&view=' + o.viewName + '&docid=' + docId, '_blank');
+
+};
+
+//===================================================================================
+RbOper.prototype.getDocLink = function (oper) {
+    if (IsNull(oper)) return "";
+    if (oper.docId>0) {
+
+        var o = getViewNameByDocType(oper.doc_type);
+        if (IsNull(o)) return;
+        if (o.viewName == "") return "";
+
+
+        return "<a href='javascript:oper.showDoc(\"" + oper.doc_type + "\"," + oper.docId + ")'>"+o.titleShort+" №" + oper.doc_num + " / " + oper.doc_date + "</a>";
+    }
+
+    return "";
+};
+
+//===================================================================================
 RbOper.prototype.attachOperModule = function () {
     var self = this;
     //подключаем форму для редакции документов
@@ -76,6 +102,11 @@ RbOper.prototype.attachOperModule = function () {
         }, {
             "title": "Товар/услуга",
             "data": "product_name"
+        }, {
+            "title": "Док-т",
+            "data": function (source, type, val) {
+                return oper.getDocLink(source);
+            }
         }, {
             "title": "Прим.",
             "data": "oper_rem"

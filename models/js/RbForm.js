@@ -10,7 +10,7 @@
  */
 function getFormData(formName, objPrefix, objToPrefix) {
     var s, o = {}, tagName, tagType;
-    objToPrefix = NullTo(objToPrefix,objPrefix);
+    objToPrefix = NullTo(objToPrefix, objPrefix);
     o[objToPrefix] = {};
     $("#" + formName + " *").find("[id^='" + objPrefix + "']").each(function (x, elem) {
         s = $(this).attr("id");
@@ -165,6 +165,50 @@ function getOperTypeList() {
 }
 
 //===================================================================================
+function getDocNameByOperType(operType) {
+    operType = NullTo(operType, "");
+    if (operType == "") return "";
+
+    var o = {
+        "счет": "invoice",
+        "продажа": "b_bill",
+        "закуп": "s_bill",
+        "затраты-аренда": "opers",
+        "затраты-банков": "opers",
+        "затраты-бухгал": "opers",
+        "затраты-зарплата": "opers",
+        "затраты-коммун": "opers",
+        "затраты-налоги": "opers",
+        "затраты-произв": "opers",
+        "затраты-прочие": "opers",
+        "затраты-связь": "opers",
+        "ддс": "opers",
+        "инвентар": "инвентар",
+        "декомплект": "d_cmp"
+    };
+
+    return o[operType];
+}
+
+//===================================================================================
+function getViewNameByDocType(docType) {
+    docType = NullTo(docType, "");
+    if (docType == "") return "";
+
+    var o = {
+        "счет": {viewName: "invoices", title: "Счет", titleShort: "счет"},
+        "акт": {viewName: "acts", title: "Акт", titleShort: "акт"},
+        "накл": {viewName: "shipments", title: "Накладная", titleShort: "накл"},
+        "B_ACT": {viewName: "docbact", title: "Акт (входящий)", titleShort: "акт(вх)"},
+        "B_BIL": {viewName: "docbbill", title: "Накладная (закуп)", titleShort: "накл(зак)"},
+        "D_CMP": {viewName: "docdcmp", title: "Декомплект", titleShort: "декомпл"},
+        "B_STK": {viewName: "docbstk", title: "Инвентаризация", titleShort: "инв"}
+    };
+
+    return o[docType];
+}
+
+//===================================================================================
 function getOperPeriodList() {
     return {
         "day": "день",
@@ -222,23 +266,19 @@ function getPrintLinkByDoc(docId, docType) {
     var link = "index.php?option=com_rbo&format=raw";
     var printLink = "";
     switch (docType) {
-        case "акт":
-        {
+        case "акт": {
             printLink = "PrnInv";
             break;
         }
-        case "накл":
-        {
+        case "накл": {
             printLink = "PrnShip";
             break;
         }
-        case "B_ACT":
-        {
+        case "B_ACT": {
             printLink = "";
             break;
         }
-        case "B_BIL":
-        {
+        case "B_BIL": {
             printLink = "PrnBBil";
             break;
         }

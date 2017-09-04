@@ -136,6 +136,9 @@ class RbOpers extends RbObject
             $query->clear();
             $select = $this->getFieldsForSelectClause('so');
             $select[] = "rc.cust_name cust_name";
+            $select[] = "rd.doc_type doc_type";
+            $select[] = "rd.doc_num doc_num";
+            $select[] = "rd.doc_date doc_date";
             $query->select($select);
             $query->from($db->quoteName($this->table_name, 'so'));
             $query->order($db->quoteName('so.oper_date') . " DESC");
@@ -144,6 +147,10 @@ class RbOpers extends RbObject
             $query->leftJoin(
                 $db->quoteName($rboCustTableName, 'rc') . ' ON (' . $db->quoteName('so.custId') . ' = ' .
                 $db->quoteName('rc.custId') . ')');
+            $rboDocTableName = RbHelper::getTableName("rbo_docs");
+            $query->leftJoin(
+                $db->quoteName($rboDocTableName, 'rd') . ' ON (' . $db->quoteName('so.docId') . ' = ' .
+                $db->quoteName('rd.docId') . ')');
 
             $whereAND = array();
             $whereAND[] = "so.oper_date>0"; //$query->where("so.oper_date>0");

@@ -3,30 +3,6 @@ var oFormDlg;
 var cookieName = "prn_prod_ved";
 var s_bill, b_bill, d_cmp;
 
-//===================================================================================
-function getDocNameByOperType(operType) {
-    operType = NullTo(operType, "");
-    if (operType == "") return "";
-    var docName = "";
-    switch (operType) {
-        case "закуп":
-        {
-            docName = "s_bill";
-            break;
-        }
-        case "продажа":
-        {
-            docName = "b_bill";
-            break;
-        }
-        case "декомплект":
-        {
-            docName = "d_cmp";
-            break;
-        }
-    }
-    return docName;
-}
 // ===================================================================================
 function getReportData(params) {
     $("#progressbar").show();
