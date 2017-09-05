@@ -282,39 +282,7 @@ class RbDocs extends RbObject
     /**
      * @return bool
      */
-    public function deleteObjectOld()
-    {//todo а как же ведут себя подчиненные записи?
-        $result = true;
-        $res = new stdClass ();
-        try {
-            $db = JFactory::getDBO();
-            $query = $db->getQuery(true);
-            $query->update($db->quoteName($this->table_name));
-            $query->set("doc_status='удален'");
-            $query->where($this->getWhereClause());
-            $db->setQuery($query);
-            $result = (bool)$db->execute();
-            $this->response = $result;
-        } catch (Exception $e) {
-            $result = false;
-            $res->errorCode = 50;
-            $res->errorMsg = $e->getMessage();
-            if (!$res->errorMsg)
-                $res->errorMsg = "Не удалось удалить документ";
-//            if (!$echoResponse) throw $e;
-            JLog::add(
-                get_class() . ":" . $e->getMessage() . " buffer=" . print_r($this->buffer, true),
-                JLog::ERROR, 'com_rbo');
-        }
-//        if ($echoResponse) echo $this->response;
-        $this->buffer = $res;
-        return $result;
-    }
-
-    /**
-     * @return bool
-     */
-    public function deleteObjectHard()
+    public function deleteDocHard()
     {
         $result = true;
         $res = new stdClass ();
@@ -339,8 +307,6 @@ class RbDocs extends RbObject
         return $result;
     }
 
-    // =================================================================
-
     /**
      * На входе требуется ключ документа откуда копируются данные и тип нового документа
      * @return bool
@@ -355,7 +321,7 @@ class RbDocs extends RbObject
             $doc_based_on_id = $this->docBasedOnExists($keyValue, $doc_type);
             if ($doc_based_on_id) {//если есть такой документ, то удалим его
                 $docToDelete = new RbDocs ($doc_based_on_id, false);
-                $result = $result && $docToDelete->deleteObjectHard();
+                $result = $result && $docToDelete->deleteDocHard();
             }
             $this->keyValue = $keyValue;
             $result = $result && $this->readObject();
