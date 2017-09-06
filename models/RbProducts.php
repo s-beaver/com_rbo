@@ -1,4 +1,5 @@
 <?php
+require_once 'models/RbException.php';
 require_once "models/RbObject.php";
 
 class RbProducts extends RbObject
@@ -36,7 +37,7 @@ class RbProducts extends RbObject
     {
         $this->buffer = ( object )$this->buffer;
         $this->buffer->price_name = JFactory::getDate()->format('Ymd');
-        return parent::createObject();
+        parent::createObject();
     }
 
     /**
@@ -47,41 +48,43 @@ class RbProducts extends RbObject
     {
         $this->buffer = ( object )$this->buffer;
         $this->buffer->price_name = JFactory::getDate()->format('Ymd');
-        return parent::updateObject();
+        parent::updateObject();
     }
 
-    /**
-     * @param $oper
-     * @param bool $invertUpdate
-     * @return bool
-     */
     public function updateProductInStock($oper, $invertUpdate = false)
     {
-        $oper = (object)$oper;
-        if (empty($oper->oper_date)) return true; //не "проведенная" операция
-        if (!is_array(RbConfig::$operstype[$oper->oper_type])) return false;
-        $signMove = RbConfig::$operstype[$oper->oper_type]["signMove"];
-        if (empty($signMove)) return false;
-        $signMove = (integer)$signMove;
-        if ($invertUpdate) $signMove = -$signMove;
+        try {
+            $oper = (object)$oper;
+            if (empty($oper->oper_date)) return; //не "проведенная" операция
+            if (!is_array(RbConfig::$operstype[$oper->oper_type])) {
+                throw new RbException("Ошибка при обновлении остатков товара");
+            }
+            $signMove = RbConfig::$operstype[$oper->oper_type]["signMove"];
+            if (empty($signMove)) {
+                throw new RbException("Не найден дескриптор операции ".$oper->oper_type);
+            }
+            $signMove = (integer)$signMove;
+            if ($invertUpdate) $signMove = -$signMove;
 
-        $result = parent::readObject();
-        if (empty($this->buffer->product_in_stock)) $this->buffer->product_in_stock = 0;
-        $this->buffer->product_in_stock = (integer)$this->buffer->product_in_stock + ((integer)$oper->product_cnt * $signMove);
-
-        $result = $result && parent::updateObject();
-        return $result;
+            parent::readObject();
+            if (empty($this->buffer->product_in_stock)) $this->buffer->product_in_stock = 0;
+            $this->buffer->product_in_stock = (integer)$this->buffer->product_in_stock + ((integer)$oper->product_cnt * $signMove);
+            parent::updateObject();
+        } catch (Exception $e) {
+            JLog::add(
+                get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
+                JLog::ERROR, 'com_rbo');
+            throw $e;
+        }
     }
 
     /**
      * Очень странный метод. Используется только в RbOpers, тогда как аналогичные действия в RbDocs производятся по-другому
      * @param $prodId
      * @param $prod_data
-     * @return bool
      */
-    static function updateOrCreateProduct(& $prodId, $prod_data)
+    static function updateOrCreateProduct(& $prodId, $prod_data)//todo исправить?
     {
-        $result = true;
         $prod_data = ( object )$prod_data;
         if (isset ($prod_data)) {
             $prod_data->price_name = JFactory::getDate()->format('Ymd');
@@ -90,9 +93,9 @@ class RbProducts extends RbObject
         $input->set("rbo_products", $prod_data);
         $prodRef = new RbProducts ($prodId);
         if ($prodId > 0) {
-            if (!isset ($prod_data) || !isset ($prod_data->product_name) || $prod_data->product_name == '') return true;
+            if (!isset ($prod_data) || !isset ($prod_data->product_name) || $prod_data->product_name == '') return;
             if ($prodRef->buffer->_product_data_changed) { //_product_data_changed - нигде не встречается???
-                $result = $result && $prodRef->updateObject();
+                $prodRef->updateObject();
             } else {
                 $prodRef->response = true;
             }
@@ -100,12 +103,10 @@ class RbProducts extends RbObject
             $prodId = 0;
             $prodRef->response = true;
         } else {
-            if (!isset ($prod_data) || !isset ($prod_data->product_name) || $prod_data->product_name == '') return true;
-            $result = $result && $prodRef->createObject();
+            if (!isset ($prod_data) || !isset ($prod_data->product_name) || $prod_data->product_name == '') return;
+            $prodRef->createObject();
             $prodId = $prodRef->insertid;
         }
-//        return $prodRef->response;
-        return $result;
     }
 
     /**

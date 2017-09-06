@@ -1,4 +1,5 @@
 <?php
+require_once 'models/RbException.php';
 require_once "models/RbObject.php";
 require_once "models/RbHelper.php";
 

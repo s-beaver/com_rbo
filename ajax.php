@@ -15,6 +15,7 @@ if (!defined('_JDEFINES')) {
 }
 
 require_once JPATH_BASE . '/includes/framework.php';
+require_once 'models/RbException.php';
 require_once "models/RbHelper.php";
 require_once "models/RbDocs.php";
 require_once "models/RbProducts.php";
@@ -52,35 +53,45 @@ switch ($cmd) {
         $doc = new RbDocs ();
         $db = JFactory::getDbo();
         $db->transactionStart();
-        $res = true;
-        switch ($cmd) {
-            case "doc_create" : {
-                $res = $doc->createObject();
-                break;
+        $res = new stdClass ();
+        try {
+            switch ($cmd) {
+                case "doc_create" : {
+                    $doc->createObject();
+                    break;
+                }
+                case "doc_read" : {
+                    $doc->readObject();
+                    break;
+                }
+                case "doc_update" : {
+                    $doc->updateObject();
+                    break;
+                }
+                case "doc_delete" : {
+                    $doc->deleteObject();
+                    break;
+                }
+                case "doc_copy" : {
+                    $doc->copyDocTo();
+                    break;
+                }
             }
-            case "doc_read" : {
-                $res = $doc->readObject();
-                break;
+        } catch (Exception $e) {
+            if ($e instanceof RbException) {
+                $res->errorCode = $e->getCode();
+                $res->errorMsg = $e->getMessage();
+            } else {
+                $res->errorCode = 0;
+                $res->errorMsg = "Необработанная ошибка ошибка: " . $e->getMessage();
+                JLog::add(
+                    get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
+                    JLog::ERROR, 'com_rbo');
             }
-            case "doc_update" : {
-                $res = $doc->updateObject();
-                break;
-            }
-            case "doc_delete" : {
-                $res = $doc->deleteObject();
-                break;
-            }
-            case "doc_copy" : {
-                $res = $doc->copyDocTo();
-                break;
-            }
-        }
-        if ($res) {
-            $db->transactionCommit();
-        } else {
+            $doc->buffer = $res;
             $db->transactionRollback();
         }
-
+        $db->transactionCommit();
         $doc->echoResponse();
         break;
     }
@@ -105,31 +116,41 @@ switch ($cmd) {
         $oper = new RbOpers ();
         $db = JFactory::getDbo();
         $db->transactionStart();
-        $res = true;
-        switch ($cmd) {
-            case "oper_create" : {
-                $res = $oper->createObject();
-                break;
+        $res = new stdClass ();
+        try {
+            switch ($cmd) {
+                case "oper_create" : {
+                    $oper->createObject();
+                    break;
+                }
+                case "oper_read" : {
+                    $oper->readObject();
+                    break;
+                }
+                case "oper_update" : {
+                    $oper->updateObject();
+                    break;
+                }
+                case "oper_delete" : {
+                    $oper->deleteObject();
+                    break;
+                }
             }
-            case "oper_read" : {
-                $res = $oper->readObject();
-                break;
+        } catch (Exception $e) {
+            if ($e instanceof RbException) {
+                $res->errorCode = $e->getCode();
+                $res->errorMsg = $e->getMessage();
+            } else {
+                $res->errorCode = 0;
+                $res->errorMsg = "Необработанная ошибка ошибка: " . $e->getMessage();
+                JLog::add(
+                    get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
+                    JLog::ERROR, 'com_rbo');
             }
-            case "oper_update" : {
-                $res = $oper->updateObject();
-                break;
-            }
-            case "oper_delete" : {
-                $res = $oper->deleteObject();
-                break;
-            }
-        }
-        if ($res) {
-            $db->transactionCommit();
-        } else {
+            $oper->buffer = $res;
             $db->transactionRollback();
         }
-
+        $db->transactionCommit();
         $oper->echoResponse();
         break;
     }
@@ -169,31 +190,41 @@ switch ($cmd) {
         $prod = new RbProducts ();
         $db = JFactory::getDbo();
         $db->transactionStart();
-        $res = true;
-        switch ($cmd) {
-            case "product_create" : {
-                $res = $prod->createObject();
-                break;
+        $res = new stdClass ();
+        try {
+            switch ($cmd) {
+                case "product_create" : {
+                    $prod->createObject();
+                    break;
+                }
+                case "product_read" : {
+                    $prod->readObject();
+                    break;
+                }
+                case "product_update" : {
+                    $prod->updateObject();
+                    break;
+                }
+                case "product_delete" : {
+                    $prod->deleteObject();
+                    break;
+                }
             }
-            case "product_read" : {
-                $res = $prod->readObject();
-                break;
+        } catch (Exception $e) {
+            if ($e instanceof RbException) {
+                $res->errorCode = $e->getCode();
+                $res->errorMsg = $e->getMessage();
+            } else {
+                $res->errorCode = 0;
+                $res->errorMsg = "Необработанная ошибка ошибка: " . $e->getMessage();
+                JLog::add(
+                    get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
+                    JLog::ERROR, 'com_rbo');
             }
-            case "product_update" : {
-                $res = $prod->updateObject();
-                break;
-            }
-            case "product_delete" : {
-                $res = $prod->deleteObject();
-                break;
-            }
-        }
-        if ($res) {
-            $db->transactionCommit();
-        } else {
+            $prod->buffer = $res;
             $db->transactionRollback();
         }
-
+        $db->transactionCommit();
         $prod->echoResponse();
         break;
     }
@@ -256,31 +287,41 @@ switch ($cmd) {
         $cust = new RbCust ();
         $db = JFactory::getDbo();
         $db->transactionStart();
-        $res = true;
-        switch ($cmd) {
-            case "cust_create" : {
-                $res = $cust->createObject();
-                break;
+        $res = new stdClass ();
+        try {
+            switch ($cmd) {
+                case "cust_create" : {
+                    $cust->createObject();
+                    break;
+                }
+                case "cust_read" : {
+                    $cust->readObject();
+                    break;
+                }
+                case "cust_update" : {
+                    $cust->updateObject();
+                    break;
+                }
+                case "cust_delete" : {
+                    $cust->deleteObject();
+                    break;
+                }
             }
-            case "cust_read" : {
-                $res = $cust->readObject();
-                break;
+        } catch (Exception $e) {
+            if ($e instanceof RbException) {
+                $res->errorCode = $e->getCode();
+                $res->errorMsg = $e->getMessage();
+            } else {
+                $res->errorCode = 0;
+                $res->errorMsg = "Необработанная ошибка ошибка: " . $e->getMessage();
+                JLog::add(
+                    get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
+                    JLog::ERROR, 'com_rbo');
             }
-            case "cust_update" : {
-                $res = $cust->updateObject();
-                break;
-            }
-            case "cust_delete" : {
-                $res = $cust->deleteObject();
-                break;
-            }
-        }
-        if ($res) {
-            $db->transactionCommit();
-        } else {
+            $cust->buffer = $res;
             $db->transactionRollback();
         }
-
+        $db->transactionCommit();
         $cust->echoResponse();
         break;
     }

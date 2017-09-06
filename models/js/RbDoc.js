@@ -545,30 +545,3 @@ function RbDocSale(o) {
 extendObject(RbDocSale, RbDoc);
 //===================================================================================
 
-// ===================================================================================
-// RbDocSale.prototype.readDoc = function (docId) {//todo удалить? дублирует RbDoc?
-//     var self = this;
-//     $.ajax({
-//         dataType: 'json',
-//         type: "POST",
-//         data: {
-//             "rbo_docs": {
-//                 "docId": docId,
-//                 "doc_type": self.sDocType
-//             }
-//         },
-//         url: comPath + "ajax.php?task=doc_read",
-//         success: function (doc_data) {
-//             if (doc_data.errorCode > 0) {
-//                 Msg(doc_data.errorMsg, "Ок", null, "#dialog-confirm", "Ошибка");
-//             } else {
-//                 self.showDocForm(doc_data);
-//             }
-//         },
-//         error: function (jqXHR, textStatus, errorThrown) {
-//             alert("Статус: " + textStatus + " Ошибка: " + errorThrown)
-//         }
-//
-//     });
-// };
-

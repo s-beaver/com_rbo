@@ -1,4 +1,5 @@
 <?php
+require_once 'models/RbException.php';
 require_once "models/RbObject.php";
 
 class RbCust extends RbObject
@@ -35,19 +36,17 @@ class RbCust extends RbObject
      * Очень странный метод. Используется только в RbOpers, тогда как аналогичные действия в RbDocs производятся по-другому
      * @param $custId
      * @param $doc_cust
-     * @return bool
      */
-    static function updateOrCreateCustomer(& $custId, $doc_cust)
+    static function updateOrCreateCustomer(& $custId, $doc_cust)//todo исправить?
     {
-        $result = true;
         $doc_cust = ( object )$doc_cust;
         $input = JFactory::getApplication()->input;
         $input->set("rbo_cust", $doc_cust);
         $cust = new RbCust ($custId);
         if ($custId > 0) {
-            if (!isset ($doc_cust) || !isset ($doc_cust->cust_name) || $doc_cust->cust_name == '') return false;
+            if (!isset ($doc_cust) || !isset ($doc_cust->cust_name) || $doc_cust->cust_name == '') return;
             if ($cust->buffer->_cust_data_changed) {//_cust_data_changed - нигде не встречается???
-                $result = $result && $cust->updateObject();
+                $cust->updateObject();
             } else {
                 $cust->response = true;
             }
@@ -55,12 +54,10 @@ class RbCust extends RbObject
             $custId = 0;
             $cust->response = true;
         } else {
-            if (!isset ($doc_cust) || !isset ($doc_cust->cust_name) || $doc_cust->cust_name == '') return true;
-            $result = $result && $cust->createObject();
+            if (!isset ($doc_cust) || !isset ($doc_cust->cust_name) || $doc_cust->cust_name == '') return;
+            $cust->createObject();
             $custId = $cust->insertid;
         }
-//        return $cust->response;
-        return $result;
     }
 
     /**

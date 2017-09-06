@@ -1,9 +1,7 @@
 <?php
+require_once 'models/RbException.php';
 require_once "models/RbObject.php";
 
-/**
- *
- */
 define('IMPORT_SETTINGS_FILE', realpath(dirname(__FILE__) . "/../") . "/import_settings.ini");
 define('TEMP_PRICE_TABLE', '#__rbo_products_import');
 define('PRICE_TABLE', '#__rbo_products');

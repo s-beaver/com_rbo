@@ -1,4 +1,5 @@
 <?php
+require_once 'models/RbException.php';
 require_once "models/RbObject.php";
 require_once "models/RbCust.php";
 require_once "models/RbHelper.php";
@@ -43,69 +44,76 @@ class RbOpers extends RbObject
     }
 
     /**
-     * @return bool
+     * @throws Exception
      */
     public function readObject()
     {
-        $result = parent::readObject();
-        $custId = $this->buffer->custId;
-
-        $cust = new RbCust ($custId);
-        $result = $result && $cust->readObject();
-        $cust->buffer->cust_data = json_decode($cust->buffer->cust_data);
-        $this->buffer->oper_cust = $cust->buffer;
-
-//        $this->response = json_encode($this->buffer, JSON_UNESCAPED_UNICODE);
-        return $result;
+        try {
+            parent::readObject();
+            $custId = $this->buffer->custId;
+            $cust = new RbCust ($custId);
+            $cust->readObject();
+            $cust->buffer->cust_data = json_decode($cust->buffer->cust_data);
+            $this->buffer->oper_cust = $cust->buffer;
+        } catch (Exception $e) {
+            JLog::add(
+                get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
+                JLog::ERROR, 'com_rbo');
+            throw $e;
+        }
     }
 
     /**
-     * @return bool
+     * @throws Exception
      */
     public function updateObject()
     {
-        $result = true;
-        $custId = $this->buffer->custId;
-        $oper_cust = $this->buffer->oper_cust;
-        $oper_cust ['cust_data'] = json_encode($oper_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
-        $productId = $this->buffer->productId;
+        try {
+            $custId = $this->buffer->custId;
+            $oper_cust = $this->buffer->oper_cust;
+            $oper_cust ['cust_data'] = json_encode($oper_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
+            $productId = $this->buffer->productId;
 
-        $result = $result && RbCust::updateOrCreateCustomer($custId, $oper_cust);
-        $this->buffer->custId = $custId;
+            RbCust::updateOrCreateCustomer($custId, $oper_cust);
+            $this->buffer->custId = $custId;
 
-        $result = $result && RbProducts::updateOrCreateProduct($productId, $this->buffer);
-        $this->buffer->productId = $productId;
+            RbProducts::updateOrCreateProduct($productId, $this->buffer);
+            $this->buffer->productId = $productId;
 
-        $this->buffer->modified_by = JFactory::getUser()->username;
-        $this->buffer->modified_on = RbHelper::getCurrentTimeForDb();
-
-        $result = $result && parent::updateObject();
-
-//        $this->response = $this->response && $result;
-        return $result;
+            $this->buffer->modified_by = JFactory::getUser()->username;
+            $this->buffer->modified_on = RbHelper::getCurrentTimeForDb();
+            parent::updateObject();
+        } catch (Exception $e) {
+            JLog::add(
+                get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
+                JLog::ERROR, 'com_rbo');
+            throw $e;
+        }
     }
 
+    /**
+     * @throws Exception
+     */
     public function createObject()
     {
-        $result = true;
-        $custId = $this->buffer->custId;
-        $oper_cust = $this->buffer->oper_cust;
-        $oper_cust ['cust_data'] = json_encode($oper_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
-        $productId = $this->buffer->productId;
-
-        $result = $result && RbCust::updateOrCreateCustomer($custId, $oper_cust);
-        $this->buffer->custId = $custId;
-
-        $result = $result && RbProducts::updateOrCreateProduct($productId, $this->buffer);
-        $this->buffer->productId = $productId;
-
-        $this->buffer->created_by = JFactory::getUser()->username;
-        $this->buffer->created_on = RbHelper::getCurrentTimeForDb();
-
-        $result = $result && parent::createObject();
-
-//        $this->response = $this->response && $result;
-        return $result;
+        try {
+            $custId = $this->buffer->custId;
+            $oper_cust = $this->buffer->oper_cust;
+            $oper_cust ['cust_data'] = json_encode($oper_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
+            $productId = $this->buffer->productId;
+            RbCust::updateOrCreateCustomer($custId, $oper_cust);
+            $this->buffer->custId = $custId;
+            RbProducts::updateOrCreateProduct($productId, $this->buffer);
+            $this->buffer->productId = $productId;
+            $this->buffer->created_by = JFactory::getUser()->username;
+            $this->buffer->created_on = RbHelper::getCurrentTimeForDb();
+            parent::createObject();
+        } catch (Exception $e) {
+            JLog::add(
+                get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
+                JLog::ERROR, 'com_rbo');
+            throw $e;
+        }
     }
 
     /**
@@ -216,7 +224,6 @@ class RbOpers extends RbObject
                 $res->errorMsg = "Не удалось получить список операций";
         }
 
-//        $this->response = json_encode($res);
         $this->buffer = $res;
         return $res;
     }
@@ -244,10 +251,9 @@ class RbOpers extends RbObject
             if ($this->buffer->report_type == "costs") {
                 $result->costs = RbOpers::getCostsOpers($this->buffer->year, $this->buffer->month, $this->buffer->oper_type);
             }
-//            echo json_encode($result, JSON_UNESCAPED_UNICODE);
             return $result;
         }
-//        echo "";
+        return "";
     }
 
     // =================================================================

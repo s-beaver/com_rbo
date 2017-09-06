@@ -1,4 +1,5 @@
 <?php
+require_once 'models/RbException.php';
 require_once 'configuration.php';
 
 class RbObject
@@ -230,11 +231,10 @@ class RbObject
     }
 
     /**
-     * @return bool
+     * @throws Exception
      */
     public function readObject()
     {
-        $result = true;
         $db = JFactory::getDBO();
         $query = $db->getQuery(true);
 
@@ -250,22 +250,21 @@ class RbObject
                 $this->buffer = $db->loadObject(); // возвращает объект
             }
         } catch (Exception $e) {
-            $result = false;
-            JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
+            JLog::add(
+                get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
+                JLog::ERROR, 'com_rbo');
+            throw $e;
         }
-
-        return $result;
     }
 
     /**
-     * @return bool
+     * @throws Exception
      */
     public function updateObject()
     {
         $db = JFactory::getDBO();
         $query = $db->getQuery(true);
 
-        $result = true;
         try {
             if ($this->is_multiple) {
                 foreach ($this->buffer as $key => $value) {
@@ -274,29 +273,25 @@ class RbObject
                     $query->set($this->getSetForUpdateClause($value));
                     $query->where($this->getWhereClause());
                     $db->setQuery($query);
-                    $result = $result && $db->execute();
+                    $db->execute();
                 }
-                if (!$result) throw new Exception ('Ошибка при обновлении записи в БД');
             } else {
                 $query->update($db->quoteName($this->getTableName()));
                 $query->set($this->getSetForUpdateClause($this->buffer));
                 $query->where($this->getWhereClause());
                 $db->setQuery($query);
-                $result = $db->execute();
+                $db->execute();
             }
         } catch (Exception $e) {
-            $result = false;
             JLog::add(
-                get_class() . ":" . $e->getMessage() . " buffer=" . print_r($this->buffer, true),
+                get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
                 JLog::ERROR, 'com_rbo');
+            throw $e;
         }
-        $this->response = $result;
-//        if ($echoResponse) { echo $this->response; }
-        return $result;
     }
 
     /**
-     * @return bool
+     * @throws Exception
      */
     public function createObject()
     {
@@ -314,51 +309,43 @@ class RbObject
                     $query->columns($ins [0]);
                     $query->values($ins [1]);
                     $db->setQuery($query);
-                    $result = $result && $db->execute();
+                    $db->execute();
                     $this->insertid [] = $db->insertid();
                 }
-                if (!$result) throw new Exception ('Ошибка при создании записи в БД');
             } else {
                 $ins = $this->getArraysForInsert($this->buffer);
                 $query->insert($db->quoteName($this->getTableName()));
                 $query->columns($ins [0]);
                 $query->values($ins [1]);
                 $db->setQuery($query);
-                $result = $db->execute();
+                $db->execute();
                 $this->insertid = $db->insertid();
             }
         } catch (Exception $e) {
-            $result = false;
             JLog::add(
-                get_class() . ":" . $e->getMessage() . " buffer=" . print_r($this->buffer, true),
+                get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
                 JLog::ERROR, 'com_rbo');
+            throw $e;
         }
-        $this->response = $result;
-//        if ($echoResponse) { echo $this->response; }
-        return $result;
     }
 
     /**
-     * @return bool
+     * @throws Exception
      */
     public function deleteObject()
     {
-        $result = true;
-        $db = JFactory::getDBO();
+        $db = JFactory::getDbo();
         try {
             $query = $db->getQuery(true);
             $query->delete($db->quoteName($this->getTableName()));
             $query->where($this->getWhereClause());
             $db->setQuery($query);
-            $result = (bool)$db->execute();
+            $db->execute();
         } catch (Exception $e) {
-            $result = false;
             JLog::add(
-                get_class() . ":" . $e->getMessage() . " buffer=" . print_r($this->buffer, true),
+                get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
                 JLog::ERROR, 'com_rbo');
+            throw $e;
         }
-//        if ($echoResponse) { echo $this->response; }
-        $this->response = $result;
-        return $result;
     }
 }
