@@ -33,37 +33,35 @@ class RbCust extends RbObject
     }
 
     /**
-     * Очень странный метод. Используется только в RbOpers, тогда как аналогичные действия в RbDocs производятся по-другому
      * @param $custId
      * @param $doc_cust
+     * @return int|null
      */
-    static function updateOrCreateCustomer(& $custId, $doc_cust)//todo исправить?
+    static function updateOrCreateCustomer($custId, $doc_cust)
     {
         $doc_cust = ( object )$doc_cust;
         $input = JFactory::getApplication()->input;
         $input->set("rbo_cust", $doc_cust);
         $cust = new RbCust ($custId);
-        if ($custId > 0) {
-            if (!isset ($doc_cust) || !isset ($doc_cust->cust_name) || $doc_cust->cust_name == '') return;
-            if ($cust->buffer->_cust_data_changed) {//_cust_data_changed - нигде не встречается???
-                $cust->updateObject();
-            } else {
-                $cust->response = true;
-            }
-        } elseif ($custId == -1) {
-            $custId = 0;
-            $cust->response = true;
+        if ($custId == -1) {
+            return 0;
         } else {
-            if (!isset ($doc_cust) || !isset ($doc_cust->cust_name) || $doc_cust->cust_name == '') return;
-            $cust->createObject();
-            $custId = $cust->insertid;
+            if (!isset ($doc_cust) || !isset ($doc_cust->cust_name) || $doc_cust->cust_name == '') return null;
+            if ($custId > 0) {
+                $cust->updateObject();
+                return $custId;
+            } else {
+                $cust->createObject();
+                return $cust->insertid;
+            }
         }
     }
 
     /**
      * @return object
      */
-    public function getCustListBySubstr()
+    public
+    function getCustListBySubstr()
     {
         $input = JFactory::getApplication()->input;
         $searchSubstr = $input->get("search", null, null);

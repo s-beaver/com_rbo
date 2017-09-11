@@ -107,17 +107,8 @@ class RbDocs extends RbObject
             $this->buffer->modified_by = JFactory::getUser()->username;
             $this->buffer->modified_on = RbHelper::getCurrentTimeForDb();
 
-            $input = JFactory::getApplication()->input;//todo устарело?
-            $input->set("rbo_cust", $doc_cust);
-            $cust = new RbCust ($custId);
-            if ($custId > 0) {
-                $cust->updateObject();
-            } elseif ($custId == -1) {
-                $this->buffer->custId = 0;
-            } else {
-                $cust->createObject();
-                $this->buffer->custId = $cust->insertid;
-            }
+            $input = JFactory::getApplication()->input;
+            $this->buffer->custId = RbCust::updateOrCreateCustomer($custId, $doc_cust);
 
             //При удалении старых операций требуется "отменить" изменение остатков товаров
             //todo Учесть документ инвентаризацию 
@@ -160,11 +151,17 @@ class RbDocs extends RbObject
             $res->docId = $this->buffer->docId;//todo зачем?
             $this->buffer = $res;
 
+        } catch (RbException $e) {
+            $msg = "Не удалось обновить документ по причине: " . $e->getMessage();
+            JLog::add(
+                get_class() . ":" . $msg . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
+                JLog::ERROR, 'com_rbo');
+            throw new RbException($msg, $e->getCode());
         } catch (Exception $e) {
             JLog::add(
                 get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
                 JLog::ERROR, 'com_rbo');
-            throw new RbException("Не удалось обновить документ", 20);
+            throw $e;
         }
 
         /*
@@ -197,7 +194,7 @@ class RbDocs extends RbObject
                 $newObj = $this->getNextDocNumber();
                 if ($newObj)
                     $this->buffer->doc_num = $newObj->new_num;
-                else throw new RbException("Не удалось получить очередной номер документа",100);//todo 100 - это значит номер надо уточнить
+                else throw new RbException("Не удалось получить очередной номер документа", 100);//todo 100 - это значит номер надо уточнить
             }
             if (empty($this->buffer->doc_date)) $this->buffer->doc_date = RbHelper::getCurrentTimeForDb();
 
@@ -344,30 +341,10 @@ class RbDocs extends RbObject
     public function setOpersFromDocByStatus(&$product)
     {
         if (strtotime($this->buffer->doc_date) < strtotime('1 November 2015')) return;
-
         if ($this->buffer->doc_status == "подписан" && $this->buffer->doc_cust["cust_is_own_firm"] != "1") {
-            switch ($this->buffer->doc_type) {
-                case "акт":
-                case "накл": {
-                    $product["oper_type"] = "продажа";
-                    break;
-                }
-                case "B_ACT":
-                case "B_BIL": {
-                    $product["oper_type"] = "закуп";
-                    break;
-                }
-                case "D_CMP": {
-                    $product["oper_type"] = "декомплект";
-                    break;
-                }
-                case "B_STK": {
-                    $product["oper_type"] = "инвентар";
-                    break;
-                }
-                default:
-                    return;
-            }
+            $operName = RbConfig::$doc2oper[$this->buffer->doc_type];
+            if (!isset($operName)) return;
+            $product["oper_type"] = $operName;
             $product["oper_date"] = $this->buffer->doc_date;
             $product["pay_date"] = $this->buffer->pay_date;
             //$product["oper_sum"] = (integer)$product["product_price"]*(integer)$product["product_cnt"];
@@ -377,7 +354,6 @@ class RbDocs extends RbObject
         } else {
             $product["oper_date"] = null;
         }
-
     }
 
     /**
@@ -386,7 +362,6 @@ class RbDocs extends RbObject
     public function getDocList()
     {
         $db = JFactory::getDBO();
-
         $res = new stdClass ();
         try {
             $input = JFactory::getApplication()->input;
@@ -479,7 +454,7 @@ class RbDocs extends RbObject
             $res->new_num = $newNumber + 1;
             $res->new_date = $currentTime->format('d.m.Y', true);
 
-            $result = $res;
+            return $res;
         } catch (Exception $e) {
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
             throw $e;

@@ -6,7 +6,6 @@ require_once "models/RbHelper.php";
 
 class RbOpers extends RbObject
 {
-
     /**
      * RbOpers constructor.
      * @param null $keyValue
@@ -73,13 +72,8 @@ class RbOpers extends RbObject
             $oper_cust = $this->buffer->oper_cust;
             $oper_cust ['cust_data'] = json_encode($oper_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
             $productId = $this->buffer->productId;
-
-            RbCust::updateOrCreateCustomer($custId, $oper_cust);
-            $this->buffer->custId = $custId;
-
-            RbProducts::updateOrCreateProduct($productId, $this->buffer);
-            $this->buffer->productId = $productId;
-
+            $this->buffer->custId = RbCust::updateOrCreateCustomer($custId, $oper_cust);
+//            $this->buffer->productId = RbProducts::updateOrCreateProduct($productId, $this->buffer);
             $this->buffer->modified_by = JFactory::getUser()->username;
             $this->buffer->modified_on = RbHelper::getCurrentTimeForDb();
             parent::updateObject();
@@ -101,10 +95,10 @@ class RbOpers extends RbObject
             $oper_cust = $this->buffer->oper_cust;
             $oper_cust ['cust_data'] = json_encode($oper_cust ['cust_data'], JSON_UNESCAPED_UNICODE);
             $productId = $this->buffer->productId;
-            RbCust::updateOrCreateCustomer($custId, $oper_cust);
-            $this->buffer->custId = $custId;
-            RbProducts::updateOrCreateProduct($productId, $this->buffer);
-            $this->buffer->productId = $productId;
+
+            $this->buffer->custId = RbCust::updateOrCreateCustomer($custId, $oper_cust);
+//            $this->buffer->productId = RbProducts::updateOrCreateProduct($productId, $this->buffer);
+            //todo вместо закомментаренного кода нужно правильно менять остатки товара
             $this->buffer->created_by = JFactory::getUser()->username;
             $this->buffer->created_on = RbHelper::getCurrentTimeForDb();
             parent::createObject();
@@ -113,6 +107,25 @@ class RbOpers extends RbObject
                 get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
                 JLog::ERROR, 'com_rbo');
             throw $e;
+        }
+    }
+
+    /**
+     * todo Непонятно как помечать операции, которые должны иметь дату, но не должны менять остатки (ддс или если своя фирма). Предложение - договориться с что в операциях мы товары не указываем - только через документы
+     * @param $product
+     */
+    public function setOpersByStatus(&$product)
+    {
+        if (strtotime($this->buffer->oper_date) < strtotime('1 November 2015')) return;
+        if ($this->buffer->doc_status == "подписан" && $this->buffer->doc_cust["cust_is_own_firm"] != "1") {
+            $product["oper_date"] = $this->buffer->doc_date;
+            $product["pay_date"] = $this->buffer->pay_date;
+            //$product["oper_sum"] = (integer)$product["product_price"]*(integer)$product["product_cnt"];
+            $product["custId"] = $this->buffer->custId;
+            $product["oper_firm"] = $this->buffer->doc_firm;
+            $product["oper_manager"] = $this->buffer->doc_manager;
+        } else {
+            $product["oper_date"] = null;
         }
     }
 

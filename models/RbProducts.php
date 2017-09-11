@@ -56,12 +56,9 @@ class RbProducts extends RbObject
         try {
             $oper = (object)$oper;
             if (empty($oper->oper_date)) return; //не "проведенная" операция
-            if (!is_array(RbConfig::$operstype[$oper->oper_type])) {
-                throw new RbException("Ошибка при обновлении остатков товара");
-            }
             $signMove = RbConfig::$operstype[$oper->oper_type]["signMove"];
             if (empty($signMove)) {
-                throw new RbException("Не найден дескриптор операции ".$oper->oper_type);
+                throw new RbException("Не найден дескриптор операции '" . $oper->oper_type . "'", 10);//todo коды надо упорядочивать
             }
             $signMove = (integer)$signMove;
             if ($invertUpdate) $signMove = -$signMove;
@@ -79,11 +76,11 @@ class RbProducts extends RbObject
     }
 
     /**
-     * Очень странный метод. Используется только в RbOpers, тогда как аналогичные действия в RbDocs производятся по-другому
      * @param $prodId
      * @param $prod_data
+     * @return int|null
      */
-    static function updateOrCreateProduct(& $prodId, $prod_data)//todo исправить?
+    static function updateOrCreateProduct($prodId, $prod_data)
     {
         $prod_data = ( object )$prod_data;
         if (isset ($prod_data)) {
@@ -92,20 +89,18 @@ class RbProducts extends RbObject
         $input = JFactory::getApplication()->input;
         $input->set("rbo_products", $prod_data);
         $prodRef = new RbProducts ($prodId);
-        if ($prodId > 0) {
-            if (!isset ($prod_data) || !isset ($prod_data->product_name) || $prod_data->product_name == '') return;
-            if ($prodRef->buffer->_product_data_changed) { //_product_data_changed - нигде не встречается???
-                $prodRef->updateObject();
-            } else {
-                $prodRef->response = true;
-            }
-        } elseif ($prodId == -1) {
-            $prodId = 0;
-            $prodRef->response = true;
+
+        if ($prodId == -1) {
+            return 0;
         } else {
-            if (!isset ($prod_data) || !isset ($prod_data->product_name) || $prod_data->product_name == '') return;
-            $prodRef->createObject();
-            $prodId = $prodRef->insertid;
+            if (!isset ($doc_cust) || !isset ($doc_cust->cust_name) || $doc_cust->cust_name == '') return null;
+            if ($prodId > 0) {
+                $prodRef->updateObject();
+                return $prodId;
+            } else {
+                $prodRef->createObject();
+                return $prodRef->insertid;
+            }
         }
     }
 
