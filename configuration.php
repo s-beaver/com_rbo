@@ -48,6 +48,16 @@ class RbConfig
         "затраты-коммун" => array("signMove" => -1),
         "затраты-связь" => array("signMove" => -1),
         "ддс" => array("signMove" => 0),
-        "инвентар" => array("signMove" => 0)
+        "инвентар" => array("signMove" => 0),
+        "декомплект" => array("signMove" => 1)
+    );
+
+    public static $doc2oper = array(
+        "акт" => "продажа",
+        "накл" => "продажа",
+        "B_ACT" => "закуп",
+        "B_BIL" => "закуп",
+        "D_CMP" => "декомплект",
+        "B_STK" => "инвентар"
     );
 }
