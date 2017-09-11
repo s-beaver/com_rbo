@@ -191,6 +191,11 @@ RbOper.prototype.attachOperModule = function () {
         dateFormat: "dd.mm.yy"
     });
 
+    $("#rbo_opers\\.pay_date").datepicker({
+        showButtonPanel: true,
+        dateFormat: "dd.mm.yy"
+    });
+
     $("#dialog-confirm").dialog({
         autoOpen: false
     });
