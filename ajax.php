@@ -77,12 +77,13 @@ switch ($cmd) {
                     break;
                 }
             }
+            $db->transactionCommit();
         } catch (Exception $e) {
             if ($e instanceof RbException) {
                 $res->errorCode = $e->getCode();
                 $res->errorMsg = $e->getMessage();
             } else {
-                $res->errorCode = 0;
+                $res->errorCode = 1000;
                 $res->errorMsg = "Необработанная ошибка ошибка: " . $e->getMessage();
                 JLog::add(
                     get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
@@ -91,7 +92,6 @@ switch ($cmd) {
             $doc->buffer = $res;
             $db->transactionRollback();
         }
-        $db->transactionCommit();
         $doc->echoResponse();
         break;
     }
@@ -136,12 +136,13 @@ switch ($cmd) {
                     break;
                 }
             }
+            $db->transactionCommit();
         } catch (Exception $e) {
             if ($e instanceof RbException) {
                 $res->errorCode = $e->getCode();
                 $res->errorMsg = $e->getMessage();
             } else {
-                $res->errorCode = 0;
+                $res->errorCode = 1000;
                 $res->errorMsg = "Необработанная ошибка ошибка: " . $e->getMessage();
                 JLog::add(
                     get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
@@ -150,7 +151,6 @@ switch ($cmd) {
             $oper->buffer = $res;
             $db->transactionRollback();
         }
-        $db->transactionCommit();
         $oper->echoResponse();
         break;
     }
@@ -210,12 +210,13 @@ switch ($cmd) {
                     break;
                 }
             }
+            $db->transactionCommit();
         } catch (Exception $e) {
             if ($e instanceof RbException) {
                 $res->errorCode = $e->getCode();
                 $res->errorMsg = $e->getMessage();
             } else {
-                $res->errorCode = 0;
+                $res->errorCode = 1000;
                 $res->errorMsg = "Необработанная ошибка ошибка: " . $e->getMessage();
                 JLog::add(
                     get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
@@ -224,7 +225,6 @@ switch ($cmd) {
             $prod->buffer = $res;
             $db->transactionRollback();
         }
-        $db->transactionCommit();
         $prod->echoResponse();
         break;
     }
@@ -307,12 +307,13 @@ switch ($cmd) {
                     break;
                 }
             }
+            $db->transactionCommit();
         } catch (Exception $e) {
             if ($e instanceof RbException) {
                 $res->errorCode = $e->getCode();
                 $res->errorMsg = $e->getMessage();
             } else {
-                $res->errorCode = 0;
+                $res->errorCode = 1000;
                 $res->errorMsg = "Необработанная ошибка ошибка: " . $e->getMessage();
                 JLog::add(
                     get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
@@ -321,7 +322,6 @@ switch ($cmd) {
             $cust->buffer = $res;
             $db->transactionRollback();
         }
-        $db->transactionCommit();
         $cust->echoResponse();
         break;
     }
