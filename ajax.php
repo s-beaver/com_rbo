@@ -86,7 +86,7 @@ switch ($cmd) {
                 $res->errorCode = 1000;
                 $res->errorMsg = "Необработанная ошибка ошибка: " . $e->getMessage();
                 JLog::add(
-                    get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
+                    get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($doc->buffer, true),
                     JLog::ERROR, 'com_rbo');
             }
             $doc->buffer = $res;
@@ -145,7 +145,7 @@ switch ($cmd) {
                 $res->errorCode = 1000;
                 $res->errorMsg = "Необработанная ошибка ошибка: " . $e->getMessage();
                 JLog::add(
-                    get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($this->buffer, true),
+                    get_class() . ":" . $e->getMessage() . " (" . $e->getCode() . ") buffer=" . print_r($oper->buffer, true),
                     JLog::ERROR, 'com_rbo');
             }
             $oper->buffer = $res;
