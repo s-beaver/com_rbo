@@ -72,10 +72,12 @@ class RbDocs extends RbObject
             $prod->readObject();
             $this->buffer->doc_products = $prod->buffer;
 
-            $cust = new RbCust ($custId);
-            $cust->readObject();
-            $cust->buffer->cust_data = json_decode($cust->buffer->cust_data);
-            $this->buffer->doc_cust = $cust->buffer;
+            if ($custId > 0) {
+                $cust = new RbCust ($custId);
+                $cust->readObject();
+                $cust->buffer->cust_data = json_decode($cust->buffer->cust_data);
+                $this->buffer->doc_cust = $cust->buffer;
+            }
 
             $firm = RbConfig::$firms [mb_strtoupper($this->buffer->doc_firm, "UTF-8")];
             if (is_string($firm ["copyof"]) && strlen($firm ["copyof"]) > 0) {
