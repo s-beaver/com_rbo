@@ -227,7 +227,14 @@ RbOper.prototype.readOper = function (operId) {
         },
         url: comPath + "ajax.php?task=oper_read",
         success: function (oper_data) {
-            self.showOperForm(oper_data);
+            if (oper_data.errorCode > 0) {
+                Msg(oper_data.errorMsg, "Ок", null, "#dialog-confirm", "Ошибка");
+            } else {
+                self.showOperForm(oper_data);
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert("Статус: " + textStatus + " Ошибка: " + errorThrown)
         }
     });
 };
@@ -316,6 +323,7 @@ RbOper.prototype.showOperForm = function (oper_data) {
     refillSelect("rbo_opers\\.oper_firm", getFirmList());
     refillSelect("rbo_opers\\.oper_type", getOperTypeList());
 
+    self.productSearchOff();
     setFormData(self.docFormPrefix + "\\.oper-form", "rbo_opers", oper_data);
 
     var pId = $('#rbo_opers\\.productId').val();
@@ -442,7 +450,7 @@ RbOper.prototype.calcTotals = function () {
 $(document).ready(function () {
 
     oper = new RbOper({
-        checkFields: ["prod_search_off_btn", "\\.oper_date", "\\.oper_type", "\\.oper_firm", "\\.oper_manager", "\\.oper_sum", "\\.oper_rem",
+        checkFields: ["prod_search_off_btn", "\\.oper_date", "\\.pay_date", "\\.oper_type", "\\.oper_firm", "\\.oper_manager", "\\.oper_sum", "\\.oper_rem",
             "prod_search", "prod_search_btn", "\\.cedit",
             "\\.product_name", "\\.product_price", "\\.product_cnt"],
         tips: $(".validateTips")
