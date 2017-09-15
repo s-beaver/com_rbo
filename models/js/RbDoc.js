@@ -270,7 +270,7 @@ RbDoc.prototype.getDocDataBeforeSave = function (docId) {
     for (var i = 0; i < p.length; i++)
         pAr[i] = p[i];
 
-    if (self.oCust.flds.cust_name == "")
+    if (NullTo(self.oCust.flds.cust_name,"") == "")
         $("#custId").val("-1");//значит мы сознательно удаляем покупателя из документа
 
     var oData = getFormData(self.docFormPrefix + "\\.doc-form", self.docFormPrefix, "rbo_docs");
