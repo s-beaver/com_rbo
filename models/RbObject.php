@@ -166,7 +166,7 @@ class RbObject
                     if (is_null($value) /*|| empty($value)*/) {//поставил комментарии потому что 0 превращалось в null
                         $setAr [] = $db->quoteName($key) . "=NULL";
                     } else {
-                        $setAr [] = $db->quoteName($key) . "=$value";
+                        $setAr [] = $db->quoteName($key) . "=".($value+0);//это такое преобразование типа
                     }
                     break;
                 }
