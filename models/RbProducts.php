@@ -208,7 +208,6 @@ class RbProducts extends RbObject
             $res->recordsTotal = $iRecordsTotal;
             $res->recordsFiltered = $iRecordsTotal;
             $res->data = $data_rows_assoc_list;
-            echo json_encode($res);
         } catch (Exception $e) {
             $res->errorCode = 90;
             $res->errorMsg = $e->getMessage();
