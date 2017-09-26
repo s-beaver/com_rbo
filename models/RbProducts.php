@@ -55,7 +55,7 @@ class RbProducts extends RbObject
     {
         try {
             $oper = (object)$oper;
-            if (empty($oper->oper_date)) return; //не "проведенная" операция
+            if (empty($oper->oper_date) or $oper->oper_date == "00.00.0000") return; //не "проведенная" операция
             $signMove = RbConfig::$operstype[$oper->oper_type]["signMove"];
             if (empty($signMove)) {
                 throw new RbException("Не найден дескриптор операции '" . $oper->oper_type . "'", 10);//todo коды надо упорядочивать
@@ -64,6 +64,7 @@ class RbProducts extends RbObject
             if ($invertUpdate) $signMove = -$signMove;
 
             parent::readObject();
+            if ($this->buffer->product_type = 1) return;
             if (empty($this->buffer->product_in_stock)) $this->buffer->product_in_stock = 0;
             $this->buffer->product_in_stock = (integer)$this->buffer->product_in_stock + ((integer)$oper->product_cnt * $signMove);
             parent::updateObject();
