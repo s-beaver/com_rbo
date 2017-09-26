@@ -24,7 +24,7 @@ $(document).ready(function () {
         autoOpen: false
     });
 
-    $("#doc_date").datepicker({
+    $("#s_act\\.doc_date").datepicker({
         showButtonPanel: true,
         dateFormat: "dd.mm.yy"
     });
