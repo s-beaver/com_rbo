@@ -69,11 +69,11 @@ function fillInvoicePrintForm(i) {
       sPr += "<td style='text-align: left'>-</td>";// к-во мест
       sPr += "<td style='text-align: left'>-</td>";// масса брутто
       sPr += "<td style='text-align: center'>" + i.doc_products[x].product_cnt + "</td>";
-      sPr += "<td style='text-align: right'>" + i.doc_products[x].product_price + ",00</td>";
-      sPr += "<td style='text-align: right'>" + i.doc_products[x].oper_sum + ",00</td>";
+      sPr += "<td style='text-align: right'>" + MoneyFmt(i.doc_products[x].product_price) + "</td>";
+      sPr += "<td style='text-align: right'>" + MoneyFmt(i.doc_products[x].oper_sum) + "</td>";
       sPr += "<td style='text-align: left'>Без НДС</td>";// ставка НДС
       sPr += "<td style='text-align: center'>0,00</td>";// сумма НДС
-      sPr += "<td style='text-align: right'>" + i.doc_products[x].oper_sum + ",00</td>";// сумма с НДС
+      sPr += "<td style='text-align: right'>" + MoneyFmt(i.doc_products[x].oper_sum) + "</td>";// сумма с НДС
       sPr += "</tr>";
       iCntSum += Number(i.doc_products[x].product_cnt);
     }
@@ -81,7 +81,7 @@ function fillInvoicePrintForm(i) {
   $("#doc_products").html(sPr);
   $("#doc_cnt_sum").html(iCntSum);
   $("[id^='doc_sum']").each(function(x, elem) {
-    $(this).html(i.doc_sum + ",00");
+    $(this).html(MoneyFmt(i.doc_sum));
   });
   $("#doc_sum_words").html(number_to_string(i.doc_sum));
 

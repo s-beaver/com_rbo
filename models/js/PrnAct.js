@@ -66,15 +66,15 @@ function fillInvoicePrintForm(i) {
       sPr += "<td style='text-align: center'>" + (x + 1) + "</td>";// #
       sPr += "<td style='text-align: left'>" + i.doc_products[x].product_name + "</td>";
       sPr += "<td style='text-align: center'>" + i.doc_products[x].product_cnt + "</td>";
-      sPr += "<td style='text-align: right'>" + Number(i.doc_products[x].product_price).toFixed(2) + "</td>";
-      sPr += "<td style='text-align: right'>" + Number(i.doc_products[x].oper_sum).toFixed(2) + "</td>";
+      sPr += "<td style='text-align: right'>" + MoneyFmt(i.doc_products[x].product_price) + "</td>";
+      sPr += "<td style='text-align: right'>" + MoneyFmt(i.doc_products[x].oper_sum) + "</td>";
       sPr += "</tr>";
       iCntSum += Number(i.doc_products[x].product_cnt);
     }
   }
   $("#doc_products").html(sPr);
   $("#doc_cnt_sum").html(iCntSum);
-  $("#doc_sum").html(Number(i.doc_sum).toFixed(2));
+  $("#doc_sum").html(MoneyFmt(i.doc_sum));
   $("#doc_sum_words").html(number_to_string(i.doc_sum));
 
   var iManOffset = $("#stamp_anchor").offset();

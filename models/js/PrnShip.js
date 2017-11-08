@@ -67,17 +67,17 @@ function fillInvoicePrintForm(i) {
           + "</td>";
       sPr += "<td style='text-align: center'>" + i.doc_products[x].product_cnt
           + "</td>";
-      sPr += "<td style='text-align: right'>" + i.doc_products[x].product_price
-          + ",00</td>";
-      sPr += "<td style='text-align: right'>" + i.doc_products[x].oper_sum
-          + ",00</td>";
+      sPr += "<td style='text-align: right'>" + MoneyFmt(i.doc_products[x].product_price)
+          + "</td>";
+      sPr += "<td style='text-align: right'>" + MoneyFmt(i.doc_products[x].oper_sum)
+          + "</td>";
       sPr += "</tr>";
       iCntSum += Number(i.doc_products[x].product_cnt);
     }
   }
   $("#doc_products").html(sPr);
   $("#doc_cnt_sum").html(iCntSum);
-  $("#doc_sum").html(i.doc_sum+",00");
+  $("#doc_sum").html(MoneyFmt(i.doc_sum));
   $("#doc_sum_words").html(number_to_string(i.doc_sum));
 
   var iManOffset = $("#stamp_anchor").offset();

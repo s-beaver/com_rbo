@@ -395,3 +395,13 @@ function Round(fVal, digits)
     return Math.round(p * fVal) / p;
 //  return o_Sys.Trunc(Sign(fVal)*0.5 + p * fVal) / p;
 }
+
+//==================================================================================
+/**
+ #hfunc(double)#Функция предназначена формирования "денежного" представления входного параметра
+ #hval(double)#первый параметр fVal - число или строка
+ */
+function MoneyFmt(fVal)
+{
+    return Number(fVal).toFixed(2).replace(".",",");
+}
