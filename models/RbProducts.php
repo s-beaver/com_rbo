@@ -25,6 +25,8 @@ class RbProducts extends RbObject
         $this->flds ["product_price_bucks"] = array("type" => "numeric");
         $this->flds ["product_type"] = array("type" => "numeric");
         $this->flds ["price_name"] = array("type" => "string");
+        $this->flds ["product_autocode"] = array("type" => "string");
+        $this->flds ["updated"] = array("type" => "date");
 
         $this->getInputBuffer();
         if (!isset ($keyValue)) $this->keyValue = $this->buffer->productId;

@@ -16,7 +16,7 @@ class RbPriceImport extends RbObject
         $this->is_multiple = false;
         $this->setTableName("rbo_price_import");
         $this->flds ["id"] = ["type" => "numeric", "is_key" => true];
-//        $this->flds ["product_code"] = ["type" => "string"];
+        $this->flds ["product_code"] = ["type" => "string"];
         $this->flds ["product_category"] = ["type" => "string"];
         $this->flds ["product_code"] = ["type" => "string"];
         $this->flds ["product_name"] = ["type" => "string"];
@@ -25,6 +25,7 @@ class RbPriceImport extends RbObject
         $this->flds ["product_price2"] = ["type" => "numeric"];
         $this->flds ["product_price3"] = ["type" => "numeric"];
         $this->flds ["product_price_vip"] = ["type" => "numeric"];
+        $this->flds ["product_autocode"] = ["type" => "string"];
         $this->flds ["productFoundCount"] = ["type" => "numeric"];
         $this->flds ["productFoundId"] = ["type" => "numeric"];
 
@@ -139,53 +140,60 @@ class RbPriceImport extends RbObject
             $line[1] = preg_replace(array("/\"/", "/\r/", "/\n/"), "", $line[1]);
             if (count($line) != 2) continue;
             switch ($line[0]) {
-                case "PRICE_NAME": {
-                    $settings->priceName = $line[1];
-                    break;
-                }
-                case "BUCKS_RATE": {
-                    $settings->bucksRate = (float)$line[1];//is_float()
-                    break;
-                }
-                case "SKIP_ROWS": {
-                    $settings->skipRows = (int)$line[1];
-                    break;
-                }
-                case "SEARCH_COL": {
-                    $settings->searchColumn = $line[1];
-                    break;
-                }
-                case "CHECK_LINE_VALID": {
-                    $settings->columnCheckLineValid = $line[1];
-                    break;
-                }
-                case "CONVERT_COLS": {
-                    $settings->convert = new stdClass ();
-                    $parts = explode("#", $line[1]);
-                    if (count($parts) < 2) continue;
-                    $settings->convert->columns = explode(",", $parts[0]);
-                    $settings->convert->rulesFrom = array();
-                    $settings->convert->rulesTo = array();
-                    for ($i = 1; $i < count($parts); $i++) {
-                        $a = explode("->", $parts[$i]);
-                        $a[1] = preg_replace("/\'/", "", $a[1]);
-                        array_push($settings->convert->rulesFrom, $a[0]);
-                        array_push($settings->convert->rulesTo, $a[1]);
+                case "PRICE_NAME":
+                    {
+                        $settings->priceName = $line[1];
+                        break;
                     }
-                    break;
-                }
-                default: {
-                    $matches = array();
-                    if (preg_match("/^CSV_COL(\d+)$/", $line[0], $matches) == 1) {
-                        $settings->csvColumns[--$matches[1]] = $line[1];
-                    } elseif (preg_match("/^DB_(.+)$/", $line[0], $matches) == 1) {
-                        $params = preg_split("/,/", $line[1]);
-                        $settings->dbFlds[$matches[1]] = $params[0];
-                        if (count($params) > 1 && $params[1] == "check") {
-                            $settings->checkForChange[$matches[1]] = $params[0];
+                case "BUCKS_RATE":
+                    {
+                        $settings->bucksRate = (float)$line[1];//is_float()
+                        break;
+                    }
+                case "SKIP_ROWS":
+                    {
+                        $settings->skipRows = (int)$line[1];
+                        break;
+                    }
+                case "SEARCH_COL":
+                    {
+                        $settings->searchColumn = $line[1];
+                        break;
+                    }
+                case "CHECK_LINE_VALID":
+                    {
+                        $settings->columnCheckLineValid = $line[1];
+                        break;
+                    }
+                case "CONVERT_COLS":
+                    {
+                        $settings->convert = new stdClass ();
+                        $parts = explode("#", $line[1]);
+                        if (count($parts) < 2) continue;
+                        $settings->convert->columns = explode(",", $parts[0]);
+                        $settings->convert->rulesFrom = array();
+                        $settings->convert->rulesTo = array();
+                        for ($i = 1; $i < count($parts); $i++) {
+                            $a = explode("->", $parts[$i]);
+                            $a[1] = preg_replace("/\'/", "", $a[1]);
+                            array_push($settings->convert->rulesFrom, $a[0]);
+                            array_push($settings->convert->rulesTo, $a[1]);
+                        }
+                        break;
+                    }
+                default:
+                    {
+                        $matches = array();
+                        if (preg_match("/^CSV_COL(\d+)$/", $line[0], $matches) == 1) {
+                            $settings->csvColumns[--$matches[1]] = $line[1];
+                        } elseif (preg_match("/^DB_(.+)$/", $line[0], $matches) == 1) {
+                            $params = preg_split("/,/", $line[1]);
+                            $settings->dbFlds[$matches[1]] = $params[0];
+                            if (count($params) > 1 && $params[1] == "check") {
+                                $settings->checkForChange[$matches[1]] = $params[0];
+                            }
                         }
                     }
-                }
             }
         }
         return $settings;
@@ -221,6 +229,7 @@ class RbPriceImport extends RbObject
         $prd = new RbProducts ();
         $db = JFactory::getDBO();
         $query = $db->getQuery(true);
+        $line = 0;
         try {
             //читаем файл
             $lines = array();
@@ -239,13 +248,14 @@ class RbPriceImport extends RbObject
 
             //загружаем данные в таблицу
             for ($ln = 0; $ln < count($lines); $ln++) {
+                $line++;
                 if (is_int($settings->skipRows) && $settings->skipRows > 0 && $ln < $settings->skipRows) continue;
 
                 $columns = str_getcsv($lines[$ln], ";");
-                if (count($columns) != count($settings->csvColumns)) {
-                    //записать в лог
-                    continue;
-                }
+//                if (count($columns) != count($settings->csvColumns)) {
+//                    //записать в лог
+//                    continue;
+//                }
 
                 $buffer = array();
                 for ($i = 0; $i < count($settings->csvColumns); $i++) {
@@ -265,10 +275,16 @@ class RbPriceImport extends RbObject
                     }
                 }
 
+                $buffer['product_autocode'] = preg_replace(
+                    ['/[\s\\,\/]/', '/с/', '/б/', '/к/'],
+                    ['', 'S', 'B', 'K'],
+                    mb_strtolower($buffer[$settings->searchColumn])
+                );
                 $query->clear();
                 $query->select($prd->getFieldsForSelectClause());
                 $query->from($db->quoteName($prd->getTableName()));
-                $query->where("product_name='" . $buffer[$settings->searchColumn] . "'");
+                $query->where("product_name='" . $buffer[$settings->searchColumn] . "'", "OR");
+                $query->where("product_autocode='" . $buffer['product_autocode'] . "'");
                 $query->order($db->quoteName('price_name') . " DESC");
                 $db->setQuery($query);
                 $productFound = $db->loadAssoc();
@@ -302,7 +318,15 @@ class RbPriceImport extends RbObject
 
         } catch (Exception $e) {
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
+            die(json_encode(array('error' => array(
+                'message' => "Ошибка в строке $line. " . $e->getMessage(),
+                'code' => 1,
+            )), JSON_UNESCAPED_UNICODE));
         }
+        echo json_encode(array('success' => array(
+            'message' => "Обработано " . count($lines) . " строк",
+        )), JSON_UNESCAPED_UNICODE);
+
     }
 
     // =================================================================
@@ -320,12 +344,15 @@ class RbPriceImport extends RbObject
         $query->select($select);
         $query->from($db->quoteName($this->table_name));
         $db->setQuery($query);
+        $line = 0;
+        $lines = 0;
         try {
             $price = $db->loadAssocList();
             $input = JFactory::getApplication()->input;
             $settings = $this->readImportSettings(IMPORT_SETTINGS_FILE);
             if (empty($settings)) return;
             foreach ($price as &$p) {
+                $line++;
                 $p = (array)$p;
 
                 if (!($p ["productFoundId"] > 0)) {
@@ -333,16 +360,26 @@ class RbPriceImport extends RbObject
                 }
 
                 $pRef = $this->convertByRate($settings, $p);
-                $pRef["price_name"] = JFactory::getDate()->format('Ymd'); // https://php.net/manual/en/function.date.php
+                $pRef["price_name"] = $settings->priceName;
+                $pRef["updated"] = RbHelper::getCurrentTimeForDb();
                 $input->set("rbo_products", $pRef);
                 $prodRef = new RbProducts ($p ["productFoundId"]);
                 $prodRef->updateObject(false);
+                $lines++;
             }
             $result = $result && RbHelper::executeQuery("DELETE FROM " . $db->quoteName($this->table_name) . " WHERE productFoundId is not null");
 
         } catch (Exception $e) {
             JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
+            die(json_encode(array('error' => array(
+                'message' => "Ошибка в строке $line. " . $e->getMessage(),
+                'code' => 1,
+            )), JSON_UNESCAPED_UNICODE));
         }
+        echo json_encode(array('success' => array(
+            'message' => "Обработано " . count($lines) . " строк",
+        )), JSON_UNESCAPED_UNICODE);
+
     }
 
     // =================================================================
@@ -368,7 +405,8 @@ class RbPriceImport extends RbObject
         $settings = $this->readImportSettings(IMPORT_SETTINGS_FILE);
         if (empty($settings)) return;
         $pRef = $this->convertByRate($settings, (array)$p);
-        $pRef["price_name"] = JFactory::getDate()->format('Ymd'); // https://php.net/manual/en/function.date.php
+        $pRef["price_name"] = $settings->priceName;
+        $pRef["updated"] = RbHelper::getCurrentTimeForDb();
         $input->set("rbo_products", $pRef);
         if ($p ["productFoundId"] > 0) {
             $prodRef = new RbProducts ($p ["productFoundId"]);
@@ -620,7 +658,7 @@ class RbPriceImport extends RbObject
                 $productId = $productIdList[0]["productId"];
                 $productInStock = (integer)(trim($columns[$inStockCol]));
                 RbHelper::executeQuery("update #__rbo_products set product_in_stock=$productInStock where productId=$productId");
-                JLog::add("Установлен остаток для товара ($productName)=$productInStock" , JLog::INFO, 'com_rbo_iis');
+                JLog::add("Установлен остаток для товара ($productName)=$productInStock", JLog::INFO, 'com_rbo_iis');
             }
 
         } catch (Exception $e) {

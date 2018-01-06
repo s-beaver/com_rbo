@@ -154,25 +154,28 @@ PriceImport.prototype.attachProductModule = function () {
 //===================================================================================
 PriceImport.prototype.addProduct = function (id) {
     var self = this;
-    var idData = {
-        "importLineNumber": id
-    };
-    $.ajax({
-        url: comPath + "ajax.php?task=import_product_add",
-        dataType: 'json',
-        type: "POST",
-        data: idData,
-        success: function (p) {
-            if (!IsNull(p) && !IsNull(p.error)) {
-                alert("Статус: " + NullTo(p.error.code, "") + " Ошибка: " + NullTo(p.error.message, ""));
+    Ask("Добавить позицию в прайс?", "Да", "Нет", function () {
+        var idData = {
+            "importLineNumber": id
+        };
+        $.ajax({
+            url: comPath + "ajax.php?task=import_product_add",
+            dataType: 'json',
+            type: "POST",
+            data: idData,
+            success: function (p) {
+                if (!IsNull(p) && !IsNull(p.error)) {
+                    alert("Статус: " + NullTo(p.error.code, "") + " Ошибка: " + NullTo(p.error.message, ""));
+                }
+                self.oTableAPI.draw();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert("Статус: " + textStatus + " Ошибка: " + errorThrown);
+                self.oTableAPI.draw();
             }
-            self.oTableAPI.draw();
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            alert("Статус: " + textStatus + " Ошибка: " + errorThrown);
-            self.oTableAPI.draw();
-        }
-    });
+        });
+    }, null, "#dialog-confirm");
+
 };
 
 
@@ -269,7 +272,7 @@ PriceImport.prototype.openCSV = function () {
             processData: false,  // tell jQuery not to process the data
             contentType: false,  // tell jQuery not to set contentType
             success: function (p) {
-                if (typeof(p)=="string") {
+                if (typeof(p) == "string") {
                     p = JSON.parse(p);
                 }
                 $("#progressbar").hide();
@@ -324,7 +327,7 @@ PriceImport.prototype.openInStockCSV = function () {
             processData: false,
             contentType: false,
             success: function (p) {
-                if (typeof(p)=="string") {
+                if (typeof(p) == "string") {
                     p = JSON.parse(p);
                 }
                 $("#progressbar").hide();
