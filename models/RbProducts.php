@@ -241,7 +241,7 @@ class RbProducts extends RbObject
             $res->date = RbHelper::getCurrentTimeForDb();
             $res->products = $db->loadAssocList();
 
-            echo json_encode($res);
+//            echo json_encode($res);
         } catch (Exception $e) {
             $res->errorCode = 100;
             $res->errorMsg = $e->getMessage();
