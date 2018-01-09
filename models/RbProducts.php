@@ -233,6 +233,7 @@ class RbProducts extends RbObject
         $query->order($db->quoteName('rp.product_name'));
         //$query->where($db->quoteName('rp.product_type') . '=1');//пусть покажутся и услуги, если они неверно были оформлены
         $query->where($db->quoteName('rp.product_in_stock') . '!=0');
+        $query->where($db->quoteName('rp.product_type') . '=1');
 
         $res = new stdClass ();
         try {
