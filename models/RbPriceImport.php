@@ -620,8 +620,9 @@ class RbPriceImport extends RbObject
 // =================================================================
     public static function importInStockFromCSV($fileName)
     {
-        $nameCol = 0;
-        $inStockCol = 1;
+        $idCol = 0;
+        $nameCol = 1;
+        $inStockCol = 2;
 
         JLog::addLogger(
             array(
@@ -643,12 +644,15 @@ class RbPriceImport extends RbObject
                 $line++;
                 $columns = str_getcsv($lines[$ln], ";");
                 JLog::add("Строка $line =" . implode(",", $columns), JLog::INFO, 'com_rbo_iis');
-                if (empty($columns[$nameCol])) continue;
-                if (empty($columns[$inStockCol])) continue;
+                if ($columns[$idCol]=="") continue;
+                if ($columns[$nameCol]=="") continue;
+                if ($columns[$inStockCol]=="") continue;
+                $productId = trim($columns[$idCol]);
                 $productName = trim($columns[$nameCol]);
-                $productIdList = RbHelper::SQLGetAssocList("select productId from #__rbo_products where product_name='$productName'");
+//                $productIdList = RbHelper::SQLGetAssocList("select productId from #__rbo_products where product_name='$productName'");
+                $productIdList = RbHelper::SQLGetAssocList("select productId from #__rbo_products where productId=$productId");
                 if (empty($productIdList)) {
-                    JLog::add("Не удалось найти товар '$productName'", JLog::ERROR, 'com_rbo_iis');
+                    JLog::add("Строка $line. Не удалось найти товар '$productName'", JLog::ERROR, 'com_rbo_iis');
                     continue;
                 }
                 if (count($productIdList) > 1) {
@@ -658,7 +662,7 @@ class RbPriceImport extends RbObject
                 $productId = $productIdList[0]["productId"];
                 $productInStock = (integer)(trim($columns[$inStockCol]));
                 RbHelper::executeQuery("update #__rbo_products set product_in_stock=$productInStock where productId=$productId");
-                JLog::add("Установлен остаток для товара ($productName)=$productInStock", JLog::INFO, 'com_rbo_iis');
+                JLog::add("Строка $line. Установлен остаток для товара ($productName)=$productInStock", JLog::INFO, 'com_rbo_iis');
             }
 
         } catch (Exception $e) {
