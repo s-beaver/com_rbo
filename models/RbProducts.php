@@ -66,7 +66,7 @@ class RbProducts extends RbObject
             if ($invertUpdate) $signMove = -$signMove;
 
             parent::readObject();
-            if ($this->buffer->product_type = 1) return;
+            if ($this->buffer->product_type != 1) return;
             if (empty($this->buffer->product_in_stock)) $this->buffer->product_in_stock = 0;
             $this->buffer->product_in_stock = (integer)$this->buffer->product_in_stock + ((integer)$oper->product_cnt * $signMove);
             parent::updateObject();
