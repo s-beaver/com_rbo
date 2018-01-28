@@ -193,10 +193,13 @@ class RbDocs extends RbObject
             $this->buffer->modified_on = null;
             // $this->buffer->doc_type = $this->docType;//надо передавать через буфер
             if (empty($this->buffer->doc_num)) {
-                $newObj = $this->getNextDocNumber();
-                if ($newObj)
-                    $this->buffer->doc_num = $newObj->new_num;
-                else throw new RbException("Не удалось получить очередной номер документа", 100);//todo 100 - это значит номер надо уточнить
+                for ($i = 0; $i < 1000; $i++) {
+                    $newObj = $this->getNextDocNumber();
+                    if ($newObj)
+                        $this->buffer->doc_num = $newObj->new_num;
+                    else throw new RbException("Не удалось получить очередной номер документа", 100);//todo 100 - это значит номер надо уточнить
+                    if (!$this->duplicateExists($this->buffer->doc_num)) break;
+                }
             }
             if (empty($this->buffer->doc_date)) $this->buffer->doc_date = RbHelper::getCurrentTimeForDb();
 
@@ -212,9 +215,6 @@ class RbDocs extends RbObject
                 $this->buffer->custId = $cust->insertid;
             }
 
-            if ($this->duplicateExists($this->buffer->doc_num)) {
-                throw new RbException("Документ такого типа, с таким номером (" . $this->buffer->doc_num . ") в этом году уже существует", 30);
-            }
             parent::createObject();
 
             $docId = $this->insertid;
@@ -385,7 +385,7 @@ class RbDocs extends RbObject
             $rboCustTableName = RbHelper::getTableName("rbo_cust");
             $sSelect = "SELECT docId, doc_num, doc_date, pay_date, rc.cust_name doc_cust, doc_sum, doc_status, doc_firm, doc_manager, doc_rem ";
             $sRestOfQuery = " FROM " . $this->table_name . " rd LEFT JOIN " . $rboCustTableName . " rc ON rd.custId = rc.custId " .
-                $sWhere . " ORDER BY rd.docId DESC";
+                $sWhere . " ORDER BY rd.doc_date DESC, rd.docId DESC";
 
             if (isset ($iDisplayStart) && $iDisplayLength != '-1') {
                 $db->setQuery($sSelect . $sRestOfQuery, intval($iDisplayStart), intval($iDisplayLength));
@@ -437,30 +437,11 @@ class RbDocs extends RbObject
     public function getNextDocNumber()
     {
         $currentTime = new JDate ();
-        $year = $currentTime->format('Y', false);
-
-        try {
-            $db = JFactory::getDBO();
-            $query = $db->getQuery(true);
-            $query->select("MAX(doc_num)");
-            $query->from($this->table_name);
-            if (!RbConfig::$continuousNumbering) {
-                $query->where("doc_type='" . $this->buffer->doc_type . "'");
-            }
-            $query->where("DATE_FORMAT(doc_date,'%Y')=$year");
-            $query->where("doc_base IS NULL");
-            $db->setQuery($query);
-            $newNumber = $db->loadResult();
-            if (is_null($newNumber)) $newNumber = 0;
-            $res = new stdClass ();
-            $res->new_num = $newNumber + 1;
-            $res->new_date = $currentTime->format('d.m.Y', true);
-
-            return $res;
-        } catch (Exception $e) {
-            JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
-            throw $e;
-        }
+        $newNumber = RbHelper::getNextDocNumber($this->buffer->doc_type);
+        $res = new stdClass ();
+        $res->new_num = $newNumber;
+        $res->new_date = $currentTime->format('d.m.Y', true);
+        return $res;
     }
 
     /**

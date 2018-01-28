@@ -90,40 +90,94 @@ class RbHelper
 // =================================================================
     static function executeQuery($SQL)
     {
-        $db = JFactory::getDBO();
-        $db->setQuery($SQL);
-        $result = $db->execute();
-        return $result;
+        try {
+            $db = JFactory::getDBO();
+            $db->setQuery($SQL);
+            $result = $db->execute();
+            return $result;
+        } catch (Exception $e) {
+            throw new RbException($db->getQuery()." | ".$e->getMessage(), $e->getCode());
+        }
     }
 
 // =================================================================
     static function insertQuery($SQL)
     {
-        $db = JFactory::getDBO();
-        $db->setQuery($SQL);
-        $result = $db->execute();
-        if (!$result) return null;
-        return $db->insertid();
+        try {
+            $db = JFactory::getDBO();
+            $db->setQuery($SQL);
+            $result = $db->execute();
+            if (!$result) return null;
+            return $db->insertid();
+        } catch (Exception $e) {
+            throw new RbException($db->getQuery()." | ".$e->getMessage(), $e->getCode());
+        }
     }
 
 // =================================================================
     static function SQLGet($SQL)
     {
-        $db = JFactory::getDBO();
-        $db->setQuery($SQL);
-        $result = $db->execute();
-        if (!$result) return null;
-        return $db->loadResult();
+        try {
+            $db = JFactory::getDBO();
+            $db->setQuery($SQL);
+            $result = $db->execute();
+            if (!$result) return null;
+            return $db->loadResult();
+        } catch (Exception $e) {
+            throw new RbException($db->getQuery()." | ".$e->getMessage(), $e->getCode());
+        }
     }
 
 // =================================================================
     static function SQLGetAssocList($SQL)
     {
-        $db = JFactory::getDBO();
-        $db->setQuery($SQL);
-        $result = $db->execute();
-        if (!$result) return null;
-        return $db->loadAssocList();
+        try {
+            $db = JFactory::getDBO();
+            $db->setQuery($SQL);
+            $result = $db->execute();
+            if (!$result) return null;
+            return $db->loadAssocList();
+        } catch (Exception $e) {
+            throw new RbException($db->getQuery()." | ".$e->getMessage(), $e->getCode());
+        }
+    }
+
+// =================================================================
+    static function getNextDocNumber($doc_type)
+    {
+        $res = self::SQLGetAssocList(
+            "select docnum_num, docnum_date_prev, docnum_date_clear from #__rbo_doc_num where docnum_doc_type='$doc_type'")[0];
+        if (is_null($res)) {
+            self::insertQuery(
+                "insert into #__rbo_doc_num(
+                        docnum_doc_type, 
+                        docnum_num, 
+                        docnum_date_prev, 
+                        docnum_date_clear) values (
+                        '$doc_type',
+                        1,
+                        date(CONCAT(YEAR(NOW()),'-01-01')),
+                        date(CONCAT(YEAR(NOW())+1,'-01-01'))
+                      )");
+            return 1;
+        }
+
+        $currentTime = new JDate ("now", self::getTimezone());
+        if ($currentTime >= $res["docnum_date_prev"] && $currentTime < $res["docnum_date_clear"]) {
+            $next = $res["docnum_num"] + 1;
+            self::executeQuery("update #__rbo_doc_num set docnum_num=$next where docnum_doc_type='$doc_type'");
+            return $next;
+        } else {
+            self::executeQuery(
+                "update #__rbo_doc_num set 
+                        docnum_num=1,
+                        docnum_date_prev = date(CONCAT(YEAR(NOW()),'-01-01')), 
+                        docnum_date_clear = date(CONCAT(YEAR(NOW())+1,'-01-01')) 
+                        where docnum_doc_type='$doc_type'");
+            return 1;
+        }
+
+        return $res["docnum_num"] + 1;
     }
 
 }

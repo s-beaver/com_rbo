@@ -170,3 +170,18 @@ CREATE TABLE #__rbo_price_import (
   AVG_ROW_LENGTH = 247
   CHARACTER SET utf8
   COLLATE utf8_general_ci;
+
+CREATE TABLE #__rbo_doc_num (
+  docNumId int(11) NOT NULL AUTO_INCREMENT,
+  docnum_doc_type varchar(5) DEFAULT NULL,
+  docnum_num int(11) DEFAULT NULL,
+  docnum_date_clear date DEFAULT NULL,
+  docnum_fmt varchar(255) DEFAULT NULL,
+  docnum_date_prev date DEFAULT NULL,
+  docnum_calc_num_code varchar(255) DEFAULT NULL,
+PRIMARY KEY (docNumId),
+UNIQUE INDEX UK_j3_rbo_doc_num_docnum_doc_t (docnum_doc_type)
+)
+ENGINE = INNODB
+CHARACTER SET utf8
+COLLATE utf8_general_ci;
