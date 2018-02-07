@@ -144,7 +144,7 @@
     </tr>
     </thead>
     <tbody id="doc_products"></tbody>
-    <tfoot id="doc_products">
+    <tfoot id="doc_products_foot">
     <tr>
         <td colspan=3>Итого</td>
         <td id="doc_cnt_sum" style='text-align: center'>ххКвоИтогохх</td>

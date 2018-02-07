@@ -55,7 +55,7 @@ function fillInvoicePrintForm(i) {
     for (var x = 0; x < i.doc_products.length; x++) {
       sPr += "<tr>";
       sPr += "<td style='text-align: center'>" + (x + 1) + "</td>";// #
-      sPr += "<td style='text-align: left'>" + i.doc_products[x].product_name
+      sPr += "<td style='text-align: left'>" + i.doc_products[x].product_name + (i.doc_products[x].product_code?" ("+i.doc_products[x].product_code+")":"")
           + "</td>";
       sPr += "<td style='text-align: center'>" + i.doc_products[x].product_uom
           + "</td>";
