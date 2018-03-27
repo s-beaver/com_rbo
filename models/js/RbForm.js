@@ -138,6 +138,7 @@ function getPeopleList() {
 function getFirmList() {
     return {
         "ИП-бн": "ИП-бн",
+        "ИП-pos": "ИП-pos",
         "ИП-нал": "ИП-нал",
         "ООО": "ООО"
     };
