@@ -407,7 +407,8 @@ RbOper.prototype.setProductPrice = function () {
     $("#rbo_opers\\.product_price").val(self.arFoundProducts[oVal].product_price);
     $("#rbo_opers\\.product_code").val(self.arFoundProducts[oVal].product_code);
     $("#rbo_opers\\.product_cnt").val(1);
-    $("#prod_price1").html("Цена Опт.1= " + NullTo(self.arFoundProducts[oVal].product_price1, 0) + "р. Остаток на складе=" + NullTo(self.arFoundProducts[oVal].product_in_stock, 0));
+    $("#prod_price1").val(NullTo(self.arFoundProducts[oVal].product_price1, 0));
+    $("#product_in_stock").val(NullTo(self.arFoundProducts[oVal].product_in_stock, 0));
     this.calcSum();
 };
 

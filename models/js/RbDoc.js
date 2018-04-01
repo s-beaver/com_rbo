@@ -68,6 +68,11 @@ RbDoc.prototype.attachDocForm = function () {
             "data": "product_code",
             "width": "5%"
         }, {
+            "title": "Ост.",
+            "data": "product_in_stock",
+            "className": "center",
+            "width": "5%"
+        }, {
             "title": "Наименование",
             "data": "product_name"
         }, {

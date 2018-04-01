@@ -89,6 +89,7 @@ RboProduct.prototype.showProductForm = function (o) {
     $("#prod_price").val(o.pData.product_price);
     $("#prod_cnt").val(o.pData.product_cnt);
     $("#prod_sum").val(o.pData.oper_sum);
+    $("#product_in_stock").val(o.pData.product_in_stock);
 
     $("#product-form").dialog({
         title: "Позиция - " + NullTo(o.pData.product_code, ""),
@@ -118,6 +119,7 @@ RboProduct.prototype.showProductForm = function (o) {
                 } else {
                     p.product_name = $('#prod_name option:selected').text();
                 }
+                p.product_in_stock = "";
                 p.product_price = $("#prod_price").val();
                 p.product_cnt = $("#prod_cnt").val();
                 p.oper_sum = $("#prod_sum").val();
@@ -174,7 +176,8 @@ RboProduct.prototype.setProductPrice = function () {
     $("#prod_price").val(self.arFoundProducts[oVal].product_price);
     $("#prod_code").val(self.arFoundProducts[oVal].product_code);
     $("#prod_cnt").val(1);
-    $("#prod_price1").html("Цена Опт.1= " + NullTo(self.arFoundProducts[oVal].product_price1, 0) + "р. Остаток на складе=" + NullTo(self.arFoundProducts[oVal].product_in_stock, 0));
+    $("#prod_price1").val(NullTo(self.arFoundProducts[oVal].product_price1, 0));
+    $("#product_in_stock").val(NullTo(self.arFoundProducts[oVal].product_in_stock, 0));
     this.calcSum();
 };
 

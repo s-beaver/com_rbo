@@ -70,7 +70,7 @@ class RbDocs extends RbObject
 
             $prod = new RbDocsProducts ($this->keyValue);
             $prod->readObject();
-            $this->buffer->doc_products = $prod->buffer;
+            $this->buffer->doc_products = $this->addInStockData($prod->buffer);
 
             if ($custId > 0) {
                 $cust = new RbCust ($custId);
@@ -520,6 +520,40 @@ class RbDocs extends RbObject
         $s .= " Покупатель:" . $buffer->doc_cust->cust_name;
 
         return $s;
+    }
+
+    function addInStockData($products)
+    {
+        if (is_null($products)) return $products;
+        $pIDs = array();
+        foreach ($products as $p) {
+            array_push($pIDs, $p->productId);
+        }
+
+        $db = JFactory::getDBO();
+        try {
+            $prodRef = new RbProducts ();
+            $query = $db->getQuery(true);
+            $query->select(array("productId", "product_in_stock"));
+            $query->from($db->quoteName($prodRef->table_name));
+            $query->where("productId in (" . join(",", $pIDs) . ")");
+            $query->where("product_in_stock!=0");
+            $db->setQuery($query);
+            $inStockData = $db->loadAssocList();
+            foreach ($products as &$p) {
+                $p->product_in_stock = "-";
+                if ($inStockData)
+                    foreach ($inStockData as &$v) {
+                        if ($v['productId'] == $p->productId) {
+                            $p->product_in_stock = $v["product_in_stock"];
+                            break;
+                        }
+                    }
+            }
+        } catch (Exception $e) {
+            JLog::add(get_class() . ":" . $e->getMessage(), JLog::ERROR, 'com_rbo');
+        }
+        return $products;
     }
 }
 
